@@ -1,4 +1,4 @@
 Gjackctl
 ========
 
-JACK gtk based frontend. 
+Gtk3 based frontend for JACK. 
