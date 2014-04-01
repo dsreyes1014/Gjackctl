@@ -34,7 +34,7 @@ main (int argc, char *argv[])
 
 	gtk_widget_set_size_request (frame, 350, 120);
 	gtk_widget_set_halign (frame, GTK_ALIGN_BASELINE);
-	gdk_rgba_parse (&color, "black");
+	gdk_rgba_parse (&color, "255,255,255,0.5");
 	gtk_widget_override_background_color (frame,
 											GTK_STATE_FLAG_NORMAL,
 											&color);
