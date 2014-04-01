@@ -20,6 +20,7 @@ main (int argc, char *argv[])
 
 	/* Initialize here */
 
+	app = gtk_application_new ("g.jack.ctl", G_APPLICATION_FLAGS_NONE);
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
 	g_signal_connect (window, "destroy", G_CALLBACK (close_window), NULL);
