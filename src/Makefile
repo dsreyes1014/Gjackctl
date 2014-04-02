@@ -9,3 +9,6 @@ $(PROGRAM):$(OBJECTS)
 	$(CC) $(OBJECTS) -o $(PROGRAM) $(LINK)
 main.o:main.c
 	$(CC) $(CFLAGS) main.c  
+
+clean:
+	rm -v *~ *.o $(PROGRAM)
