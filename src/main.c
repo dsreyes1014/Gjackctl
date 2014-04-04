@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 
 #include "server_switch.h"
+#include "rt_box.h"
 
 
 static void
@@ -10,9 +11,10 @@ run_app (GApplication *app, gpointer data)
 	GtkWidget *box;
 
 	window = gtk_application_window_new (GTK_APPLICATION (app));
-	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 3);
 
 	server_switch (box);
+	rt_box (box);
 
 	gtk_container_add (GTK_CONTAINER (window), box);	
 
