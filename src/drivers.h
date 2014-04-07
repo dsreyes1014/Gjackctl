@@ -5,6 +5,9 @@ void
 drivers (GtkWidget *box);
 
 void
-activate_popover (GtkToggleButton *button, gpointer data);
+activate_popover (GtkWidget *button, gpointer data);
+
+void
+alsa_sel (GtkMenuItem *item, gpointer data);
 
 #endif
