@@ -38,12 +38,13 @@ rt_box (GtkWidget *box)
 	check = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (checkbox));
 	gtk_toggle_button_set_mode (GTK_TOGGLE_BUTTON (checkbox), TRUE);	
 
-	gtk_container_add (GTK_CONTAINER (vbox), label);
-	gtk_container_add (GTK_CONTAINER (vbox), checkbox);
-	gtk_container_add (GTK_CONTAINER (box), vbox);
+	gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 6);
+	gtk_box_pack_start (GTK_BOX (vbox), checkbox, FALSE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (box), vbox, FALSE, FALSE, 4);
 
 	g_signal_connect (checkbox, "toggled", G_CALLBACK (real_time), NULL);	
 
+	/* Initiate tooltip for checkbox here or else it won't show when app first starts. */
 	if (check == TRUE)
 	{
 		gtk_widget_set_tooltip_text (checkbox, "Disable Realtime Audio");		

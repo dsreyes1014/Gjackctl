@@ -6,6 +6,7 @@
 #include "rt_box.h"
 #include "drivers.h"
 
+/* Declared in rt_box.c */
 extern GtkWidget *checkbox;
 
 /* 'switch_pos' will start JACK when switched on and terminate it when switched off. */
@@ -15,6 +16,8 @@ switch_pos (GtkSwitch *sw, gpointer data)
 	gboolean check;
 	gboolean spawn;
 	gchar *jack_args[10];
+
+	/* Declared with static or else 'pid' will reset to 0 in the else command */
 	static GPid pid;
 		
 	check = gtk_switch_get_active (sw);
@@ -81,14 +84,14 @@ server_switch (GtkWidget *box)
 	label = gtk_label_new ("JACK");
 	check = gtk_switch_get_active (GTK_SWITCH (jack_switch));
 
-	gtk_container_add (GTK_CONTAINER (vbox), label);
-	gtk_container_add (GTK_CONTAINER (vbox), jack_switch);
+	gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, TRUE, 6);
+	gtk_box_pack_start (GTK_BOX (vbox), jack_switch, FALSE, TRUE, 0);
 	drivers (vbox);
-	gtk_container_add (GTK_CONTAINER (box), vbox);
+	gtk_box_pack_start (GTK_BOX (box), vbox, FALSE, FALSE, 2);
 
 	g_signal_connect (jack_switch, "notify::active", G_CALLBACK (switch_pos), jack_switch);
 
-	/* Starts a tooltip for the switch here because it doesn't show when starting app */
+	/* Initiate tooltip for 'jack_switch' here or else it won't show when app first starts. */
 	if (check == TRUE)
 	{
 		gtk_widget_set_tooltip_text (GTK_WIDGET (jack_switch) , "Shutdown Server");

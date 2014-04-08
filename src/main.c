@@ -11,13 +11,13 @@ run_app (GApplication *app, gpointer data)
 	GtkWidget *box;
 
 	window = gtk_application_window_new (GTK_APPLICATION (app));
-	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 18);
 
 	server_switch (box);
 	rt_box (box);
 
 	gtk_widget_set_size_request (window, 500, 250);
-	gtk_application_window_set_show_menubar (GTK_APPLICATION_WINDOW (window), TRUE);
+	gtk_window_set_title (GTK_WINDOW (window), "GJackCtl");
 
 	gtk_container_add (GTK_CONTAINER (window), box);	
 
