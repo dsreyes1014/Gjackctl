@@ -5,12 +5,13 @@
 #include "driver_alsa_names.h"
 #include "drivers.h"
 
+GMenu *submenu;
+
 /* Fetch ALSA device names for menu selection */
-int
-driver_alsa_names (GMenu *submenu)
+void
+driver_alsa_names ()
 //main ()
 {
-	//GMenu *submenu;
 	gint err;	
 	gint card;
 	gint count;
@@ -24,6 +25,7 @@ driver_alsa_names (GMenu *submenu)
 	snd_ctl_card_info_t *info;
 
 	card = -1;
+	submenu = g_menu_new ();
 		
 	/* First loop to obtain count of available cards */
 	for (;;)
@@ -34,7 +36,7 @@ driver_alsa_names (GMenu *submenu)
 		{				
 			g_print ("%s.\n", snd_strerror (err));
 		
-			return -1;
+			break;
 		}
 		
 		/* If 'card' reaches '-1' after finding devices, there
@@ -63,7 +65,7 @@ driver_alsa_names (GMenu *submenu)
 		{				
 			g_print ("%s.\n", snd_strerror (err));
 		
-			return -1;
+			break;
 		}
 		
 		/* If 'card' reaches '-1' after finding devices, there
@@ -83,14 +85,14 @@ driver_alsa_names (GMenu *submenu)
 		{
 			g_print ("%s.\n", snd_strerror (err));
 
-			return -1;
+			break;
 		}
 
 		if ((err = snd_ctl_card_info_malloc (&info)) < 0)
 		{
 			g_print ("%s.\n", snd_strerror (err));
 
-			return -1;
+			break;
 		}
 
 		//g_print ("%s\n", device);  /* debug */
@@ -100,7 +102,7 @@ driver_alsa_names (GMenu *submenu)
 		{
 			g_print ("%s.\n", snd_strerror (err));
 
-			return -1;
+			break;
 		}
 
 		/* Card hardware info extracted from 'info'. */
@@ -187,6 +189,4 @@ driver_alsa_names (GMenu *submenu)
 			g_menu_insert_item (submenu, 6, item7);
 		}
 	}	
-
-	return 0;
 }

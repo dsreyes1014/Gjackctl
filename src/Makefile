@@ -14,7 +14,7 @@ server_switch.o: server_switch.c rt_box.h drivers.h
 	$(CC) $(CFLAGS) server_switch.c 
 rt_box.o: rt_box.c 
 	$(CC) $(CFLAGS) rt_box.c
-drivers.o: drivers.c 
+drivers.o: drivers.c driver_alsa_names.h
 	$(CC) $(CFLAGS) drivers.c
 driver_alsa_names.o: driver_alsa_names.c drivers.h
 	$(CC) $(CFLAGS) driver_alsa_names.c
