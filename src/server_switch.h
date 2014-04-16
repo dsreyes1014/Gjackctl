@@ -6,10 +6,10 @@
 void 
 server_switch (GtkWidget *box);
 
-gboolean
-switch_pos (GtkSwitch *sw, gpointer data);
+void
+switch_pos_cb (GtkSwitch *sw, gpointer data);
 
 gchar 
-*rt_status();
+*rt_arg ();
 
 #endif

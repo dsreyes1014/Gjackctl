@@ -3,7 +3,6 @@
 #include "server_switch.h"
 #include "rt_box.h"
 
-
 static void
 run_app (GApplication *app, gpointer data)
 {

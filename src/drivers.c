@@ -3,10 +3,11 @@
 #include "drivers.h"
 #include "driver_alsa_names.h"
 
+/* Declared in `driver_alsa_names.c` */
 extern GMenu *submenu;
 
 void
-activate_popover (GtkWidget *button, gpointer data)
+activate_popover_cb (GtkWidget *button, gpointer data)
 {
 	GtkWidget *popover;
 	GMenu *menu;  
@@ -20,20 +21,21 @@ activate_popover (GtkWidget *button, gpointer data)
 	//color.blue = 0.0; 
 	//color.alpha = 0.4;
 
-	/* 'menu' is the main menu which is a subclass of 'GMenuModel'. All 'GMenus' are. */
+	/* `menu` is the main menu which is a subclass of `GMenuModel`. All `GMenus` are. */
 	menu = g_menu_new ();	
 	section = g_menu_new ();	
 	item1 = g_menu_item_new ("firewire", NULL);
 	item2 = g_menu_item_new ("test", NULL);
+
 	driver_alsa_names ();	
 		
-	/* Creates a submenu from an item in 'section'. */
+	/* Creates a submenu from an item in `section`. */
 	g_menu_insert_submenu (section, 0, "ALSA", G_MENU_MODEL (submenu));
 
 	g_menu_insert_item (section, 1, item1);
 	g_menu_insert_item (section, 2, item2);
 	
-	/* Creates the first section of 'menu' which labels drivers */
+	/* Creates the first section of `menu` which labels drivers */
 	g_menu_insert_section (menu, 0, "Driver", G_MENU_MODEL (section));
 
 	popover = gtk_popover_new_from_model (button, G_MENU_MODEL (section));	
@@ -55,7 +57,7 @@ drivers (GtkWidget *box)
 	
 	label = gtk_label_new ("Driver");
 	label2 = gtk_label_new (NULL);	
-	button = gtk_toggle_button_new ();	
+	button = gtk_button_new ();	
 		
 	gtk_widget_set_tooltip_text (button , "Choose Driver");
 
@@ -63,7 +65,7 @@ drivers (GtkWidget *box)
 	gtk_container_add (GTK_CONTAINER (button), label2);
 	gtk_box_pack_start (GTK_BOX (box), button, FALSE, TRUE, 0);
 
-	g_signal_connect (button, "toggled", G_CALLBACK (activate_popover), NULL);
+	g_signal_connect (button, "clicked", G_CALLBACK (activate_popover_cb), NULL);
 }
 
 

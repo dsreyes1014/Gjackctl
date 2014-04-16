@@ -44,7 +44,7 @@ rt_box (GtkWidget *box)
 
 	g_signal_connect (checkbox, "toggled", G_CALLBACK (real_time), NULL);	
 
-	/* Initiate tooltip for checkbox here or else it won't show when app first starts. */
+	/* Initiate tooltip for `checkbox` here or else it won't show when app first starts. */
 	if (check == TRUE)
 	{
 		gtk_widget_set_tooltip_text (checkbox, "Disable Realtime Audio");		

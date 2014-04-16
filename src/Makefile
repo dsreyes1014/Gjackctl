@@ -10,7 +10,7 @@ $(PROGRAM):$(OBJECTS)
 	$(CC) $(OBJECTS) $(LINK) -o $(PROGRAM)
 main.o:main.c $(HEADERS)
 	$(CC) $(CFLAGS) main.c 
-server_switch.o: server_switch.c rt_box.h drivers.h
+server_switch.o: server_switch.c rt_box.h drivers.h driver_alsa_names.h
 	$(CC) $(CFLAGS) server_switch.c 
 rt_box.o: rt_box.c 
 	$(CC) $(CFLAGS) rt_box.c

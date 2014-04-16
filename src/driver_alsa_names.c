@@ -10,14 +10,14 @@ GMenu *submenu;
 /* Fetch ALSA device names for menu selection */
 void
 driver_alsa_names ()
-//main ()
 {
+	
 	gint err;	
 	gint card;
 	gint count;
 	gint card_number;
 	
-	/* Initialize 'count' to be used by 'names[*][32]' correctly */
+	/* Initialize `count` to be used by 'names[*][32]' correctly */
 	count = 0;	
 
 	gchar names[count][50];	
@@ -26,12 +26,13 @@ driver_alsa_names ()
 
 	card = -1;
 	submenu = g_menu_new ();
+	
 		
 	/* First loop to obtain count of available cards */
 	for (;;)
 	{			
-		/* Scans a list of alsa devices. With 'card' 
-			at '-1' it will search for the first device. */ 
+		/* Scans a list of alsa devices. With `card` 
+			at `-1` it will search for the first device. */ 
 		if ((err = snd_card_next (&card)) < 0)
 		{				
 			g_print ("%s.\n", snd_strerror (err));
@@ -39,7 +40,7 @@ driver_alsa_names ()
 			break;
 		}
 		
-		/* If 'card' reaches '-1' after finding devices, there
+		/* If `card` reaches `-1` after finding devices, there
 			are no more devices. */
 		if (card < 0)
 		{
@@ -59,8 +60,8 @@ driver_alsa_names ()
 		gchar card_name[32]; 
 		gchar card_id[32];	
 				
-		/* Scans a list of alsa devices. With 'card' 
-			at '-1' it will search for the first device. */ 
+		/* Scans a list of alsa devices. With `card` 
+			at `-1` it will search for the first device. */ 
 		if ((err = snd_card_next (&card)) < 0)
 		{				
 			g_print ("%s.\n", snd_strerror (err));
@@ -68,7 +69,7 @@ driver_alsa_names ()
 			break;
 		}
 		
-		/* If 'card' reaches '-1' after finding devices, there
+		/* If `card` reaches `-1` after finding devices, there
 			are no more devices. */
 		if (card < 0)
 		{
@@ -77,7 +78,7 @@ driver_alsa_names ()
 			break;
 		}
 
-		/* Setup 'device' with proper syntax needed by other functions. */
+		/* Setup `device` with proper syntax needed by other functions. */
 		sprintf (device, "hw:%d", card);
 
 		/* Open device to probe for hardware info here */		
@@ -88,6 +89,7 @@ driver_alsa_names ()
 			break;
 		}
 
+		/* This initializes `info` allocates space in memory for it. */
 		if ((err = snd_ctl_card_info_malloc (&info)) < 0)
 		{
 			g_print ("%s.\n", snd_strerror (err));
@@ -105,20 +107,20 @@ driver_alsa_names ()
 			break;
 		}
 
-		/* Card hardware info extracted from 'info'. */
+		/* Card hardware info extracted from `info`. */
 		sprintf (card_id, "%s", snd_ctl_card_info_get_id (info));
 		sprintf (card_name, "%s", snd_ctl_card_info_get_name (info));
 		card_number = snd_ctl_card_info_get_card (info);
 	
+		/* Close `handle` and free space in memory used by `info`. */
 		snd_ctl_close (handle);
 		snd_ctl_card_info_clear (info);
 		snd_ctl_card_info_free (info);
 
 		sprintf (names[card], "%s", card_name);
 		g_print ("%s\n", names[card]);
-		//dev_names (count, card, card_id, card_name);	
 		
-		/* Pack 'submenu' with alsa names. */
+		/* Pack `submenu` with alsa names. */
 		if (card == 0)
 		{
 			gchar item_name[50];

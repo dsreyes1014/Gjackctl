@@ -5,6 +5,6 @@ void
 drivers (GtkWidget *box);
 
 void
-activate_popover (GtkWidget *button, gpointer data);
+activate_popover_cb (GtkWidget *button, gpointer data);
 
 #endif
