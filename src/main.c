@@ -4,6 +4,7 @@
 #include "rt_box.h"
 #include "driver_alsa_names.h"
 
+/* Callback `alsa_driver_activate` is defined in `driver_alsa_names.c` */
 const GActionEntry entries[] =
 	{
 		{"alsa_driver", alsa_driver_activate, "s"}
