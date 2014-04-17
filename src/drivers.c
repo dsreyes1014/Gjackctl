@@ -38,7 +38,7 @@ activate_popover_cb (GtkWidget *button, gpointer data)
 	/* Creates the first section of `menu` which labels drivers */
 	g_menu_insert_section (menu, 0, "Driver", G_MENU_MODEL (section));
 
-	popover = gtk_popover_new_from_model (button, G_MENU_MODEL (section));	
+	popover = gtk_popover_new_from_model (button, G_MENU_MODEL (menu));	
 
 	gtk_popover_set_modal (GTK_POPOVER (popover), TRUE);
 	gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_RIGHT);

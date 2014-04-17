@@ -88,7 +88,7 @@ server_switch (GtkWidget *box)
 	gtk_box_pack_start (GTK_BOX (box), vbox, FALSE, FALSE, 2);
 
 	/* Signal that works here for the `GtkSwitch` is `notify::active` which is a
-		different convention used for other widget's signals. */
+		different convention used for other widget's signals that I've used. */
 	g_signal_connect (jack_switch, "notify::active", G_CALLBACK (switch_pos_cb), jack_switch);
 
 	/* Initiate tooltip for `jack_switch` here or else it won't show when app first starts. */

@@ -2,15 +2,23 @@
 
 #include "server_switch.h"
 #include "rt_box.h"
+#include "driver_alsa_names.h"
 
-static void
+const GActionEntry entries[] =
+	{
+		{"alsa_driver", alsa_driver_activate, "s"}
+	};	
+
+void
 run_app (GApplication *app, gpointer data)
 {
 	GtkWidget *window;
 	GtkWidget *box;
 
 	window = gtk_application_window_new (GTK_APPLICATION (app));
-	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 18);
+	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 18); 	
+
+	g_action_map_add_action_entries (G_ACTION_MAP (app), entries, G_N_ELEMENTS (entries), app);
 
 	server_switch (box);
 	rt_box (box);

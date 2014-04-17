@@ -4,4 +4,9 @@
 void
 driver_alsa_names ();
 
+void
+alsa_driver_activate (GSimpleAction *action,
+							GVariant *parameter,
+							gpointer data);
+
 #endif
