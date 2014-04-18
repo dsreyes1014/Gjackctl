@@ -2,12 +2,12 @@
 
 #include "server_switch.h"
 #include "rt_box.h"
-#include "driver_alsa_names.h"
+#include "alsa_device_names.h"
 
 /* Callback `alsa_driver_activate` is defined in `driver_alsa_names.c` */
 const GActionEntry entries[] =
 	{
-		{"alsa_driver", alsa_driver_activate, "s"}
+		{"print_alsa_driver", print_alsa_driver_activate, "s"}
 	};	
 
 void

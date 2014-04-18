@@ -3,17 +3,21 @@
 #include <stdio.h>
 
 #include "server_switch.h"
-#include "driver_alsa_names.h"
+#include "alsa_device_names.h"
 #include "rt_box.h"
 #include "drivers.h"
 
 /* Declared in `rt_box.c`. */
 extern GtkWidget *checkbox;
 
+/* Declared in `alsa_device_names.c`. */
+extern gchar alsa_arg1[];
+extern gchar alsa_arg2[];
+
 /* `rt_status` checks the status of `checkbox` which is declared globally 
 	in `rt_box.c` and returns a gchar used for a jackd argument. */
-gchar
-*rt_arg ()
+gchar *
+rt_arg ()
 {
 	gchar *arg;	
 
@@ -40,7 +44,6 @@ void
 switch_pos_cb (GtkSwitch *sw, gpointer data)
 {	
 	gboolean check;
-	gboolean spawn;
 	gchar *jack_args[10];
 
 	/* Declared with static or else `pid` will reset to 0 in the else command. */
@@ -50,22 +53,21 @@ switch_pos_cb (GtkSwitch *sw, gpointer data)
 	jack_args[0] = "jackd";
 	jack_args[1] = rt_arg ();
 	jack_args[2] = "-P75";
-	jack_args[3] = "-dalsa";
-	jack_args[4] = NULL;
+	jack_args[3] = alsa_arg1;
+	jack_args[4] = alsa_arg2;
+	jack_args[5] = NULL;
 
 	if (check == TRUE)
 	{	
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw) , "Shutdown Server");
 
-		spawn = g_spawn_async (NULL, jack_args, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, &pid, NULL);
+		g_spawn_async (NULL, jack_args, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, &pid, NULL);
 	}
 	else
 	{	
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw) , "Start Server");
 	
-		kill (pid, SIGTERM);	
-		
-		spawn = FALSE;	
+		kill (pid, SIGTERM);		
 	}
 }
 

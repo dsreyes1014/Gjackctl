@@ -2,22 +2,29 @@
 #include <gtk/gtk.h>
 #include <alsa/asoundlib.h>
 
-#include "driver_alsa_names.h"
+#include "alsa_device_names.h"
 #include "drivers.h"
+#include "server_switch.h"
 
 GMenu *submenu;
+gchar alsa_arg1[20];
+gchar alsa_arg2[20];
 
 void
-alsa_driver_activate (GSimpleAction *action,
+print_alsa_driver_activate (GSimpleAction *action,
 							GVariant *parameter,
 							gpointer data)
 {
+	/* Arguments for JACK server. */
+	sprintf (alsa_arg1, "-dalsa");
+	sprintf (alsa_arg2, "-dhw:%s", g_variant_get_string (parameter, NULL));
+
 	g_print("%s\n", g_variant_get_string (parameter, NULL));
 }
 
 /* Fetch ALSA device names for menu selection */
 void
-driver_alsa_names ()
+alsa_device_names ()
 {
 	
 	gint err;	
@@ -50,11 +57,7 @@ driver_alsa_names ()
 		/* If `card` reaches `-1` after finding devices, there
 			are no more devices. */
 		if (card < 0)
-		{
-			g_print ("\nNo more sound cards.\n\n");
-
-			g_print ("%d\n\n", count);
-	
+		{	
 			break;
 		}
 			
@@ -79,9 +82,7 @@ driver_alsa_names ()
 		/* If `card` reaches `-1` after finding devices, there
 			are no more devices. */
 		if (card < 0)
-		{
-			g_print ("\nNo more sound cards.\n\n");
-	
+		{	
 			break;
 		}
 
@@ -103,8 +104,6 @@ driver_alsa_names ()
 
 			break;
 		}
-
-		//g_print ("%s\n", device);  /* debug */
 
 		/* Get hardware info after opening device */
 		if ((err = snd_ctl_card_info (handle, info)) != 0)
@@ -132,7 +131,7 @@ driver_alsa_names ()
 
 			id = g_variant_new_string (card_id);
 			item1 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item1, "app.alsa_driver", id);
+			g_menu_item_set_action_and_target_value (item1, "app.print_alsa_driver", id);
 			g_menu_insert_item (submenu, 0, item1);	
 		}
 	
@@ -143,7 +142,7 @@ driver_alsa_names ()
 
 			id = g_variant_new_string (card_id);
 			item2 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item2, "app.alsa_driver", id);
+			g_menu_item_set_action_and_target_value (item2, "app.print_alsa_driver", id);
 			g_menu_insert_item (submenu, 1, item2);
 		}
 
@@ -154,7 +153,7 @@ driver_alsa_names ()
 
 			id = g_variant_new_string (card_id);
 			item3 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item3, "app.alsa_driver", id);
+			g_menu_item_set_action_and_target_value (item3, "app.print_alsa_driver", id);
 			g_menu_insert_item (submenu, 2, item3);
 		}
 
@@ -165,7 +164,7 @@ driver_alsa_names ()
 
 			id = g_variant_new_string (card_id);
 			item4 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item4, "app.alsa_driver", id);
+			g_menu_item_set_action_and_target_value (item4, "app.print_alsa_driver", id);
 			g_menu_insert_item (submenu, 3, item4);
 		}
 
@@ -176,7 +175,7 @@ driver_alsa_names ()
 
 			id = g_variant_new_string (card_id);
 			item5 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item5, "app.alsa_driver", id);
+			g_menu_item_set_action_and_target_value (item5, "app.print_alsa_driver", id);
 			g_menu_insert_item (submenu, 4, item5);
 		}
 
@@ -187,7 +186,7 @@ driver_alsa_names ()
 
 			id = g_variant_new_string (card_id);
 			item6 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item6, "app.alsa_driver", id);
+			g_menu_item_set_action_and_target_value (item6, "app.print_alsa_driver", id);
 			g_menu_insert_item (submenu, 5, item6);
 		}
 
@@ -198,7 +197,7 @@ driver_alsa_names ()
 
 			id = g_variant_new_string (card_id);
 			item7 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item7, "app.alsa_driver", id);
+			g_menu_item_set_action_and_target_value (item7, "app.print_alsa_driver", id);
 			g_menu_insert_item (submenu, 6, item7);
 		}
 	}	

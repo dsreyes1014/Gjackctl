@@ -1,7 +1,7 @@
 #include <gtk/gtk.h>
 
 #include "drivers.h"
-#include "driver_alsa_names.h"
+#include "alsa_device_names.h"
 
 /* Declared in `driver_alsa_names.c` */
 extern GMenu *submenu;
@@ -27,7 +27,7 @@ activate_popover_cb (GtkWidget *button, gpointer data)
 	item1 = g_menu_item_new ("firewire", NULL);
 	item2 = g_menu_item_new ("test", NULL);
 
-	driver_alsa_names ();	
+	alsa_device_names ();	
 		
 	/* Creates a submenu from an item in `section`. */
 	g_menu_insert_submenu (section, 0, "ALSA", G_MENU_MODEL (submenu));
