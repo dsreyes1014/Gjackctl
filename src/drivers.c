@@ -3,9 +3,10 @@
 #include "drivers.h"
 #include "alsa_device_names.h"
 
+GtkWidget *label2;
+
 /* Declared in `alsa_device_names.c` */
 extern GMenu *submenu;
-GtkWidget *label2;
 
 void
 activate_popover_cb (GtkWidget *button, gpointer data)
