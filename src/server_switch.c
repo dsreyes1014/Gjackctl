@@ -7,37 +7,9 @@
 #include "rt_box.h"
 #include "drivers.h"
 
-/* Declared in `rt_box.c`. */
-extern GtkWidget *checkbox;
 
-/* Declared in `alsa_device_names.c`. */
-extern gchar alsa_arg1[];
-extern gchar alsa_arg2[];
-
-/* `rt_status` checks the status of `checkbox` which is declared globally 
-	in `rt_box.c` and returns a gchar used for a jackd argument. */
-gchar *
-rt_arg ()
-{
-	gchar *arg;	
-
-	gboolean check;
-
-	check = real_time (GTK_TOGGLE_BUTTON (checkbox), NULL);
-
-	if (check == TRUE)
-	{
-		arg = "-R";
-
-		return arg;
-	}
-	else
-	{
-		arg = "-r";
-
-		return arg;
-	}
-}
+gchar driver_arg1[20];
+gchar driver_arg2[20];
 
 /* `switch_pos` will start JACK when switched on and terminate it when switched off. */
 void
@@ -53,8 +25,8 @@ switch_pos_cb (GtkSwitch *sw, gpointer data)
 	jack_args[0] = "jackd";
 	jack_args[1] = rt_arg ();
 	jack_args[2] = "-P75";
-	jack_args[3] = alsa_arg1;
-	jack_args[4] = alsa_arg2;
+	jack_args[3] = driver_arg1;
+	jack_args[4] = driver_arg2;
 	jack_args[5] = NULL;
 
 	if (check == TRUE)
@@ -74,8 +46,8 @@ switch_pos_cb (GtkSwitch *sw, gpointer data)
 void 
 server_switch (GtkWidget *box)
 {
-	GtkWidget *jack_switch;
-	GtkWidget *vbox;	
+	GtkWidget *jack_switch;	
+	GtkWidget *vbox;
 	GtkWidget *label;
 	gboolean check;	
 	

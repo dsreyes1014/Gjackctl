@@ -7,17 +7,34 @@
 #include "server_switch.h"
 
 GMenu *submenu;
-gchar alsa_arg1[20];
-gchar alsa_arg2[20];
+
+/* Declared in `server_switch.c`. */
+extern gchar driver_arg1[];
+extern gchar driver_arg2[];
+
+/* Declared in `drivers.c`. */
+extern GtkWidget *label2;
+
+/* Declared in the `main.c`. */
+extern GtkWidget *box;
 
 void
 print_alsa_driver_activate (GSimpleAction *action,
 							GVariant *parameter,
 							gpointer data)
 {
+	gchar device_hint[20];	
+
 	/* Arguments for JACK server. */
-	sprintf (alsa_arg1, "-dalsa");
-	sprintf (alsa_arg2, "-dhw:%s", g_variant_get_string (parameter, NULL));
+	sprintf (driver_arg1, "-dalsa");
+	sprintf (driver_arg2, "-dhw:%s", g_variant_get_string (parameter, NULL));
+	
+	/* For tooltip */
+	sprintf (device_hint, "hw:%s", g_variant_get_string (parameter, NULL));
+
+	gtk_label_set_text (GTK_LABEL (label2), "ALSA");
+
+	gtk_widget_set_tooltip_text (label2, device_hint);
 
 	g_print("%s\n", g_variant_get_string (parameter, NULL));
 }
@@ -26,7 +43,6 @@ print_alsa_driver_activate (GSimpleAction *action,
 void
 alsa_device_names ()
 {
-	
 	gint err;	
 	gint card;
 	gint count;

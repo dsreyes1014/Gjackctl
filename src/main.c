@@ -4,7 +4,7 @@
 #include "rt_box.h"
 #include "alsa_device_names.h"
 
-/* Callback `alsa_driver_activate` is defined in `driver_alsa_names.c` */
+/* Callback `print_alsa_driver_activate` is defined in `alsa_device_names.c` */
 const GActionEntry entries[] =
 	{
 		{"print_alsa_driver", print_alsa_driver_activate, "s"}
@@ -15,7 +15,7 @@ run_app (GApplication *app, gpointer data)
 {
 	GtkWidget *window;
 	GtkWidget *box;
-
+	
 	window = gtk_application_window_new (GTK_APPLICATION (app));
 	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 18); 	
 

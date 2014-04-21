@@ -3,8 +3,9 @@
 #include "drivers.h"
 #include "alsa_device_names.h"
 
-/* Declared in `driver_alsa_names.c` */
+/* Declared in `alsa_device_names.c` */
 extern GMenu *submenu;
+GtkWidget *label2;
 
 void
 activate_popover_cb (GtkWidget *button, gpointer data)
@@ -27,7 +28,7 @@ activate_popover_cb (GtkWidget *button, gpointer data)
 	item1 = g_menu_item_new ("firewire", NULL);
 	item2 = g_menu_item_new ("test", NULL);
 
-	alsa_device_names ();	
+	alsa_device_names (data);	
 		
 	/* Creates a submenu from an item in `section`. */
 	g_menu_insert_submenu (section, 0, "ALSA", G_MENU_MODEL (submenu));
@@ -52,7 +53,6 @@ void
 drivers (GtkWidget *box)
 {
 	GtkWidget *label;
-	GtkWidget *label2;
 	GtkWidget *button;
 	
 	label = gtk_label_new ("Driver");
@@ -65,7 +65,7 @@ drivers (GtkWidget *box)
 	gtk_container_add (GTK_CONTAINER (button), label2);
 	gtk_box_pack_start (GTK_BOX (box), button, FALSE, TRUE, 0);
 
-	g_signal_connect (button, "clicked", G_CALLBACK (activate_popover_cb), NULL);
+	g_signal_connect (button, "clicked", G_CALLBACK (activate_popover_cb), label2);
 }
 
 

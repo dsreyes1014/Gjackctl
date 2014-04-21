@@ -4,6 +4,30 @@
 
 GtkWidget *checkbox;
 
+/* `rt_status` checks the status of `checkbox` and returns a gchar used for a jackd argument. */
+gchar *
+rt_arg ()
+{
+	gchar *arg;	
+
+	gboolean check;
+
+	check = real_time (GTK_TOGGLE_BUTTON (checkbox), NULL);
+
+	if (check == TRUE)
+	{
+		arg = "-R";
+
+		return arg;
+	}
+	else
+	{
+		arg = "-r";
+
+		return arg;
+	}
+}
+
 gboolean
 real_time (GtkToggleButton *button, gpointer data)
 {

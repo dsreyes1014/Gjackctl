@@ -7,4 +7,7 @@ rt_box (GtkWidget *box);
 gboolean
 real_time (GtkToggleButton *radio, gpointer data);
 
+gchar *
+rt_arg ();
+
 #endif
