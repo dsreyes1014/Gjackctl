@@ -3,4 +3,16 @@
 
 #include <gtk/gtk.h>
 
+typedef struct _jack_arg
+{
+	gchar rt;
+	gchar no_rt;
+	gchar server_name;
+	gchar load;
+	gchar 
+} jack_arg;
 
+gint 
+jack_server_init ();
+
+#endif
