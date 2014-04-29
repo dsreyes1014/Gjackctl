@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <gtk/gtk.h>
-#include <alsa/asoundlib.h>
-
 #include "alsa_device_names.h"
-#include "drivers.h"
-#include "server_switch.h"
 
 GMenu *submenu;
 
@@ -14,9 +8,6 @@ extern gchar driver_arg2[];
 
 /* Declared in `drivers.c`. */
 extern GtkWidget *label2;
-
-/* Declared in the `main.c`. */
-extern GtkWidget *box;
 
 void
 print_alsa_driver_activate (GSimpleAction *action,

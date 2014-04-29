@@ -3,6 +3,8 @@
 #include "server_switch.h"
 #include "rt_box.h"
 #include "alsa_device_names.h"
+#include "dsp_load.h"
+
 
 /* Callback `print_alsa_driver_activate` is defined in `alsa_device_names.c` */
 const GActionEntry entries[] =
@@ -22,9 +24,9 @@ run_app (GApplication *app, gpointer data)
 	g_action_map_add_action_entries (G_ACTION_MAP (app), entries, G_N_ELEMENTS (entries), app);
 
 	server_switch (box);
-	rt_box (box);
+	//rt_box (box);
 
-	gtk_widget_set_size_request (window, 500, 250);
+	gtk_widget_set_size_request (window, 400, 170);
 	gtk_window_set_title (GTK_WINDOW (window), "GJackCtl");
 
 	gtk_container_add (GTK_CONTAINER (window), box);	
