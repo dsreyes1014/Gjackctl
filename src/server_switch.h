@@ -14,12 +14,13 @@
 #include "rt_box.h"
 #include "drivers.h"
 #include "dsp_load.h"
+#include "jack_server_init.h"
 
 void 
 server_switch (GtkWidget *box);
 
 void
-switch_pos_new_cb (GtkSwitch *sw, jack_client_t *client);
+switch_pos_cb (GtkSwitch *sw, jack_client_t *client);
 
 void
 dsp_init ();

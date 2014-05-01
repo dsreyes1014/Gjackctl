@@ -2,10 +2,6 @@
 
 GMenu *submenu;
 
-/* Declared in `server_switch.c`. */
-extern gchar driver_arg1[];
-extern gchar driver_arg2[];
-
 /* Declared in `drivers.c`. */
 extern GtkWidget *label2;
 
@@ -14,40 +10,39 @@ print_alsa_driver_activate (GSimpleAction *action,
 							GVariant *parameter,
 							gpointer data)
 {
+	/* Callback function for a `GActionEntry *entry` declared in `main.c`. */
+
 	gchar device_hint[20];	
+	jack_arg arg;	
 
 	/* Arguments for JACK server. */
-	sprintf (driver_arg1, "-dalsa");
-	sprintf (driver_arg2, "-dhw:%s", g_variant_get_string (parameter, NULL));
+	g_sprintf (&arg.driver, "-d alsa");
+	g_sprintf (&arg.device, "-d hw:%s", g_variant_get_string (parameter, NULL));
 	
 	/* For tooltip */
-	sprintf (device_hint, "hw:%s", g_variant_get_string (parameter, NULL));
+	g_sprintf (device_hint, "hw:%s", g_variant_get_string (parameter, NULL));
 
 	gtk_label_set_text (GTK_LABEL (label2), "ALSA");
-
 	gtk_widget_set_tooltip_text (label2, device_hint);
-
 	g_print("%s\n", g_variant_get_string (parameter, NULL));
 }
 
-/* Fetch ALSA device names for menu selection */
 void
 alsa_device_names ()
 {
+	/* Fetch ALSA device names for menu selection */	
+
 	gint err;	
 	gint card;
 	gint count;
 	gint card_number;
-	
-	/* Initialize `count` to be used by 'names[*][32]' correctly */
-	count = 0;	
 	
 	snd_ctl_t *handle;
 	snd_ctl_card_info_t *info;
 
 	card = -1;
 	submenu = g_menu_new ();
-	
+	count = 0;	
 		
 	/* First loop to obtain count of available cards */
 	for (;;)
@@ -73,6 +68,9 @@ alsa_device_names ()
 
 	for (;;)
 	{	
+		GMenuItem *item;
+		GVariant *id;
+
 		gchar device[20];
 		gchar card_name[32]; 
 		gchar card_id[32];	
@@ -94,7 +92,7 @@ alsa_device_names ()
 		}
 
 		/* Setup `device` with proper syntax needed by other functions. */
-		sprintf (device, "hw:%d", card);
+		g_sprintf (device, "hw:%d", card);
 
 		/* Open device to probe for hardware info here */		
 		if ((err = snd_ctl_open (&handle, device, 0)) < 0)
@@ -121,8 +119,8 @@ alsa_device_names ()
 		}
 
 		/* Card hardware info extracted from `info`. */
-		sprintf (card_id, "%s", snd_ctl_card_info_get_id (info));
-		sprintf (card_name, "%s", snd_ctl_card_info_get_name (info));
+		g_sprintf (card_id, "%s", snd_ctl_card_info_get_id (info));
+		g_sprintf (card_name, "%s", snd_ctl_card_info_get_name (info));
 		card_number = snd_ctl_card_info_get_card (info);
 	
 		/* Close `handle` and free space in memory used by `info`. */
@@ -130,82 +128,53 @@ alsa_device_names ()
 		snd_ctl_card_info_clear (info);
 		snd_ctl_card_info_free (info);
 
-		/* Pack `submenu` with alsa names. */
-		if (card == 0)
+		/* Pack `GMenu submenu` with alsa names. */
+		switch (card)
 		{
-			GMenuItem *item1;
-			GVariant *id;
-
+		case 0:
 			id = g_variant_new_string (card_id);
-			item1 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item1, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 0, item1);	
-		}
-	
-		if (card == 1)
-		{
-			GMenuItem *item2;
-			GVariant *id;
-
+			item = g_menu_item_new (card_name, NULL);
+			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+			g_menu_insert_item (submenu, 0, item);	
+			break;		
+		case 1:
 			id = g_variant_new_string (card_id);
-			item2 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item2, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 1, item2);
-		}
-
-		if (card == 2)
-		{
-			GMenuItem *item3;
-			GVariant *id;
-
+			item = g_menu_item_new (card_name, NULL);
+			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+			g_menu_insert_item (submenu, 1, item);
+			break;
+		case 2:
 			id = g_variant_new_string (card_id);
-			item3 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item3, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 2, item3);
-		}
-
-		if (card == 3)
-		{
-			GMenuItem *item4;
-			GVariant *id;
-
+			item = g_menu_item_new (card_name, NULL);
+			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+			g_menu_insert_item (submenu, 2, item);
+			break;		
+		case 3:
 			id = g_variant_new_string (card_id);
-			item4 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item4, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 3, item4);
-		}
-
-		if (card == 4)
-		{
-			GMenuItem *item5;
-			GVariant *id;
-
+			item = g_menu_item_new (card_name, NULL);
+			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+			g_menu_insert_item (submenu, 3, item);
+			break;
+		case 4:
 			id = g_variant_new_string (card_id);
-			item5 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item5, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 4, item5);
-		}
-
-		if (card == 5)
-		{
-			GMenuItem *item6;
-			GVariant *id;
-
+			item = g_menu_item_new (card_name, NULL);
+			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+			g_menu_insert_item (submenu, 4, item);
+			break;
+		case 5:
 			id = g_variant_new_string (card_id);
-			item6 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item6, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 5, item6);
-		}
-
-		if (card == 6)
-		{
-			GMenuItem *item7;
-			GVariant *id;
-
+			item = g_menu_item_new (card_name, NULL);
+			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+			g_menu_insert_item (submenu, 5, item);
+			break;
+		case 6:
 			id = g_variant_new_string (card_id);
-			item7 = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item7, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 6, item7);
+			item = g_menu_item_new (card_name, NULL);
+			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+			g_menu_insert_item (submenu, 6, item);
+			break;
+		default:
+			g_print ("There are only %d alsa devices.\n", card);
 		}
 	}	
 }

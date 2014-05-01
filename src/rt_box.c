@@ -1,52 +1,27 @@
-#include <gtk/gtk.h>
-
 #include "rt_box.h"
 
 GtkWidget *checkbox;
 GtkWidget *label_dsp;
 
-/* `rt_status` checks the status of `checkbox` and returns a gchar used for a jackd argument. */
-gchar *
-rt_arg ()
-{
-	gchar *arg;	
-
-	gboolean check;
-
-	check = real_time (GTK_TOGGLE_BUTTON (checkbox), NULL);
-
-	if (check == TRUE)
-	{
-		arg = "-R";
-
-		return arg;
-	}
-	else
-	{
-		arg = "-r";
-
-		return arg;
-	}
-}
-
-gboolean
+void
 real_time (GtkToggleButton *button, gpointer data)
 {
 	gboolean check;
+	jack_arg arg;
 	
 	check = gtk_toggle_button_get_active (button);
 
 	if (check == TRUE)
 	{
-		gtk_widget_set_tooltip_text (checkbox, "Disable Realtime Audio");		
-
-		return check;
+		gtk_widget_set_tooltip_text (checkbox, "Disable Realtime Audio");
+		arg.rt = g_strdup ("-R");
+		g_print ("%s\n", arg.rt);
 	}
 	else
 	{	
 		gtk_widget_set_tooltip_text (checkbox, "Enable Realtime Audio");
-
-		return check;
+		arg.rt = g_strdup ("-r");
+		g_print ("%s\n", arg.rt);
 	}
 }
 
@@ -88,7 +63,3 @@ rt_box (GtkWidget *box)
 		gtk_widget_set_tooltip_text (checkbox, "Enable Realtime Audio");
 	}
 }
-
-
-
-

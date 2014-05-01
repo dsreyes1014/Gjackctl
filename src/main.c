@@ -1,10 +1,7 @@
 #include <gtk/gtk.h>
 
 #include "server_switch.h"
-#include "rt_box.h"
 #include "alsa_device_names.h"
-#include "dsp_load.h"
-
 
 /* Callback `print_alsa_driver_activate` is defined in `alsa_device_names.c` */
 const GActionEntry entries[] =
@@ -16,18 +13,22 @@ void
 run_app (GApplication *app, gpointer data)
 {
 	GtkWidget *window;
+	GtkWidget *header_bar;
 	GtkWidget *box;
 	
 	window = gtk_application_window_new (GTK_APPLICATION (app));
-	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 18); 	
+	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 18);
+	header_bar = gtk_header_bar_new ();
 
 	g_action_map_add_action_entries (G_ACTION_MAP (app), entries, G_N_ELEMENTS (entries), app);
 
 	server_switch (box);
-	//rt_box (box);
 
-	gtk_widget_set_size_request (window, 400, 170);
-	gtk_window_set_title (GTK_WINDOW (window), "GJackCtl");
+	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "JACK");
+	gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);
+	gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (header_bar), "close:");
+	gtk_window_set_titlebar (GTK_WINDOW (window), header_bar);
+	gtk_widget_set_size_request (window, 400, 250);
 
 	gtk_container_add (GTK_CONTAINER (window), box);	
 

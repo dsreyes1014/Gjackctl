@@ -1,10 +1,16 @@
 #ifndef RADIO_RT_H
 #define RADIO_RT_H
 
+#include <gtk/gtk.h>
+#include <glib.h>
+#include <glib/gprintf.h>
+
+#include "jack_server_init.h"
+
 void
 rt_box (GtkWidget *box);
 
-gboolean
+void
 real_time (GtkToggleButton *radio, gpointer data);
 
 gchar *
