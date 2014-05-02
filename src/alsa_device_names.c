@@ -5,19 +5,24 @@ GMenu *submenu;
 /* Declared in `drivers.c`. */
 extern GtkWidget *label2;
 
+extern gchar *driver_arg;
+extern gchar device_arg[];
+extern gchar *jack_init[];
+
 void
 print_alsa_driver_activate (GSimpleAction *action,
 							GVariant *parameter,
 							gpointer data)
 {
 	/* Callback function for a `GActionEntry *entry` declared in `main.c`. */
-
 	gchar device_hint[20];	
-	jack_arg arg;	
 
 	/* Arguments for JACK server. */
-	g_sprintf (&arg.driver, "-d alsa");
-	g_sprintf (&arg.device, "-d hw:%s", g_variant_get_string (parameter, NULL));
+	driver_arg = g_strdup ("-dalsa");
+	g_sprintf (device_arg, "-dhw:%s", g_variant_get_string (parameter, NULL));
+
+	jack_init[2] = driver_arg;
+	jack_init[3] = device_arg;
 	
 	/* For tooltip */
 	g_sprintf (device_hint, "hw:%s", g_variant_get_string (parameter, NULL));

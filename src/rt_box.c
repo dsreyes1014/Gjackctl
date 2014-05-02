@@ -3,25 +3,26 @@
 GtkWidget *checkbox;
 GtkWidget *label_dsp;
 
+extern gchar *jack_init[];
+
 void
 real_time (GtkToggleButton *button, gpointer data)
 {
 	gboolean check;
-	jack_arg arg;
 	
 	check = gtk_toggle_button_get_active (button);
 
 	if (check == TRUE)
 	{
 		gtk_widget_set_tooltip_text (checkbox, "Disable Realtime Audio");
-		arg.rt = g_strdup ("-R");
-		g_print ("%s\n", arg.rt);
+		jack_init[1] = "-R";
+		g_print ("%s\n", jack_init[1]);
 	}
 	else
 	{	
 		gtk_widget_set_tooltip_text (checkbox, "Enable Realtime Audio");
-		arg.rt = g_strdup ("-r");
-		g_print ("%s\n", arg.rt);
+		jack_init[1] = "-r";
+		g_print ("%s\n", jack_init[1]);
 	}
 }
 

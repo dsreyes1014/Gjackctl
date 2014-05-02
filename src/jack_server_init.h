@@ -3,16 +3,16 @@
 
 #include <gtk/gtk.h>
 
-typedef struct _jack_arg
-{
-	gchar *rt;
-	gchar driver;
-	gchar device;
-} jack_arg;
+#include "server_switch.h"
+
+#define COMMAND "jackd"
 
 GPid pid;
 
 gint 
 jack_server_init ();
+
+void
+child_watch (GPid pid, gint status, gpointer data);
 
 #endif

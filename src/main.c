@@ -28,7 +28,7 @@ run_app (GApplication *app, gpointer data)
 	gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);
 	gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (header_bar), "close:");
 	gtk_window_set_titlebar (GTK_WINDOW (window), header_bar);
-	gtk_widget_set_size_request (window, 400, 250);
+	gtk_widget_set_size_request (window, 400, 280);
 
 	gtk_container_add (GTK_CONTAINER (window), box);	
 
