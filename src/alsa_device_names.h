@@ -10,6 +10,8 @@
 #include "server_switch.h"
 #include "jack_server_init.h"
 
+GMenu *submenu;
+
 void
 alsa_device_names ();
 

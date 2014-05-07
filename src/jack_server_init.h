@@ -4,10 +4,10 @@
 #include <gtk/gtk.h>
 
 #include "server_switch.h"
-
-#define COMMAND "jackd"
+#include "rt_box.h"
 
 GPid pid;
+extern gchar *jack_start[];
 
 gint 
 jack_server_init ();

@@ -1,14 +1,5 @@
 #include "alsa_device_names.h"
 
-GMenu *submenu;
-
-/* Declared in `drivers.c`. */
-extern GtkWidget *label2;
-
-extern gchar *driver_arg;
-extern gchar device_arg[];
-extern gchar *jack_init[];
-
 void
 print_alsa_driver_activate (GSimpleAction *action,
 							GVariant *parameter,
@@ -16,19 +7,22 @@ print_alsa_driver_activate (GSimpleAction *action,
 {
 	/* Callback function for a `GActionEntry *entry` declared in `main.c`. */
 	gchar device_hint[20];	
+	gchar *driver_args;
 
 	/* Arguments for JACK server. */
-	driver_arg = g_strdup ("-dalsa");
-	g_sprintf (device_arg, "-dhw:%s", g_variant_get_string (parameter, NULL));
-
-	jack_init[2] = driver_arg;
-	jack_init[3] = device_arg;
+	jack_start[2] = "-dalsa";	
+	driver_args = g_strdup ("-dhw:");
 	
+	jack_start[3] = g_strconcat (driver_args, g_variant_get_string (parameter, NULL), NULL);
+
+	g_print ("Debug from `print_alsa_driver_activate`: %s\n", jack_start[2]);
+
 	/* For tooltip */
 	g_sprintf (device_hint, "hw:%s", g_variant_get_string (parameter, NULL));
 
-	gtk_label_set_text (GTK_LABEL (label2), "ALSA");
-	gtk_widget_set_tooltip_text (label2, device_hint);
+	/* GtkLabel *label2 is declared in `drivers.h`. */
+	gtk_label_set_text (GTK_LABEL (label_driver), "ALSA");
+	gtk_widget_set_tooltip_text (label_driver, device_hint);
 	g_print("%s\n", g_variant_get_string (parameter, NULL));
 }
 
@@ -53,7 +47,7 @@ alsa_device_names ()
 	for (;;)
 	{			
 		/* Scans a list of alsa devices. With `card` 
-			at `-1` it will search for the first device. */ 
+		set at `-1` it will search for the first device. */ 
 		if ((err = snd_card_next (&card)) < 0)
 		{				
 			g_print ("%s.\n", snd_strerror (err));
@@ -62,7 +56,7 @@ alsa_device_names ()
 		}
 		
 		/* If `card` reaches `-1` after finding devices, there
-			are no more devices. */
+		are no more devices. */
 		if (card < 0)
 		{	
 			break;
@@ -81,7 +75,7 @@ alsa_device_names ()
 		gchar card_id[32];	
 				
 		/* Scans a list of alsa devices. With `card` 
-			at `-1` it will search for the first device. */ 
+		at `-1` it will search for the first device. */ 
 		if ((err = snd_card_next (&card)) < 0)
 		{				
 			g_print ("%s.\n", snd_strerror (err));
@@ -90,7 +84,7 @@ alsa_device_names ()
 		}
 		
 		/* If `card` reaches `-1` after finding devices, there
-			are no more devices. */
+		are no more devices. */
 		if (card < 0)
 		{	
 			break;
@@ -136,50 +130,50 @@ alsa_device_names ()
 		/* Pack `GMenu submenu` with alsa names. */
 		switch (card)
 		{
-		case 0:
-			id = g_variant_new_string (card_id);
-			item = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 0, item);	
-			break;		
-		case 1:
-			id = g_variant_new_string (card_id);
-			item = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 1, item);
-			break;
-		case 2:
-			id = g_variant_new_string (card_id);
-			item = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 2, item);
-			break;		
-		case 3:
-			id = g_variant_new_string (card_id);
-			item = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 3, item);
-			break;
-		case 4:
-			id = g_variant_new_string (card_id);
-			item = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 4, item);
-			break;
-		case 5:
-			id = g_variant_new_string (card_id);
-			item = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 5, item);
-			break;
-		case 6:
-			id = g_variant_new_string (card_id);
-			item = g_menu_item_new (card_name, NULL);
-			g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
-			g_menu_insert_item (submenu, 6, item);
-			break;
-		default:
-			g_print ("There are only %d alsa devices.\n", card);
+			case 0:
+				id = g_variant_new_string (card_id);
+				item = g_menu_item_new (card_name, NULL);
+				g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+				g_menu_insert_item (submenu, 0, item);	
+				break;		
+			case 1:
+				id = g_variant_new_string (card_id);
+				item = g_menu_item_new (card_name, NULL);
+				g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+				g_menu_insert_item (submenu, 1, item);
+				break;
+			case 2:
+				id = g_variant_new_string (card_id);
+				item = g_menu_item_new (card_name, NULL);
+				g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+				g_menu_insert_item (submenu, 2, item);
+				break;		
+			case 3:
+				id = g_variant_new_string (card_id);
+				item = g_menu_item_new (card_name, NULL);
+				g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+				g_menu_insert_item (submenu, 3, item);
+				break;
+			case 4:
+				id = g_variant_new_string (card_id);
+				item = g_menu_item_new (card_name, NULL);
+				g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+				g_menu_insert_item (submenu, 4, item);
+				break;
+			case 5:
+				id = g_variant_new_string (card_id);
+				item = g_menu_item_new (card_name, NULL);
+				g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+				g_menu_insert_item (submenu, 5, item);
+				break;
+			case 6:
+				id = g_variant_new_string (card_id);
+				item = g_menu_item_new (card_name, NULL);
+				g_menu_item_set_action_and_target_value (item, "app.print_alsa_driver", id);
+				g_menu_insert_item (submenu, 6, item);
+				break;
+			default:
+				g_print ("There are only %d alsa devices.\n", card);
 		}
 	}	
 }

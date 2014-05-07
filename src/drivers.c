@@ -1,13 +1,10 @@
 #include "drivers.h"
 
-GtkWidget *label2;
-
-/* Declared in `alsa_device_names.c` */
-extern GMenu *submenu;
-
 void
 activate_popover_cb (GtkWidget *button, gpointer data)
 {
+	/* Creates popover menu for drivers button. */
+
 	GtkWidget *popover;
 	GMenu *menu;  
 	GMenu *section; 
@@ -20,7 +17,8 @@ activate_popover_cb (GtkWidget *button, gpointer data)
 
 	alsa_device_names (data);	
 		
-	/* Creates a submenu from an item in `section`. */
+	/* Creates a submenu from an item in `section`. `GMenu submenu` 
+	is declared in `alsa_device_names.h` */
 	g_menu_insert_submenu (section, 0, "ALSA", G_MENU_MODEL (submenu));
 
 	g_menu_insert_item (section, 1, item1);
@@ -41,16 +39,14 @@ drivers (GtkWidget *box)
 {
 	GtkWidget *button;
 	
-	label2 = gtk_label_new ("Driver");	
+	label_driver = gtk_label_new_with_mnemonic ("_Driver");	
 	button = gtk_button_new ();	
 
-	gtk_widget_set_tooltip_text (button , "Choose Driver");
+	gtk_widget_set_tooltip_text (button, "Choose Driver");
 
 	//gtk_box_pack_start (GTK_BOX (box), separator, FALSE, TRUE, 2);
-	gtk_container_add (GTK_CONTAINER (button), label2);
+	gtk_container_add (GTK_CONTAINER (button), label_driver);
 	gtk_box_pack_start (GTK_BOX (box), button, FALSE, TRUE, 4);
 
-	g_signal_connect (button, "clicked", G_CALLBACK (activate_popover_cb), label2);
+	g_signal_connect (button, "clicked", G_CALLBACK (activate_popover_cb), NULL);
 }
-
-

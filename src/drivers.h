@@ -5,6 +5,8 @@
 
 #include "alsa_device_names.h"
 
+GtkWidget *label_driver;
+
 void
 drivers (GtkWidget *box);
 

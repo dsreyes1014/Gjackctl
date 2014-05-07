@@ -14,4 +14,7 @@
 gboolean
 dsp_load (jack_client_t *client);
 
+void
+dsp_init ();
+
 #endif
