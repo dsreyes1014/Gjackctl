@@ -15,17 +15,15 @@
 #include "drivers.h"
 #include "dsp_load.h"
 #include "jack_server_init.h"
-#include "sample_rate.h"
+#include "gjackctl_settings.h"
+#include "connections.h"
 
-GtkWidget *jack_switch;
+extern GtkWidget *jack_switch;
 
 void 
-server_switch (GtkWidget *box);
+server_switch (GtkWidget *box, GtkApplication *app);
 
 void
 switch_pos_cb (GtkSwitch *sw, jack_client_t *client);
-
-void
-jack_settings_cb (GtkWidget *button, gpointer data);
 
 #endif

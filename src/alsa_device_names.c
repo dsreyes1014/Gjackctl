@@ -7,13 +7,15 @@ print_alsa_driver_activate (GSimpleAction *action,
 {
 	/* Callback function for a `GActionEntry *entry` declared in `main.c`. */
 	gchar device_hint[20];	
-	gchar *driver_args;
+	gchar *driver_args1;
+	gchar *driver_args2;
 
 	/* Arguments for JACK server. */
 	jack_start[2] = "-dalsa";	
-	driver_args = g_strdup ("-dhw:");
+	//driver_args1 = g_strdup ("-dalsa ");
+	driver_args2 = g_strdup ("-dhw:");
 	
-	jack_start[3] = g_strconcat (driver_args, g_variant_get_string (parameter, NULL), NULL);
+	jack_start[3] = g_strconcat (driver_args2, g_variant_get_string (parameter, NULL), NULL);
 
 	g_print ("Debug from `print_alsa_driver_activate`: %s\n", jack_start[2]);
 

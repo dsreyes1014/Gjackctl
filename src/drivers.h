@@ -5,12 +5,12 @@
 
 #include "alsa_device_names.h"
 
-GtkWidget *label_driver;
+extern GtkWidget *label_driver;
 
 void
 drivers (GtkWidget *box);
 
 void
-activate_popover_cb (GtkWidget *button, gpointer data);
+driver_popover_cb (GtkWidget *button, gpointer data);
 
 #endif

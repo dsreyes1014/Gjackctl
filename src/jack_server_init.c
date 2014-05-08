@@ -1,8 +1,7 @@
 #include "jack_server_init.h"
 
+GPid pid;
 gchar *jack_start[20];
-gchar *driver_arg;
-gchar device_arg[20];
 
 gint 
 jack_server_init ()

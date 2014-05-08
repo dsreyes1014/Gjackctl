@@ -8,8 +8,7 @@
 #include "jack_server_init.h"
 
 GtkWidget *label_dsp;
-GtkWidget *checkbox;
-gchar *rt_arg;
+extern GtkWidget *checkbox;
 
 void
 rt_box (GtkWidget *box);

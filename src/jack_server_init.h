@@ -6,7 +6,7 @@
 #include "server_switch.h"
 #include "rt_box.h"
 
-GPid pid;
+extern GPid pid;
 extern gchar *jack_start[];
 
 gint 

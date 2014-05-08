@@ -3,16 +3,17 @@
 #include "server_switch.h"
 #include "alsa_device_names.h"
 
+GtkWidget *window;	
+
 /* Callback `print_alsa_driver_activate` is defined in `alsa_device_names.c` */
 const GActionEntry entries[] =
 	{
 		{"print_alsa_driver", print_alsa_driver_activate, "s"}
-	};	
+	};
 
 void
 run_app (GApplication *app, gpointer data)
 {
-	GtkWidget *window;
 	GtkWidget *header_bar;
 	GtkWidget *box;
 	
@@ -22,13 +23,13 @@ run_app (GApplication *app, gpointer data)
 
 	g_action_map_add_action_entries (G_ACTION_MAP (app), entries, G_N_ELEMENTS (entries), app);
 
-	server_switch (box);
+	server_switch (box, GTK_APPLICATION (app));
 
 	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "JACK");
 	gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);
 	gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (header_bar), "close:");
 	gtk_window_set_titlebar (GTK_WINDOW (window), header_bar);
-	gtk_widget_set_size_request (window, 400, 280);
+	gtk_widget_set_size_request (window, 400, 200);
 
 	gtk_container_add (GTK_CONTAINER (window), box);	
 

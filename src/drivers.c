@@ -1,7 +1,9 @@
 #include "drivers.h"
 
+GtkWidget *label_driver;
+
 void
-activate_popover_cb (GtkWidget *button, gpointer data)
+driver_popover_cb (GtkWidget *button, gpointer data)
 {
 	/* Creates popover menu for drivers button. */
 
@@ -28,25 +30,26 @@ activate_popover_cb (GtkWidget *button, gpointer data)
 
 	popover = gtk_popover_new_from_model (button, G_MENU_MODEL (menu));	
 
-	gtk_popover_set_modal (GTK_POPOVER (popover), TRUE);
 	gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_RIGHT);
-
+	gtk_popover_set_modal (GTK_POPOVER (popover), TRUE);
+	
 	gtk_widget_show_all (popover);
-}
+} 
 
 void
 drivers (GtkWidget *box)
 {
-	GtkWidget *button;
+	GtkWidget *driver_button;
+	//GtkWidget *ebox;
 	
 	label_driver = gtk_label_new_with_mnemonic ("_Driver");	
-	button = gtk_button_new ();	
-
-	gtk_widget_set_tooltip_text (button, "Choose Driver");
+	driver_button = gtk_button_new ();	
+	//ebox = gtk_event_box_new ();
+	gtk_widget_set_tooltip_text (label_driver, "Choose Driver");
 
 	//gtk_box_pack_start (GTK_BOX (box), separator, FALSE, TRUE, 2);
-	gtk_container_add (GTK_CONTAINER (button), label_driver);
-	gtk_box_pack_start (GTK_BOX (box), button, FALSE, TRUE, 4);
+	gtk_container_add (GTK_CONTAINER (driver_button), label_driver);
+	gtk_box_pack_start (GTK_BOX (box), driver_button, FALSE, TRUE, 4);
 
-	g_signal_connect (button, "clicked", G_CALLBACK (activate_popover_cb), NULL);
+	g_signal_connect (driver_button, "clicked", G_CALLBACK (driver_popover_cb), NULL);
 }
