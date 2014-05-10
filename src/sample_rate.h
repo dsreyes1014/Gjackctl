@@ -7,11 +7,11 @@
 
 #include "jack_server_init.h"
 
-GtkWidget *button_rate;
-GtkWidget *popover;
+extern GtkWidget *button_rate;
+extern GtkWidget *popover;
 
 void
-sample_rate (GtkWidget *box);
+sample_rate (GtkWidget *grid);
 
 void
 sample_rate_popover_cb (GtkWidget *button, gpointer data);

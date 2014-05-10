@@ -1,0 +1,28 @@
+[Anjuta]
+Maximized=1
+Geometry=1920x1025+0+27
+
+[File Loader]
+Files=../../src/sample_rate.c#17%%%../../src/alsa_device_names.c#5%%%../../src/drivers.c#1%%%../../src/dsp_load.c#1%%%../../src/jack_server_init.c#8%%%../../src/main.c#1%%%../../src/rt_box.c#15%%%../../src/server_switch.c#11%%%../../src/jack_server_init.h#10%%%../../src/sample_rate.h#7%%%../../src/Makefile#9%%%../../src/alsa_device_names.h#7%%%../../src/server_switch.h#1%%%../../src/rt_box.h#12
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
+
+[Execution]
+Program uri=../../src/gjackctl
+Run in terminal=2
+Working directories=../../.
+
+[Project Manager]
+Expand=gjackctl%%%gjackctl//src
+
+[Debugger]
+Stop at beginning=2
+
+[Build]
+Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized
+Selected Configuration=Default
+BuildArgs/Default=--enable-maintainer-mode
+BuildArgs/Debug=--enable-maintainer-mode 'CFLAGS=-g -O0' 'CXXFLAGS=-g -O0' 'JFLAGS=-g -O0' 'FFLAGS=-g -O0'
+BuildArgs/Profiling=--enable-maintainer-mode 'CFLAGS=-g -pg' 'CXXFLAGS=-g -pg' 'JFLAGS=-g -pg' 'FFLAGS=-g -pg'
+BuildArgs/Optimized=--enable-maintainer-mode 'CFLAGS=-O2' 'CXXFLAGS=-O2' 'JFLAGS=-O2' 'FFLAGS=-O2'

@@ -11,7 +11,7 @@ GtkWidget *label_dsp;
 extern GtkWidget *checkbox;
 
 void
-rt_box (GtkWidget *box);
+rt_box (GtkWidget *grid);
 
 void
 real_time (GtkToggleButton *radio, gpointer data);

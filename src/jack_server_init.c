@@ -11,7 +11,7 @@ jack_server_init ()
 	gint check_pid;
 
 	jack_start[0] = "jackd";
-	jack_start[5] = NULL;
+	jack_start[20] = NULL;
 
 	g_spawn_async (NULL, jack_start, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, &pid, NULL);
 

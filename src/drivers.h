@@ -8,7 +8,7 @@
 extern GtkWidget *label_driver;
 
 void
-drivers (GtkWidget *box);
+drivers (GtkWidget *grid);
 
 void
 driver_popover_cb (GtkWidget *button, gpointer data);

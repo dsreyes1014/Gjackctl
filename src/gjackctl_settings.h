@@ -5,6 +5,8 @@
 
 #include "sample_rate.h"
 #include "rt_box.h"
+#include "rt_priority.h"
+#include "server_name.h"
 
 /* Declared in `main.c`. */
 extern GtkWidget *window;

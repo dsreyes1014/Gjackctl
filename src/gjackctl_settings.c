@@ -20,24 +20,25 @@ popup_clicked_ok_cb (GtkButton *button, gpointer user_data)
 
 void
 gjackctl_settings_cb (GtkWidget *button, gpointer user_data)
-{
+{	
 	GtkWidget *popup;
-	GtkWidget *hbox;
-	GtkWidget *vbox;
+	GtkWidget *grid;
 	GtkWidget *header_bar;
 	GtkWidget *button1;
 	GtkWidget *separator;
 	GtkApplication *app;
-	
 		
-	hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
-	vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+	grid = gtk_grid_new ();
 	app = user_data;
-	button1 = gtk_button_new_with_label ("Ok");
+	button1 = gtk_button_new_with_label ("OK");
 	separator = gtk_separator_new (GTK_ORIENTATION_VERTICAL);
-
 	popup = gtk_application_window_new (GTK_APPLICATION (app));
 	header_bar = gtk_header_bar_new ();
+
+	gtk_grid_set_row_spacing (GTK_GRID (grid), 4);
+	gtk_grid_set_column_spacing (GTK_GRID (grid), 4);
+	gtk_grid_set_column_homogeneous (GTK_GRID (grid), FALSE);
+	gtk_grid_set_row_homogeneous (GTK_GRID (grid), FALSE);
 
 	/* Show header_bar. */
 	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "Settings");
@@ -45,13 +46,14 @@ gjackctl_settings_cb (GtkWidget *button, gpointer user_data)
 	gtk_header_bar_pack_end (GTK_HEADER_BAR (header_bar), button1);
 
 	/* Pack popup. */
-	rt_box (hbox);
-	gtk_container_add (GTK_CONTAINER (hbox), separator);
-	drivers (vbox);
-	sample_rate (vbox);
-	gtk_box_pack_start (GTK_BOX (hbox), vbox, FALSE, TRUE, 2);
-	gtk_container_add (GTK_CONTAINER (popup), hbox);
-
+	//server_name (grid);	
+	rt_box (grid);
+	//gtk_container_add (GTK_CONTAINER (hbox), separator);	
+	rt_priority (grid);
+	drivers (grid);
+	sample_rate (grid);
+	gtk_container_add (GTK_CONTAINER (popup), grid);
+	
 	gtk_widget_set_size_request (popup, 600,400);
 	
 	g_signal_connect (popup, "destroy", G_CALLBACK (popup_destroy_cb), NULL);

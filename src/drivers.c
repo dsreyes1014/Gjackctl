@@ -37,19 +37,19 @@ driver_popover_cb (GtkWidget *button, gpointer data)
 } 
 
 void
-drivers (GtkWidget *box)
+drivers (GtkWidget *grid)
 {
 	GtkWidget *driver_button;
-	//GtkWidget *ebox;
 	
 	label_driver = gtk_label_new_with_mnemonic ("_Driver");	
 	driver_button = gtk_button_new ();	
-	//ebox = gtk_event_box_new ();
 	gtk_widget_set_tooltip_text (label_driver, "Choose Driver");
 
-	//gtk_box_pack_start (GTK_BOX (box), separator, FALSE, TRUE, 2);
+	gtk_widget_set_halign (driver_button, GTK_ALIGN_CENTER);
+
+	/* Pack `grid`. */
 	gtk_container_add (GTK_CONTAINER (driver_button), label_driver);
-	gtk_box_pack_start (GTK_BOX (box), driver_button, FALSE, TRUE, 4);
+	gtk_grid_attach (GTK_GRID (grid), driver_button, 2, 3, 1, 1);
 
 	g_signal_connect (driver_button, "clicked", G_CALLBACK (driver_popover_cb), NULL);
 }

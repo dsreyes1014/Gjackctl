@@ -1,6 +1,7 @@
 #include "sample_rate.h"
 
-extern gchar *jack_start[];
+GtkWidget *button_rate;
+GtkWidget *popover;
 
 void
 rates_cb (GtkToggleButton *tb, gpointer user_data)
@@ -19,9 +20,13 @@ rates_cb (GtkToggleButton *tb, gpointer user_data)
 			gchar *arg_rate_const;
 
 			arg_rate_const = g_strdup ("-r");			
+
 			g_sprintf (arg_rate, "-r%s", gtk_button_get_label (GTK_BUTTON (tb)));
+
 			gtk_button_set_label (GTK_BUTTON (button_rate), gtk_button_get_label (GTK_BUTTON (tb)));
-			jack_start[4] = g_strconcat (arg_rate_const, gtk_button_get_label (GTK_BUTTON (tb)), NULL);
+
+			jack_start[5] = g_strconcat (arg_rate_const, gtk_button_get_label (GTK_BUTTON (tb)), NULL);
+
 			g_print ("Button number %s selected\n", gtk_button_get_label (GTK_BUTTON (tb)));
 			break;
 		}
@@ -80,12 +85,16 @@ sample_rate_popover_cb (GtkWidget *button, gpointer data)
 }
 
 void
-sample_rate (GtkWidget *box)
+sample_rate (GtkWidget *grid)
 {
 	button_rate = gtk_button_new_with_mnemonic ("_Rate");
 
-	gtk_box_pack_start (GTK_BOX (box), button_rate, FALSE, TRUE, 2);
+	//gtk_box_pack_start (GTK_BOX (box), button_rate, FALSE, FALSE, 2);
 	gtk_widget_set_tooltip_text (GTK_WIDGET (button_rate) , "Sample Rate");
+
+	gtk_widget_set_halign (button_rate, GTK_ALIGN_CENTER);
+
+	gtk_grid_attach (GTK_GRID (grid), button_rate, 2, 5, 1, 1);
 	
 	g_signal_connect (button_rate, "clicked", G_CALLBACK (sample_rate_popover_cb), NULL);
 }
