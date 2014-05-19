@@ -12,7 +12,7 @@
 extern GtkWidget *window;
 
 void
-gjackctl_settings (GtkWidget *box, GtkApplication *app);
+gjackctl_settings (GtkWidget *grid, GtkApplication *app);
 
 void
 gjackctl_settings_cb (GtkWidget *widget, gpointer user_data);

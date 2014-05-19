@@ -42,7 +42,8 @@ rt_box (GtkWidget *grid)
 
 	/* Initiate tooltip for `checkbox` in the if/else statement. It won't show when app first starts
 	if we don't. `gchar *jack_start[]` is declared in `jack_server_init.c` which is a NULL
-	terminated array used to spawn the `jackd` server and obtain the process id.*/
+	terminated array used to spawn the `jackd` server and obtain the process id
+	for signal handling.*/
 	if (check == TRUE)
 	{
 		/*  */

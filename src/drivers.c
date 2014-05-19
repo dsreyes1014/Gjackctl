@@ -43,9 +43,10 @@ drivers (GtkWidget *grid)
 	
 	label_driver = gtk_label_new_with_mnemonic ("_Driver");	
 	driver_button = gtk_button_new ();	
-	gtk_widget_set_tooltip_text (label_driver, "Choose Driver");
 
+	gtk_widget_set_tooltip_text (label_driver, "Choose Driver");
 	gtk_widget_set_halign (driver_button, GTK_ALIGN_CENTER);
+	gtk_widget_set_size_request (driver_button, 96, 34);
 
 	/* Pack `grid`. */
 	gtk_container_add (GTK_CONTAINER (driver_button), label_driver);

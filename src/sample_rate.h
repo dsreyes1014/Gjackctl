@@ -7,7 +7,7 @@
 
 #include "jack_server_init.h"
 
-extern GtkWidget *button_rate;
+extern GtkWidget *srate_button;
 extern GtkWidget *popover;
 
 void

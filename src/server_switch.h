@@ -21,7 +21,7 @@
 extern GtkWidget *jack_switch;
 
 void 
-server_switch (GtkWidget *box, GtkApplication *app);
+server_switch (GtkWidget *grid, GtkApplication *app);
 
 void
 switch_pos_cb (GtkSwitch *sw, jack_client_t *client);

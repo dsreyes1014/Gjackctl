@@ -2,6 +2,7 @@
 
 #include "server_switch.h"
 #include "alsa_device_names.h"
+#include "display.h"
 
 GtkWidget *window;	
 
@@ -15,15 +16,18 @@ void
 run_app (GApplication *app, gpointer data)
 {
 	GtkWidget *header_bar;
-	GtkWidget *box;
+	GtkWidget *grid;
 	
 	window = gtk_application_window_new (GTK_APPLICATION (app));
-	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 18);
+	grid = gtk_grid_new ();
 	header_bar = gtk_header_bar_new ();
 
 	g_action_map_add_action_entries (G_ACTION_MAP (app), entries, G_N_ELEMENTS (entries), app);
+	gtk_grid_set_row_spacing (GTK_GRID (grid), 4);
+	gtk_grid_set_column_spacing (GTK_GRID (grid), 4);	
 
-	server_switch (box, GTK_APPLICATION (app));
+	server_switch (grid, GTK_APPLICATION (app));
+	display (grid);
 
 	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "JACK");
 	gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);
@@ -31,7 +35,7 @@ run_app (GApplication *app, gpointer data)
 	gtk_window_set_titlebar (GTK_WINDOW (window), header_bar);
 	gtk_widget_set_size_request (window, 400, 200);
 
-	gtk_container_add (GTK_CONTAINER (window), box);	
+	gtk_container_add (GTK_CONTAINER (window), grid);	
 
 	gtk_widget_show_all (window);
 }

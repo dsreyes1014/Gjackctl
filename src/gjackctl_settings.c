@@ -64,7 +64,7 @@ gjackctl_settings_cb (GtkWidget *button, gpointer user_data)
 }
 
 void
-gjackctl_settings (GtkWidget *box, GtkApplication *app)
+gjackctl_settings (GtkWidget *grid, GtkApplication *app)
 {
 	GtkWidget *settings_button;
 
@@ -72,8 +72,8 @@ gjackctl_settings (GtkWidget *box, GtkApplication *app)
 	
 	gtk_widget_set_tooltip_text (settings_button, "JACK Server Settings");
 
-	gtk_box_pack_start (GTK_BOX (box), settings_button, FALSE, TRUE, 2);
-
+	gtk_grid_attach (GTK_GRID (grid), settings_button, 1, 2, 1, 1);	
+	
 	g_signal_connect (settings_button, "clicked", G_CALLBACK (gjackctl_settings_cb), app);
 }
 

@@ -26,10 +26,9 @@ switch_pos_cb (GtkSwitch *sw, jack_client_t *client)
 }
 
 void 
-server_switch (GtkWidget *box, GtkApplication *app)
+server_switch (GtkWidget *grid, GtkApplication *app)
 {	
-	GtkWidget *vbox;
-	GtkWidget *label;
+	GtkWidget *grid_space1;
 	gchar result[10];
 	gboolean check;	
 	FILE *cmd;
@@ -37,8 +36,7 @@ server_switch (GtkWidget *box, GtkApplication *app)
 	pid = -2;
 	cmd = popen ("pgrep jackd", "r");
 	jack_switch = gtk_switch_new ();
-	vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-	label = gtk_label_new ("JACK");
+	grid_space1 = gtk_label_new ("");
 	check = gtk_switch_get_active (GTK_SWITCH (jack_switch));
 
 	while (fgets (result, sizeof (result), cmd) != NULL)
@@ -49,13 +47,16 @@ server_switch (GtkWidget *box, GtkApplication *app)
 	}
 	
 	dsp_init ();
+	
+	/* Widget positions inside of `grid`. */
+	gtk_widget_set_valign (jack_switch, GTK_ALIGN_START);
+	gtk_widget_set_valign (grid_space1, GTK_ALIGN_END);
 
-	/* Pack `vbox` and add it to `box`. */
-	gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, TRUE, 6);
-	gtk_box_pack_start (GTK_BOX (vbox), jack_switch, FALSE, TRUE, 0);
-	gjackctl_settings (vbox, app);
-	connections (vbox);
-	gtk_box_pack_start (GTK_BOX (box), vbox, FALSE, TRUE, 2);
+	/* Pack `grid` which is declared in `main.c`. */
+	gtk_grid_attach (GTK_GRID (grid), grid_space1, 0, 0, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), jack_switch, 1, 1, 1, 1);	
+	gjackctl_settings (grid, app);
+	//connections (vbox);
 	
 	g_signal_connect (jack_switch, "notify::active", G_CALLBACK (switch_pos_cb), NULL);
 	

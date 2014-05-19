@@ -3,10 +3,10 @@ CFLAGS=-Wall -std=gnu99 `pkg-config --cflags gtk+-3.0 jack` -c
 PROGRAM=gjackctl
 OBJECTS=main.o server_switch.o rt_box.o drivers.o alsa_device_names.o \
 		dsp_load.o jack_server_init.o sample_rate.o gjackctl_settings.o \
-		connections.o rt_priority.o server_name.o
+		connections.o rt_priority.o server_name.o display.o
 HEADERS=server_switch.h rt_box.h drivers.h alsa_device_names.h dsp_load.h \
 		jack_server_init.h sample_rate.h gjackctl_settings.h connections.h \
-		rt_priority.h server_name.h
+		rt_priority.h server_name.h display.h
 LIBS= `pkg-config --libs gtk+-3.0 alsa jack`
 
 all:$(PROGRAM)
@@ -38,6 +38,8 @@ rt_priority.o: rt_priority.c jack_server_init.h
 	$(CC) $(CFLAGS) rt_priority.c
 server_name.o: server_name.c
 	$(CC) $(CFLAGS) server_name.c
+display.o: display.c
+	$(CC) $(CFLAGS) display.c
 
 clean:
 	rm -v *~ *.o $(PROGRAM)
