@@ -9,7 +9,8 @@
 #include <signal.h>
 #include <jack/jack.h>
 
-#include "rt_box.h"
+#include "display.h"
+#include "jack_server_init.h"
 
 gboolean
 dsp_load (jack_client_t *client);

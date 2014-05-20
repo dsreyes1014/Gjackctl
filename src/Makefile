@@ -14,18 +14,18 @@ $(PROGRAM):$(OBJECTS)
 	$(CC) $(OBJECTS) $(LIBS) -o $(PROGRAM)
 main.o:main.c $(HEADERS)
 	$(CC) $(CFLAGS) main.c 
-server_switch.o: server_switch.c rt_box.h drivers.h alsa_device_names.h dsp_load.h \
-					jack_server_init.h gjackctl_settings.h connections.h
-	$(CC) $(CFLAGS) server_switch.c 
-rt_box.o: rt_box.c 
+server_switch.o: server_switch.c dsp_load.h jack_server_init.h \
+					gjackctl_settings.h connections.h
+	$(CC) $(CFLAGS) server_switch.c
+rt_box.o: rt_box.c
 	$(CC) $(CFLAGS) rt_box.c
 drivers.o: drivers.c alsa_device_names.h
 	$(CC) $(CFLAGS) drivers.c
 alsa_device_names.o: alsa_device_names.c server_switch.h jack_server_init.h
 	$(CC) $(CFLAGS) alsa_device_names.c
-dsp_load.o: dsp_load.c
+dsp_load.o: dsp_load.c jack_server_init.h display.h
 	$(CC) $(CFLAGS) dsp_load.c
-jack_server_init.o: jack_server_init.c
+jack_server_init.o: jack_server_init.c dsp_load.h
 	$(CC) $(CFLAGS) jack_server_init.c
 sample_rate.o: sample_rate.c jack_server_init.h
 	$(CC) $(CFLAGS) sample_rate.c

@@ -5,6 +5,7 @@
 
 #include "server_switch.h"
 #include "rt_box.h"
+#include "dsp_load.h"
 
 extern GPid pid;
 extern gchar *jack_start[];

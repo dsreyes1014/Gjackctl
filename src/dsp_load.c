@@ -1,15 +1,12 @@
 #include "dsp_load.h"
 
-/* Declared in `rt_box.c`. */
-extern GtkWidget *label_dsp;
-
 void
 dsp_init ()
 {
-	/* Using the `kill ()` function to check if JACK server is running and `GPid pid` exists. 
-	`GPid pid` is declared in `jack_server_init.h`. Using the `g_timeout_add ()` 
-	function to refresh the cpu usage. `GtkWidget *jack_switch` declared in 
-	`server_switch.h`. */
+	/* Using the `kill ()` function to check if JACK server is running and 
+	`GPid pid` exists.  `GPid pid` is declared in `jack_server_init.h`.
+	 Using the `g_timeout_add ()` function to refresh the cpu usage. 
+	`GtkWidget *jack_switch` declared in `server_switch.h`. */
 
 	jack_client_t *client;
 	jack_status_t status;
@@ -19,7 +16,8 @@ dsp_init ()
 	
 	if (check_pid == 0)
 	{
-		client = jack_client_open ("gjackctl", JackServerName, &status, "default");	
+		client = jack_client_open ("gjackctl", JackServerName,
+									 &status, "default");	
 		gtk_switch_set_active (GTK_SWITCH (jack_switch), TRUE);
 		jack_activate (client);
 		g_timeout_add (1000, (GSourceFunc) dsp_load, (gpointer) client);
@@ -38,8 +36,9 @@ dsp_load (jack_client_t *client)
 
 	if (check_pid != 0)
 	{
-		gtk_label_set_text (GTK_LABEL (label_dsp), "DSP");
-		gtk_widget_set_tooltip_text (GTK_WIDGET (label_dsp), "JACK not running");
+		gtk_label_set_text (GTK_LABEL (label_dsp), "--");
+		gtk_widget_set_tooltip_text (GTK_WIDGET (label_dsp), 
+									"JACK not running");
 
 		return FALSE;
 	}

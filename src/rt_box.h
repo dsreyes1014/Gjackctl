@@ -7,7 +7,6 @@
 
 #include "jack_server_init.h"
 
-GtkWidget *label_dsp;
 extern GtkWidget *checkbox;
 
 void

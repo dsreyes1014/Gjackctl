@@ -36,14 +36,15 @@ rt_box (GtkWidget *grid)
 	/* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
 	in the `gjackctl_settings_cb` function. */
 	gtk_grid_attach (GTK_GRID (grid), checkbox, 0, 0, 1, 1);
-	gtk_grid_attach_next_to (GTK_GRID (grid), label, checkbox, GTK_POS_RIGHT, 1, 1);
+	gtk_grid_attach_next_to (GTK_GRID (grid), label, 
+								checkbox, GTK_POS_RIGHT, 1, 1);
 	
 	g_signal_connect (checkbox, "toggled", G_CALLBACK (real_time), NULL);	
 
-	/* Initiate tooltip for `checkbox` in the if/else statement. It won't show when app first starts
-	if we don't. `gchar *jack_start[]` is declared in `jack_server_init.c` which is a NULL
-	terminated array used to spawn the `jackd` server and obtain the process id
-	for signal handling.*/
+	/* Initiate tooltip for `checkbox` in the if/else statement. It won't 
+	show when app first starts if we don't.  `gchar *jack_start[]` is 
+	declared in `jack_server_init.c` which is a NULL terminated array used 
+	to spawn the `jackd` server and obtain the process id for signal handling.*/
 	if (check == TRUE)
 	{
 		/*  */

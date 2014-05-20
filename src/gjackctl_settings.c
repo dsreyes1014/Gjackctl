@@ -67,13 +67,16 @@ void
 gjackctl_settings (GtkWidget *grid, GtkApplication *app)
 {
 	GtkWidget *settings_button;
+	GtkWidget *grid_space;
 
 	settings_button = gtk_button_new_with_mnemonic ("_Settings");
-	
+	grid_space = gtk_label_new ("");
+
 	gtk_widget_set_tooltip_text (settings_button, "JACK Server Settings");
 
-	gtk_grid_attach (GTK_GRID (grid), settings_button, 1, 2, 1, 1);	
-	
+	gtk_grid_attach (GTK_GRID (grid), settings_button, 90, 1, 1, 1);	
+	gtk_grid_attach (GTK_GRID (grid), grid_space, 91, 1, 1, 1);
+
 	g_signal_connect (settings_button, "clicked", G_CALLBACK (gjackctl_settings_cb), app);
 }
 

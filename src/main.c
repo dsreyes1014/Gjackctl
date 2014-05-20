@@ -29,9 +29,10 @@ run_app (GApplication *app, gpointer data)
 	server_switch (grid, GTK_APPLICATION (app));
 	display (grid);
 
-	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "JACK");
+	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "GJackCtl");
 	gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);
 	gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (header_bar), "close:");
+	/* Use `GtkHeaderBar *head_bar` as titlebar. */
 	gtk_window_set_titlebar (GTK_WINDOW (window), header_bar);
 	gtk_widget_set_size_request (window, 400, 200);
 

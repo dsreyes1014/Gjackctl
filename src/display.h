@@ -3,6 +3,8 @@
 
 #include <gtk/gtk.h>
 
+extern GtkWidget *label_dsp;
+
 void
 display (GtkWidget *grid);
 
