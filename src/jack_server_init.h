@@ -7,13 +7,16 @@
 #include "rt_box.h"
 #include "dsp_load.h"
 
-extern GPid pid;
+//extern GPid pid;
 extern gchar *jack_start[];
 
 gint 
-jack_server_init ();
+jack_server_init (GtkSwitch *sw);
 
 void
 child_watch (GPid pid, gint status, gpointer data);
+
+void
+err_msg_box ();
 
 #endif

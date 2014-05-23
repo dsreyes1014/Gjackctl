@@ -18,12 +18,10 @@
 #include "gjackctl_settings.h"
 #include "connections.h"
 
-extern GtkWidget *jack_switch;
-
 void 
 server_switch (GtkWidget *grid, GtkApplication *app);
 
 void
-switch_pos_cb (GtkSwitch *sw, jack_client_t *client);
+switch_pos_cb (GtkSwitch *sw, gpointer user_data);
 
 #endif

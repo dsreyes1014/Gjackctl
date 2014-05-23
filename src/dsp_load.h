@@ -13,9 +13,9 @@
 #include "jack_server_init.h"
 
 gboolean
-dsp_load (jack_client_t *client);
+dsp_load (gpointer user_data);
 
 void
-dsp_init ();
+dsp_init (GtkWidget *sw, GPid pid);
 
 #endif
