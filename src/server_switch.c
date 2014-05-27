@@ -3,8 +3,9 @@
 void
 switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 {	
-	/* `switch_pos_cb` will start JACK when switched on and terminate 
+	/* This callback function will start JACK when switched on and terminate 
 	it when switched off. */
+
 	GPid pid;
 	gboolean check;
 	gboolean check_pid;
@@ -12,9 +13,11 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 	gchar pid_string[6];
 
 	check = gtk_switch_get_active (sw);	
+	pid = -2;
 
-	/* Here we get the `GPid pid` from the `get_pid` variable and convert 
-	it to an gint. */
+	/* Here we get the `GPid pid` from the `get_pid` statement, which
+	uses the `pgrep` command to obtain the pid, and convert it to a gint 
+	using the `g_ascii_strtoll ()` function. */
 	get_pid = popen ("pgrep jackd", "r");
 
 	while (fgets (pid_string, sizeof (pid_string), get_pid) != NULL)
@@ -23,7 +26,8 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 	}
 	
 	pclose (get_pid);
-
+	
+	/* Check if `GPid pid` exists. */
 	check_pid = kill (pid, 0);
 
 	g_print ("From `switch_pos_cb`: %d\n", pid);
@@ -36,7 +40,7 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 		turned on. */
 		if (check_pid != 0)
 		{
-			jack_server_init (sw);
+			jack_server_init (sw, pid);
 		}
 	}
 	else
@@ -64,8 +68,8 @@ server_switch (GtkWidget *grid, GtkApplication *app)
 	grid_space = gtk_label_new ("");
 	check = gtk_switch_get_active (GTK_SWITCH (jack_switch));
 
-	/* Here we get the `GPid pid` from the `cmd` variable and convert 
-	it to an gint. */
+	/* Here we get the `GPid pid` from the `cmd` statement and convert 
+	it to a gint using the `g_ascii_strtoll ()` function. */
 	while (fgets (result, sizeof (result), cmd) != NULL)
 	{
 		pid = g_ascii_strtoll (result, NULL, 10);
@@ -73,7 +77,9 @@ server_switch (GtkWidget *grid, GtkApplication *app)
 	
 	pclose (cmd);
 
-	/* Check to see if server is already started. */
+	/* Check to see if server is already started. If it is we call 
+	`dsp_init ()` to create this program as a JACK client and obtain 
+	cpu load. */
 	check_pid = kill (pid, 0);
 	if (check_pid == 0)
 	{
@@ -81,7 +87,7 @@ server_switch (GtkWidget *grid, GtkApplication *app)
 	}
 	
 
-	/* Widget positions inside of `grid`. */
+	/* Position widgets inside of `grid`. */
 	gtk_widget_set_valign (jack_switch, GTK_ALIGN_START);
 	gtk_widget_set_valign (grid_space, GTK_ALIGN_END);
 

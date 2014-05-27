@@ -1,6 +1,5 @@
 #include "jack_server_init.h"
 
-//GPid pid;
 gchar *jack_start[20];
 
 void
@@ -23,6 +22,7 @@ err_msg_box ()
 	warning = gtk_label_new ("JACK server could not be started");
 	dialog_grid = gtk_grid_new ();
 
+	/* Pack `dialog_grid`. */
 	gtk_grid_attach (GTK_GRID (dialog_grid), icon, 0, 0, 1, 1);
 	gtk_grid_attach (GTK_GRID (dialog_grid), warning, 1, 0, 1, 1);
 	gtk_container_add (GTK_CONTAINER (content_area), dialog_grid);
@@ -34,22 +34,48 @@ err_msg_box ()
 }
 
 gint 
-jack_server_init (GtkSwitch *sw)
+jack_server_init (GtkSwitch *sw, GPid pid)
 {
+	/* Starts the JACK server using `g_spawn_async ()` with the
+	 `GPid pid` as an out. */
+
 	jack_client_t *client;
 	jack_status_t status;
 	gint check_pid;
-	GError *err;
+	gint argc;
+	gsize size;
+	const gchar *home;
+	gchar cmd[128];
+	gchar *contents;
+	gchar **argvp;
 	gboolean ret;
-	GPid pid;
+	gboolean check_contents;
 
-	jack_start[0] = "jackd";
-	jack_start[20] = NULL;
+	home = g_getenv ("HOME");
 
-	ret = g_spawn_async (NULL, jack_start, 
+	/* Here we create the path using `g_sprintf ()` and place it into
+	`gchar cmd[]`.  We use this for `g_file_get_contents ()` and place the 
+	contents into `gchar **argvp` for `g_spawn_async ()`. */
+	g_sprintf (cmd, "%s/.jackdrc", home);
+	check_contents = g_file_get_contents (cmd, &contents, &size, NULL);
+
+	if (check_contents == FALSE)
+	{
+		/* Error if file doesn't exist. */
+		g_print ("File does not exist");
+	}
+	else
+	{
+		g_shell_parse_argv (contents, &argc, &argvp, NULL);
+	}
+
+	ret = g_spawn_async (NULL, argvp, 
 						 NULL, G_SPAWN_SEARCH_PATH, 
 						 NULL, NULL, 
-						 &pid, &err);
+						 &pid, NULL);
+
+	g_free (argvp);
+	g_free (contents);
 
 	/* Check for errors on server startup. */	
 	if (ret == FALSE)
@@ -63,7 +89,7 @@ jack_server_init (GtkSwitch *sw)
 	sleep (2);
 
 	/* `if/else` statement does a final check to see if `GPid pid` is actually
-	running.  We use the `check_pid` statement for this. */
+	running/initiated.  We use the `check_pid` statement for this. */
 	check_pid = kill (pid, 0);
 
 	if (check_pid == 0)
@@ -78,8 +104,6 @@ jack_server_init (GtkSwitch *sw)
 		gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
 		err_msg_box ();
 	}
-
-	//g_print ("%s\n", jack_start[2]);
 
 	return 0;
 }
