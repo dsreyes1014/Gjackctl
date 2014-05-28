@@ -17,4 +17,7 @@ real_time_cb (GtkToggleButton *button, gpointer data);
 void
 rt_arg_create (GtkToggleButton *button, gchar *arg);
 
+void
+file_input (gchar **string, gint argc);
+
 #endif

@@ -20,7 +20,7 @@ file_input (gchar **string, gint argc)
 }
 
 gchar **
-get_arg_vector ()
+open_file ()
 {
 	gchar cmd[128];
 	gchar *contents;

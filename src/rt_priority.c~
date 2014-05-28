@@ -14,7 +14,7 @@ digit (gchar **argvp)
 		argcp++;
 	}
 
-	for (i = 0; i <= argcp; i++)
+	for (i = 0;; i++)
 	{
 		if (strncmp (argvp[i], "-P", 2) == 0)
 		{

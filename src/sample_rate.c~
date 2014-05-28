@@ -30,7 +30,7 @@ rates_cb (GtkToggleButton *tb, gpointer user_data)
 			gtk_button_set_label (GTK_BUTTON (srate_button), gtk_button_get_label (GTK_BUTTON (tb)));
 			gtk_widget_set_tooltip_text (GTK_WIDGET (srate_button) , tooltip);
 
-			//jack_start[5] = g_strconcat (arg_rate_const, gtk_button_get_label (GTK_BUTTON (tb)), NULL);
+			jack_start[5] = g_strconcat (arg_rate_const, gtk_button_get_label (GTK_BUTTON (tb)), NULL);
 
 			g_print ("Button number %s selected\n", gtk_button_get_label (GTK_BUTTON (tb)));
 			break;

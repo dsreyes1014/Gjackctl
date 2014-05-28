@@ -14,7 +14,7 @@ void
 value_cb (GtkSpinButton *spin_button, gpointer data);
 
 void
-priority_arg_create (gchar *arg);
+priority_arg_create (gchar *arg, gint num);
 
 gint
 digit (gchar **argvp);

@@ -126,7 +126,7 @@ rt_box (GtkWidget *grid)
 
 	/* Set `GtkWidget checkbox` to active to enable the `--realtime` 
 	argument for `jackd` as default. */
-	//gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbox), TRUE);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbox), TRUE);
 
 	/* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
 	in the `gjackctl_settings_cb` function. */
