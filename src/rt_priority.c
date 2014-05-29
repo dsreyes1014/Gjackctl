@@ -40,37 +40,19 @@ priority_arg_create (gchar *arg)
 	argcp = 0;
 	i = 0;
 
-	/* obtain arg count not including the `NULL` terminator. */
+	/* Get arg count */
 	while (argvp[argcp])
 	{
 		argcp++;
 	}
 
-	g_print ("From `rt_priority.c` line 42: %d\n", argcp);
-	
 	/* Here we look for the jack arg `-Px` with the for loop then the if 
 	statement. If it does not exist then we add it to arg vector with 
 	`else/if` statement. */
 	for (i = 0; i <= argcp; i++)
 	{
-		if (g_strcmp0 (argvp[i], arg) == 0)
+		if ((i == argcp -1) && (strncmp (argvp[i], "-P", 2) != 0)) 
 		{
-			g_print ("From `rt_priority.c` line 51: %d\n", i);
-
-			break;
-		} 
-		/* If `priority arg` is found but the number does not match 
-		execute else/if statement. */
-		/*else if (strncmp (argvp[i], "-P", 2) == 0)
-		{		
-			argvp[i] = arg;
-
-			break;
-		}*/
-		else if (argvp[i] == NULL)
-		{
-			g_print ("From `rt_priority.c` line 65\n");
-
 			/* Add space to arg vector for the jackd arg `-R`. */
 			argcp = argcp + 1;
 		
@@ -86,7 +68,7 @@ priority_arg_create (gchar *arg)
 					argvp[j] = argvp[j - 1]; 
 				}
 
-				argvp[2] = arg;
+				argvp[2] = g_strdup (arg);
 			}
 			else
 			{
@@ -97,11 +79,23 @@ priority_arg_create (gchar *arg)
 					argvp[j] = argvp[j - 1]; 
 				}
 
-				argvp[1] = arg;
+				argvp[1] = g_strdup (arg);
 			}
 
 			break;
 		}		
+		else if (g_strcmp0 (argvp[i], arg) == 0)
+		{
+			break;
+		} 
+		/* If `priority arg` is found but the number does not match 
+		execute else/if statement. */
+		else if (strncmp (argvp[i], "-P", 2) == 0)
+		{		
+			argvp[i] = g_strdup (arg);
+
+			break;
+		}
 	}
 
 	file_input (argvp, argcp);
@@ -135,14 +129,14 @@ rt_priority (GtkWidget *grid)
 	gchar **argvp;
 
 	label = gtk_label_new ("Priority");
-	argvp = get_arg_vector ();
 	adjustment = gtk_adjustment_new (75, 0, 99, 1, 0, 0);
 	spin_button = gtk_spin_button_new (adjustment, 1, 0);
 	i = 0;
+	argvp = get_arg_vector ();
 
 	/* If arg in vector is priority arg (i.e. '-Px') then grab number string 
-	for later use. */
-	while (argvp[i] != NULL)
+	for display in widget. */
+	while (argvp[i])
 	{
 		if (strncmp (argvp[i], "-P", 2) == 0)
 		{
@@ -153,6 +147,8 @@ rt_priority (GtkWidget *grid)
 		}
 		else
 		{
+			/* Increase `i` until the vector lands on `NULL` or finds a 
+			a match in the `if ()` statement. */
 			i++;
 		}
 	}

@@ -17,16 +17,20 @@ file_input (gchar **string, gint argc)
 	}
 		
 	fclose (jackdrc);
+
+	g_strfreev (string);
 }
 
 gchar **
 get_arg_vector ()
 {
 	gchar cmd[128];
-	gchar *contents;
 	gchar **argvp;
+	gchar *contents;
 	gint argcp;
 	gsize size;
+
+	argcp = 0;
 
 	/* Create path to file `.jackdrc` using `g_sprintf ()`. */
 	g_sprintf (cmd, "%s/.jackdrc", g_getenv ("HOME"));
@@ -39,10 +43,15 @@ get_arg_vector ()
 		return NULL;
 	}
 
+	/* Get contents of `.jackdrc` and add it to to `gchar **argvp`. */
 	g_file_get_contents (cmd, &contents, &size, NULL);
 	g_shell_parse_argv (contents, &argcp, &argvp, NULL);
 
 	g_free (contents);
+
+	/* reallocate argvp to provide enough room for adding arguments to the 
+	vector. */
+	argvp = g_realloc (argvp, (argcp + 2) * sizeof *argvp);
 
 	return argvp;
 }
@@ -118,9 +127,6 @@ jack_server_init (GtkSwitch *sw, GPid pid)
 						 NULL, G_SPAWN_SEARCH_PATH, 
 						 NULL, NULL, 
 						 &pid, NULL);
-
-	g_free (argvp);
-	g_free (contents);
 
 	/* Check for errors on server startup. */	
 	if (ret == FALSE)
