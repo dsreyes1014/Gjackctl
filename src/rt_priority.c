@@ -51,6 +51,8 @@ priority_arg_create (gchar *arg)
 	`else/if` statement. */
 	for (i = 0; i <= argcp; i++)
 	{
+		/* If priority arg isn't found before end of `argvp[i]` then create
+		it and add it to vector. */
 		if ((i == argcp -1) && (strncmp (argvp[i], "-P", 2) != 0)) 
 		{
 			/* Add space to arg vector for the jackd arg `-R`. */
@@ -83,7 +85,8 @@ priority_arg_create (gchar *arg)
 			}
 
 			break;
-		}		
+		}
+		/* If priority arg is found and matches break out of the loop. */		
 		else if (g_strcmp0 (argvp[i], arg) == 0)
 		{
 			break;

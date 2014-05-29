@@ -42,4 +42,4 @@ display.o: display.c
 	$(CC) $(CFLAGS) display.c
 
 clean:
-	rm -v *~ *.o $(PROGRAM)
+	rm -vf *~ *.o $(PROGRAM)
