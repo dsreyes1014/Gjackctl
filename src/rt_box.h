@@ -15,6 +15,6 @@ void
 real_time_cb (GtkToggleButton *button, gpointer data);
 
 void
-rt_arg_create (GtkToggleButton *button, gchar *arg);
+rt_arg_create (GtkToggleButton *button, const gchar *arg);
 
 #endif

@@ -53,7 +53,7 @@ priority_arg_create (gchar *arg)
 	{
 		/* If priority arg isn't found before end of `argvp[i]` then create
 		it and add it to vector. */
-		if ((i == argcp -1) && (strncmp (argvp[i], "-P", 2) != 0)) 
+		if ((i == argcp - 1) && (strncmp (argvp[i], "-P", 2) != 0)) 
 		{
 			/* Add space to arg vector for the jackd arg `-R`. */
 			argcp = argcp + 1;
@@ -164,7 +164,10 @@ rt_priority (GtkWidget *grid)
 	/* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
 	in the `gjackctl_settings_cb` function. */
 	gtk_grid_attach (GTK_GRID (grid), label, 2, 0, 1, 1);
-	gtk_grid_attach_next_to (GTK_GRID (grid), spin_button, label, GTK_POS_BOTTOM, 1, 1);
+	gtk_grid_attach_next_to (GTK_GRID (grid), 
+							 spin_button, 
+							 label, 
+							 GTK_POS_BOTTOM, 1, 1);
 
 	g_signal_connect (spin_button, "value-changed", G_CALLBACK (value_cb), NULL);
 }

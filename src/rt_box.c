@@ -1,37 +1,28 @@
 #include "rt_box.h"
 
 void
-rt_arg_create (GtkToggleButton *button, gchar *arg)
-{
-	gchar cmd[128];
-	gchar *contents;
+rt_arg_create (GtkToggleButton *button, const gchar *arg)
+{	
 	gchar **argvp;
 	gint argcp;
 	gint i;
 	gint j;
-	gsize size;
 	gboolean check_toggle;
 
 	argcp = 0;
-	contents = NULL;
 	check_toggle = gtk_toggle_button_get_active (button);
+	argvp = get_arg_vector ();
 
-	/* Create path to file `.jackdrc` using `g_sprintf ()`. */
-	g_sprintf (cmd, "%s/.jackdrc", g_getenv ("HOME"));
-
-	/* Check if file path exists. */
-	if (g_file_test (cmd, G_FILE_TEST_EXISTS) == FALSE)
+	/* Get arg count */
+	while (argvp[argcp])
 	{
-		g_print ("File doesn't exist");
+		argcp++;
 	}
-
-	g_file_get_contents (cmd, &contents, &size, NULL);
-	g_shell_parse_argv (contents, &argcp, &argvp, NULL);
 
 	/* Here we look for the jack arg `-R` with the for loop then the if 
 	statement. If it does not exist then we add it to arg vector with 
-	`else/if` statement. */
-	for (i = 0;; i++)
+	`else/if` statement at the end. */
+	for (i = 0; i <= argcp; i++)
 	{
 		if (g_strcmp0 (argvp[i], arg) == 0)
 		{
@@ -44,19 +35,19 @@ rt_arg_create (GtkToggleButton *button, gchar *arg)
 		the vector according to the `checkbox`. */
 		else if ((g_strcmp0 (argvp[i], "-r") == 0) && (check_toggle == TRUE))
 		{
-			argvp[i] = arg;
+			argvp[i] = g_strdup (arg);
 
 			break;
 		} 
 		else if ((g_strcmp0 (argvp[i], "-R") == 0) && (check_toggle == FALSE))
 		{
-			argvp[i] = arg;
+			argvp[i] = g_strdup (arg);
 
 			break;
 		} 
 		/* If `arg` isn't found before the end of `argcp` is reached 
 		execute else/if statement. */
-		else if (i == argcp + 1)
+		else if (i == argcp - 1)
 		{
 			/* Add space to arg vector for the jackd arg `-R`. */
 			argcp = argcp + 1;
@@ -68,15 +59,13 @@ rt_arg_create (GtkToggleButton *button, gchar *arg)
 				argvp[j] = argvp[j - 1]; 
 			} 
 		
-			argvp[1] = arg;
+			argvp[1] = g_strdup (arg);
 
 			break;
 		}
 	}
 
-	file_input (argvp, argcp);
-
-	g_print ("From `rt_arg_create ()` line 77: %s %s\n", argvp[1], argvp[argcp]);
+	file_input (argvp, argcp);	
 }
 
 void
@@ -108,10 +97,15 @@ rt_box (GtkWidget *grid)
 	GtkWidget *checkbox;
 	GtkWidget *label;	
 	gboolean check;
+	gchar **argvp;
+	gint argcp;
+	gint i;
 
 	checkbox = gtk_check_button_new ();
 	label = gtk_label_new ("Realtime");
-	check = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (checkbox));	
+	check = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (checkbox));
+	argvp = get_arg_vector ();	
+	i = 0;
 
 	/* Initiate tooltip for `checkbox` in the if/else statement. It won't 
 	show when app first starts if we don't. */
@@ -124,9 +118,37 @@ rt_box (GtkWidget *grid)
 		gtk_widget_set_tooltip_text (checkbox, "Enable Realtime Audio");
 	}
 
-	/* Set `GtkWidget checkbox` to active to enable the `--realtime` 
-	argument for `jackd` as default. */
-	//gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbox), TRUE);
+	/* Get arg count */
+	while (argvp[argcp])
+	{
+		argcp++;
+	}
+
+	/* Check to see whether `.jackdrc` has realtime enabled/disabled 
+	check/uncheck `checkbox` accordingly (i.e. checked = realtime/unchecked = 
+	no realtime). */
+	while (argvp[i])
+	{
+		if ((g_strcmp0 (argvp[i], "-R") == 0) ||
+			((g_strcmp0 (argvp[i], "-R") != 0) &&
+			 (g_strcmp0 (argvp[i], "-r") != 0) &&
+			 (i == argcp -1)))
+		{
+			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbox), TRUE);
+
+			break;
+		}
+		else if (g_strcmp0 (argvp[i], "-r") == 0)
+		{
+			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbox), FALSE);
+			break;
+		}
+		else 
+		{
+			i++;
+		}		
+	}
+	
 
 	/* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
 	in the `gjackctl_settings_cb` function. */
