@@ -8,14 +8,23 @@
 #include "rt_priority.h"
 #include "server_name.h"
 
-/* Declared in `main.c`. */
-extern GtkWidget *window;
+typedef struct 
+{
+	GtkWidget *data1;
+	GtkApplication *data2;
+}pass_data;
+
+typedef struct
+{
+	GtkWidget *data1;
+	GtkWidget *data2;
+}pass_data_2;
 
 void
-gjackctl_settings (GtkWidget *grid, GtkApplication *app);
+gjackctl_settings (GtkWidget *grid, GtkWidget *window, GtkApplication *app);
 
 void
-gjackctl_settings_cb (GtkWidget *widget, gpointer user_data);
+gjackctl_settings_cb (GtkButton *widget, gpointer user_data);
 
 void
 popup_destroy_cb (GtkWidget *widget, gpointer user_data);

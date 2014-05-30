@@ -3,7 +3,7 @@
 void
 print_alsa_driver_activate_cb (GSimpleAction *action,
 							   GVariant *parameter,
-							   gpointer data)
+							   gpointer user_data)
 {	
 	/* Callback function for a `GActionEntry *entry` declared in `main.c`. 
 	This is for alsa devices in the `jackd -d` arg setup. */
@@ -109,14 +109,11 @@ print_alsa_driver_activate_cb (GSimpleAction *action,
 
 	file_input (argvp, argcp);
 
-	/* GtkLabel *label2 is declared in `drivers.h`. */
-	gtk_label_set_text (GTK_LABEL (label_driver), "ALSA");
-	gtk_widget_set_tooltip_text (label_driver, device_arg);
 	g_print("%s\n", g_variant_get_string (parameter, NULL));
 }
 
 void
-alsa_device_names ()
+alsa_device_names (GMenu *submenu)
 {
 	/* Fetch ALSA device names for menu selection */	
 
@@ -128,7 +125,6 @@ alsa_device_names ()
 	snd_ctl_card_info_t *info;
 
 	card = -1;
-	submenu = g_menu_new ();
 	count = 0;	
 		
 	/* First loop to obtain count of available cards */

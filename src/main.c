@@ -4,8 +4,6 @@
 #include "alsa_device_names.h"
 #include "display.h"
 
-GtkWidget *window;	
-
 /* Callback `print_alsa_driver_activate` is defined in `alsa_device_names.c` */
 const GActionEntry entries[] =
 	{
@@ -15,6 +13,7 @@ const GActionEntry entries[] =
 void
 run_app (GApplication *app, gpointer data)
 {
+	GtkWidget *window;	
 	GtkWidget *header_bar;
 	GtkWidget *grid;
 	
@@ -26,7 +25,7 @@ run_app (GApplication *app, gpointer data)
 	gtk_grid_set_row_spacing (GTK_GRID (grid), 4);
 	gtk_grid_set_column_spacing (GTK_GRID (grid), 4);	
 
-	server_switch (grid, GTK_APPLICATION (app));
+	server_switch (grid, window, GTK_APPLICATION (app));
 	display (grid);
 
 	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "GJackCtl");

@@ -52,7 +52,7 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 }
 
 void 
-server_switch (GtkWidget *grid, GtkApplication *app)
+server_switch (GtkWidget *grid, GtkWidget *window, GtkApplication *app)
 {	
 	GtkWidget *jack_switch;
 	GtkWidget *grid_space;
@@ -94,7 +94,7 @@ server_switch (GtkWidget *grid, GtkApplication *app)
 	/* Pack `grid` which is declared in `main.c`. */
 	gtk_grid_attach (GTK_GRID (grid), grid_space, 0, 0, 1, 1);
 	gtk_grid_attach (GTK_GRID (grid), jack_switch, 1, 1, 1, 1);	
-	gjackctl_settings (grid, app);
+	gjackctl_settings (grid, window, app);
 	//connections (vbox);
 	
 	g_signal_connect (jack_switch, "notify::active", 

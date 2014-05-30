@@ -19,7 +19,7 @@
 #include "connections.h"
 
 void 
-server_switch (GtkWidget *grid, GtkApplication *app);
+server_switch (GtkWidget *grid, GtkWidget *window, GtkApplication *app);
 
 void
 switch_pos_cb (GtkSwitch *sw, gpointer user_data);
