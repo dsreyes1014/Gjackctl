@@ -49,7 +49,7 @@ priority_arg_create (gchar *arg)
 	/* Here we look for the jack arg `-Px` with the for loop then the if 
 	statement. If it does not exist then we add it to arg vector with 
 	`else/if` statement. */
-	for (i = 0; i <= argcp; i++)
+	for (i = 0; i < argcp; i++)
 	{
 		/* If priority arg isn't found before end of `argvp[i]` then create
 		it and add it to vector. */
@@ -65,7 +65,7 @@ priority_arg_create (gchar *arg)
 			{
 				/* Here we move the args over one to place `-Px` as the 
 				third arg in the vector. */
-				for (j = argcp; j >= 2; j--)
+				for (j = argcp; j > 2; j--)
 				{
 					argvp[j] = argvp[j - 1]; 
 				}
@@ -76,7 +76,7 @@ priority_arg_create (gchar *arg)
 			{
 				/* Here we move the args over one to place `-Px` as the 
 				second arg in the vector. */
-				for (j = argcp; j >= 1; j--)
+				for (j = argcp; j > 1; j--)
 				{
 					argvp[j] = argvp[j - 1]; 
 				}

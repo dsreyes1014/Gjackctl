@@ -1,30 +1,117 @@
 #include "alsa_device_names.h"
 
 void
-print_alsa_driver_activate (GSimpleAction *action,
-							GVariant *parameter,
-							gpointer data)
-{
-	/* Callback function for a `GActionEntry *entry` declared in `main.c`. */
-	gchar device_hint[20];	
-	gchar *driver_args1;
-	gchar *driver_args2;
+print_alsa_driver_activate_cb (GSimpleAction *action,
+							   GVariant *parameter,
+							   gpointer data)
+{	
+	/* Callback function for a `GActionEntry *entry` declared in `main.c`. 
+	This is for alsa devices in the `jackd -d` arg setup. */
 
-	/* Arguments for JACK server. */
-	//jack_start[3] = "-dalsa";	
-	//driver_args1 = g_strdup ("-dalsa ");
-	driver_args2 = g_strdup ("-dhw:");
+	gchar **argvp;
+	gchar *device_arg;
+	gint argcp;
+	gint i;
+	gint j;
+	const gchar *device;
 	
-	//jack_start[4] = g_strconcat (driver_args2, g_variant_get_string (parameter, NULL), NULL);
+	argvp = get_arg_vector ();
+	argcp = 0;
+	i = 0;
+	j = 0;
+	device = g_variant_get_string (parameter, NULL);
+	device_arg = g_strconcat ("-dhw:", device, NULL);	
 
-	//g_print ("Debug from `print_alsa_driver_activate`: %s\n", jack_start[2]);
+	/* Get arg count */
+	while (argvp[argcp])
+	{
+		argcp++;
+	}
 
-	/* For tooltip */
-	g_sprintf (device_hint, "hw:%s", g_variant_get_string (parameter, NULL));
+	g_print ("From `alsa_device_names.c` line 31: %s\n", argvp[argcp - 1]);
+
+	for (i = 0; i < argcp; i++)
+	{
+		
+		/* If device arg already exists from `.jackdrc` break loop. */
+		if ((g_strcmp0 (argvp[i], "-dalsa") == 0) &&
+			(g_strcmp0 (argvp[i + 1], device_arg) == 0))
+		{
+			break;
+		}
+		/* If the alsa device arg matches but the actual device does not
+		change it to user-picked alsa device (i.e. -dalsa -dhw:xxx) then
+		break loop. */
+		else if ((g_strcmp0 (argvp[i], "-dalsa") == 0) &&
+				 (g_strcmp0 (argvp[i + 1], device_arg) != 0))
+		{
+			argvp[i + 1] = g_strdup (device_arg);
+			break;
+		}
+		/* Here we check to see if the alsa device arg exists at the end of 
+		argvp.  If it doesn't then we create it according to the conditions 
+		set. */
+		else if ((i == argcp -1) && (strncmp (argvp[i], "-dalsa", 6) != 0))
+		{
+			argcp = argcp + 2;
+
+			/* If priority arg exists at `vector [2]` then create alsa device
+			args right after that. */
+			if (strncmp (argvp[2], "-P", 2) == 0)
+			{
+				/* Move args over 2 spaces to input device args into vector. 
+				We move it 2 elements because the alsa device arg requires 
+				the `-dalsa` option and then its `-dhw:xxx` device backend
+				option. */
+				for (j = argcp; j > 2; j--)
+				{
+					argvp[j] = argvp[j - 2];
+				} 
+
+				argvp[3] = g_strdup ("-dalsa");
+				argvp[4] = g_strdup (device_arg);
+				break;
+			}
+			else if ((strncmp (argvp[1], "-P", 2) == 0) || 
+					 ((g_strcmp0 (argvp[1], "-R") == 0) &&
+					  (strncmp (argvp[2], "-P", 2) != 0)) ||
+					 ((g_strcmp0 (argvp[1], "-r") == 0) &&
+					  (strncmp (argvp[2], "-P", 2) != 0)))
+			{
+				/* Again we move args over 2 elements for reasons stated 
+				above. */
+				for (j = argcp; j > 1; j--)
+				{
+					argvp[j] = argvp[j - 2];
+				} 
+
+				argvp[2] = g_strdup ("-dalsa");
+				argvp[3] = g_strdup (device_arg);
+				break;
+			}	
+			else if ((strncmp (argvp[1], "-P", 2) != 0) ||
+					 (g_strcmp0 (argvp[1], "-R") != 0) ||
+					 (g_strcmp0 (argvp[1], "-r") != 0))
+			{
+				/* Again we move args over 2 elements for reasons stated 
+				above. */
+				for (j = argcp; j > 0; j--)
+				{
+					argvp[j] = argvp[j - 2];
+				} 
+
+				argvp[1] = g_strdup ("-dalsa");
+				argvp[2] = g_strdup (device_arg);
+				break;
+			}	
+		}
+	}
+
+	file_input (argvp, argcp);
 
 	/* GtkLabel *label2 is declared in `drivers.h`. */
 	gtk_label_set_text (GTK_LABEL (label_driver), "ALSA");
-	gtk_widget_set_tooltip_text (label_driver, device_hint);
+	gtk_widget_set_tooltip_text (label_driver, device_arg);
 	g_print("%s\n", g_variant_get_string (parameter, NULL));
 }
 
@@ -36,7 +123,6 @@ alsa_device_names ()
 	gint err;	
 	gint card;
 	gint count;
-	gint card_number;
 	
 	snd_ctl_t *handle;
 	snd_ctl_card_info_t *info;
@@ -122,7 +208,6 @@ alsa_device_names ()
 		/* Card hardware info extracted from `info`. */
 		g_sprintf (card_id, "%s", snd_ctl_card_info_get_id (info));
 		g_sprintf (card_name, "%s", snd_ctl_card_info_get_name (info));
-		card_number = snd_ctl_card_info_get_card (info);
 	
 		/* Close `handle` and free space in memory used by `info`. */
 		snd_ctl_close (handle);

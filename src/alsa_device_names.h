@@ -16,7 +16,7 @@ void
 alsa_device_names ();
 
 void
-print_alsa_driver_activate (GSimpleAction *action,
+print_alsa_driver_activate_cb (GSimpleAction *action,
 							GVariant *parameter,
 							gpointer data);
 

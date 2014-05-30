@@ -22,7 +22,7 @@ rt_arg_create (GtkToggleButton *button, const gchar *arg)
 	/* Here we look for the jack arg `-R` with the for loop then the if 
 	statement. If it does not exist then we add it to arg vector with 
 	`else/if` statement at the end. */
-	for (i = 0; i <= argcp; i++)
+	for (i = 0; i < argcp; i++)
 	{
 		if (g_strcmp0 (argvp[i], arg) == 0)
 		{
@@ -54,7 +54,7 @@ rt_arg_create (GtkToggleButton *button, const gchar *arg)
 		
 			/* Here we move the args over one to place `-R` as the 
 			second arg in the vector. */
-			for (j = argcp; j >= 1; j--)
+			for (j = argcp; j > 1; j--)
 			{
 				argvp[j] = argvp[j - 1]; 
 			} 

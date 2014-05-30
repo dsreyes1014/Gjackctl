@@ -9,7 +9,7 @@ GtkWidget *window;
 /* Callback `print_alsa_driver_activate` is defined in `alsa_device_names.c` */
 const GActionEntry entries[] =
 	{
-		{"print_alsa_driver", print_alsa_driver_activate, "s"}
+		{"print_alsa_driver", print_alsa_driver_activate_cb, "s"}
 	};
 
 void
