@@ -98,7 +98,7 @@ sample_rate (GtkWidget *grid)
 	gtk_widget_set_halign (srate_button, GTK_ALIGN_CENTER);
 	gtk_widget_set_size_request (srate_button, 96, 34);	
 
-	gtk_grid_attach (GTK_GRID (grid), srate_button, 2, 5, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), srate_button, 1, 5, 1, 1);
 	
 	g_signal_connect (srate_button, "clicked", G_CALLBACK (sample_rate_popover_cb), NULL);
 }

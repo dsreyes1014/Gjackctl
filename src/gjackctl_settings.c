@@ -77,13 +77,17 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	sample_rate (grid);
 	gtk_container_add (GTK_CONTAINER (popup), grid);
 	
-	gtk_widget_set_size_request (popup, 600,400);
+	gtk_widget_set_size_request (popup, 600, 400);
 	
 	g_signal_connect (popup, "destroy", 
 					  G_CALLBACK (popup_destroy_cb), window);
 	g_signal_connect (button1, "clicked", 
-					  G_CALLBACK (popup_clicked_ok_cb), (gpointer) data_to_pass);
+					  G_CALLBACK (popup_clicked_ok_cb), 
+					  (gpointer) data_to_pass);
 
+	/* Position `popup` to show wherever current mouse position is located. */
+	gtk_window_set_position (GTK_WINDOW (popup), GTK_WIN_POS_MOUSE);
+	
 	gtk_widget_show_all (popup);
 	gtk_widget_hide (window);
 }
@@ -104,9 +108,12 @@ gjackctl_settings (GtkWidget *grid, GtkWidget *window, GtkApplication *app)
 
 	gtk_widget_set_tooltip_text (settings_button, "JACK Server Settings");
 
-	gtk_grid_attach (GTK_GRID (grid), settings_button, 90, 1, 1, 1);	
-	gtk_grid_attach (GTK_GRID (grid), grid_space, 91, 1, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), settings_button, 1, 2, 1, 1);	
+	//gtk_grid_attach (GTK_GRID (grid), grid_space, 91, 1, 1, 1);
 
-	g_signal_connect (settings_button, "clicked", G_CALLBACK (gjackctl_settings_cb), (gpointer) data_to_pass);
+	g_signal_connect (settings_button, 
+					  "clicked", 
+					  G_CALLBACK (gjackctl_settings_cb), 
+					  (gpointer) data_to_pass);
 }
 

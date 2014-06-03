@@ -1,6 +1,12 @@
 #include "jack_server_init.h"
 
 void
+child_watch_cb (GPid pid, gint status, gpointer user_data)
+{
+	 g_spawn_close_pid (pid);
+}
+
+void
 file_input (gchar **string, gint argc)
 {
 	gchar file[128];	
@@ -57,38 +63,27 @@ get_arg_vector ()
 }
 
 void
-err_msg_box ()
+err_msg_box (GtkWidget *window)
 {
-	GtkWidget *dialog;
-	GtkWidget *content_area;
-	GtkWidget *icon;
-	GtkWidget *warning;
-	GtkWidget *dialog_grid;
+	GtkWidget *msg_dialog;
 
-	dialog = gtk_dialog_new_with_buttons ("JACK Warning", NULL,
-										  GTK_DIALOG_MODAL, 
-										  "Close",
-										  GTK_RESPONSE_CLOSE,
-										  NULL);
-
-	content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-	icon = gtk_image_new_from_file ("../img/dialog-warning.png");
-	warning = gtk_label_new ("JACK server could not be started");
-	dialog_grid = gtk_grid_new ();
-
-	/* Pack `dialog_grid`. */
-	gtk_grid_attach (GTK_GRID (dialog_grid), icon, 0, 0, 1, 1);
-	gtk_grid_attach (GTK_GRID (dialog_grid), warning, 1, 0, 1, 1);
-	gtk_container_add (GTK_CONTAINER (content_area), dialog_grid);
+	msg_dialog = gtk_message_dialog_new (NULL, 
+										 GTK_DIALOG_MODAL, 
+										 GTK_MESSAGE_WARNING,
+										 GTK_BUTTONS_CLOSE,
+										 "JACK Server Error");
 	
-	g_signal_connect (dialog, "response", 
-					  G_CALLBACK (gtk_widget_destroy), NULL);
+	gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (msg_dialog),
+											  "Server could not be started!");
 
-	gtk_widget_show_all (dialog);
+	//gtk_window_set_transient_for (GTK_WINDOW (msg_dialog), GTK_WINDOW (window)); 
+
+	gtk_dialog_run (GTK_DIALOG (msg_dialog));
+	gtk_widget_destroy (msg_dialog);
 }
 
 gint 
-jack_server_init (GtkSwitch *sw, GPid pid)
+jack_server_init (GtkSwitch *sw, GPid pid, GtkWidget *window)
 {
 	/* Starts the JACK server using `g_spawn_async ()` with the
 	 `GPid pid` as an out. */
@@ -96,33 +91,10 @@ jack_server_init (GtkSwitch *sw, GPid pid)
 	jack_client_t *client;
 	jack_status_t status;
 	gint check_pid;
-	gint argc;
-	gsize size;
-	const gchar *home;
-	gchar cmd[128];
-	gchar *contents;
 	gchar **argvp;
 	gboolean ret;
-	gboolean check_contents;
 
-	home = g_getenv ("HOME");
-
-	/* Here we create the path using `g_sprintf ()` and place it into
-	`gchar cmd[]`.  We use this for `g_file_get_contents ()` and place the 
-	contents into `gchar **argvp` for `g_spawn_async ()`. */
-	g_sprintf (cmd, "%s/.jackdrc", home);
-	check_contents = g_file_get_contents (cmd, &contents, &size, NULL);
-
-	if (check_contents == FALSE)
-	{
-		/* Error if file doesn't exist. */
-		g_print ("File does not exist");
-	}
-	else
-	{
-		g_shell_parse_argv (contents, &argc, &argvp, NULL);
-	}
-
+	argvp = get_arg_vector ();
 	ret = g_spawn_async (NULL, argvp, 
 						 NULL, G_SPAWN_SEARCH_PATH, 
 						 NULL, NULL, 
@@ -153,7 +125,7 @@ jack_server_init (GtkSwitch *sw, GPid pid)
 	else
 	{
 		gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
-		err_msg_box ();
+		err_msg_box (window);
 	}
 
 	return 0;

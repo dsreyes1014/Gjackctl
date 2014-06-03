@@ -38,6 +38,9 @@ run_app (GApplication *app, gpointer data)
 
 	gtk_container_add (GTK_CONTAINER (window), grid);	
 
+	/* Position `window` to show wherever current mouse position is located. */	
+	gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_MOUSE);
+
 	gtk_widget_show_all (window);
 }
 

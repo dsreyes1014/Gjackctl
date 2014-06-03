@@ -126,6 +126,7 @@ rt_priority (GtkWidget *grid)
 {
 	GtkWidget *label;
 	GtkWidget *spin_button;
+	GtkWidget *space;
 	GtkAdjustment *adjustment;
 	gint number_value;
 	gint i;
@@ -136,6 +137,7 @@ rt_priority (GtkWidget *grid)
 	spin_button = gtk_spin_button_new (adjustment, 1, 0);
 	i = 0;
 	argvp = get_arg_vector ();
+	space = gtk_label_new ("");
 
 	/* If arg in vector is priority arg (i.e. '-Px') then grab number string 
 	for display in widget. */
@@ -159,11 +161,12 @@ rt_priority (GtkWidget *grid)
 	/* Align widgets within `grid` to keep things uniform. */
 	gtk_widget_set_halign (label, GTK_ALIGN_CENTER);
 	gtk_widget_set_valign (label, GTK_ALIGN_END);
-	gtk_widget_set_halign (spin_button, GTK_ALIGN_START);
+	gtk_widget_set_halign (spin_button, GTK_ALIGN_CENTER);
 
 	/* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
 	in the `gjackctl_settings_cb` function. */
-	gtk_grid_attach (GTK_GRID (grid), label, 2, 0, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), space, 0, 0, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), label, 1, 0, 1, 1);
 	gtk_grid_attach_next_to (GTK_GRID (grid), 
 							 spin_button, 
 							 label, 

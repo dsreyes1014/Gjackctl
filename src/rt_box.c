@@ -95,7 +95,8 @@ void
 rt_box (GtkWidget *grid)
 {
 	GtkWidget *checkbox;
-	GtkWidget *label;	
+	GtkWidget *label;
+	GtkWidget *space;
 	gboolean check;
 	gchar **argvp;
 	gint argcp;
@@ -106,6 +107,7 @@ rt_box (GtkWidget *grid)
 	check = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (checkbox));
 	argvp = get_arg_vector ();	
 	i = 0;
+	space = gtk_label_new ("");
 
 	/* Initiate tooltip for `checkbox` in the if/else statement. It won't 
 	show when app first starts if we don't. */
@@ -148,13 +150,16 @@ rt_box (GtkWidget *grid)
 			i++;
 		}		
 	}
-	
+
+	/* Position `label` inside `grid`. */	
+	gtk_widget_set_valign (label, GTK_ALIGN_END);
 
 	/* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
 	in the `gjackctl_settings_cb` function. */
-	gtk_grid_attach (GTK_GRID (grid), checkbox, 0, 0, 1, 1);
-	gtk_grid_attach_next_to (GTK_GRID (grid), label, 
-							 checkbox, GTK_POS_RIGHT, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), space, 2, 0, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), label, 3, 0, 1, 1);
+	gtk_grid_attach_next_to (GTK_GRID (grid), checkbox, 
+							 label, GTK_POS_RIGHT, 1, 1);
 	
 	g_signal_connect (checkbox, "toggled", G_CALLBACK (real_time_cb), NULL);	
 }

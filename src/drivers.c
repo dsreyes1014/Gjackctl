@@ -76,7 +76,7 @@ drivers (GtkWidget *grid)
 
 	/* Pack `grid`. */
 	gtk_container_add (GTK_CONTAINER (driver_button), label_driver);
-	gtk_grid_attach (GTK_GRID (grid), driver_button, 2, 3, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), driver_button, 1, 3, 1, 1);
 
 	g_signal_connect (driver_button, "clicked", 
 					  G_CALLBACK (driver_popover_cb), NULL);

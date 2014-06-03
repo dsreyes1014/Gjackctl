@@ -8,18 +8,21 @@
 #include "dsp_load.h"
 
 gint 
-jack_server_init (GtkSwitch *sw, GPid pid);
+jack_server_init (GtkSwitch *sw, GPid pid, GtkWidget *window);
 
 void
 child_watch (GPid pid, gint status, gpointer data);
 
 void
-err_msg_box ();
+err_msg_box (GtkWidget *window);
 
 void
 file_input (gchar **string, gint argc);
 
 gchar **
 get_arg_vector ();
+
+void
+child_watch_cb (GPid pid, gint status, gpointer user_data);
 
 #endif

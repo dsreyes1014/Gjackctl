@@ -10,10 +10,12 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 	gboolean check;
 	gboolean check_pid;
 	FILE *get_pid;
-	gchar pid_string[6];
+	gchar pid_string[16];
+	GtkWidget *window;
 
 	check = gtk_switch_get_active (sw);	
 	pid = -2;
+	window = user_data;
 
 	/* Here we get the `GPid pid` from the `get_pid` statement, which
 	uses the `pgrep` command to obtain the pid, and convert it to a gint 
@@ -22,15 +24,17 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 
 	while (fgets (pid_string, sizeof (pid_string), get_pid) != NULL)
 	{
-		pid = g_ascii_strtoll (pid_string, NULL, 10);
+		pid = atoi (pid_string);
 	}
 	
+	g_print ("From `server_switch.c` line 28: %s\n", pid_string);
+
 	pclose (get_pid);
 	
 	/* Check if `GPid pid` exists. */
 	check_pid = kill (pid, 0);
 
-	g_print ("From `switch_pos_cb`: %d\n", pid);
+	g_print ("From `server_switch.c` line 35: %d\n", pid);
 
 	if (check == TRUE)
 	{						
@@ -40,16 +44,15 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 		turned on. */
 		if (check_pid != 0)
 		{
-			jack_server_init (sw, pid);
+			jack_server_init (sw, pid, window);
 		}
 	}
 	else
 	{	
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw) , "Start Server");
 		kill (pid, SIGTERM);	
-		g_spawn_close_pid (pid);	
 	}
-}
+}   
 
 void 
 server_switch (GtkWidget *grid, GtkWidget *window, GtkApplication *app)
@@ -86,7 +89,6 @@ server_switch (GtkWidget *grid, GtkWidget *window, GtkApplication *app)
 		dsp_init (jack_switch, pid);
 	}
 	
-
 	/* Position widgets inside of `grid`. */
 	gtk_widget_set_valign (jack_switch, GTK_ALIGN_START);
 	gtk_widget_set_valign (grid_space, GTK_ALIGN_END);
@@ -98,7 +100,7 @@ server_switch (GtkWidget *grid, GtkWidget *window, GtkApplication *app)
 	//connections (vbox);
 	
 	g_signal_connect (jack_switch, "notify::active", 
-					  G_CALLBACK (switch_pos_cb), NULL);
+					  G_CALLBACK (switch_pos_cb), window);
 	
 	/* Initiate tooltip for `jack_switch` here or else it won't show when 
 	app first starts. */
@@ -113,5 +115,3 @@ server_switch (GtkWidget *grid, GtkWidget *window, GtkApplication *app)
 									 "Start Server");	
 	}
 }
-
-
