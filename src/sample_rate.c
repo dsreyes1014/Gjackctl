@@ -7,10 +7,9 @@ void
 rates_cb (GtkToggleButton *tb, gpointer user_data)
 {
 	GSList *list;
-	gchar arg_rate[10];
 	
 	list = user_data;
-
+	
 	while (list)
 	{
 		tb = list -> data;
@@ -18,27 +17,56 @@ rates_cb (GtkToggleButton *tb, gpointer user_data)
 		if (gtk_toggle_button_get_active (tb) == TRUE)
 		{
 			gchar *arg_rate_const;
-			gchar tooltip[30];			
+			gchar **argvp;
+			gchar *full_string;
+			gint i;
+			gint argcp;
 			
-			/* `-r` is the argument for setting the sample rate after driver is set in 
-			jackd. */
-			arg_rate_const = g_strdup ("-r");			
+			gchar tooltip[30];	
+			const gchar *rate_string;
+				
+			arg_rate_const = g_strdup ("-r");	
+			rate_string = gtk_button_get_label (GTK_BUTTON (tb));		
+			full_string = g_strconcat (arg_rate_const, rate_string, NULL);
+			argcp = 0;
+			argvp = get_arg_vector ();
+
+			/* Get arg count */
+			while (argvp[argcp])
+			{
+				argcp++;
+			}
+
+			for (i = 0; i < argcp; i++)
+			{
+				/* If sample rate arg does not match and arg element before
+				current element being evaluated is driver arg then change 
+				sample rate to user-chosen sample rate. */
+				if ((i > 0) && 
+					(g_strcmp0 (argvp[i], full_string) != 0) &&
+					(strncmp (argvp[i - 1], "-d", 2) == 0) &&
+					(strncmp (argvp[i], "-d", 2) != 0))
+				{
+					argvp[i] = g_strdup (full_string);
+					break;
+				}
+			}
+	
+			file_input (argvp, argcp);
 			
-			g_sprintf (arg_rate, "-r%s", gtk_button_get_label (GTK_BUTTON (tb)));
-			g_sprintf (tooltip, "Sample Rate = %s", gtk_button_get_label (GTK_BUTTON(tb)));
+			g_sprintf (tooltip, "Sample Rate = %s", gtk_button_get_label (GTK_BUTTON(tb)));			
 
 			gtk_button_set_label (GTK_BUTTON (srate_button), gtk_button_get_label (GTK_BUTTON (tb)));
 			gtk_widget_set_tooltip_text (GTK_WIDGET (srate_button) , tooltip);
-
-			//jack_start[5] = g_strconcat (arg_rate_const, gtk_button_get_label (GTK_BUTTON (tb)), NULL);
 
 			g_print ("Button number %s selected\n", gtk_button_get_label (GTK_BUTTON (tb)));
 			break;
 		}
 
 		list = list -> next;
-		gtk_widget_hide (popover);
 	}
+	
+	gtk_widget_hide (popover);
 }
 
 void
