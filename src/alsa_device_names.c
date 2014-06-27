@@ -8,8 +8,10 @@ print_alsa_driver_activate_cb (GSimpleAction *action,
 	/* Callback function for a `GActionEntry *entry` declared in `main.c`. 
 	This is for alsa devices in the `jackd -d` arg setup. */
 
+	GtkWidget *label_driver;
 	gchar **argvp;
 	gchar *device_arg;
+	gchar *tooltip;
 	gint argcp;
 	gint i;
 	gint j;
@@ -21,6 +23,7 @@ print_alsa_driver_activate_cb (GSimpleAction *action,
 	j = 0;
 	device = g_variant_get_string (parameter, NULL);
 	device_arg = g_strconcat ("-dhw:", device, NULL);	
+	label_driver = user_data;
 
 	/* Get arg count */
 	while (argvp[argcp])
@@ -109,6 +112,9 @@ print_alsa_driver_activate_cb (GSimpleAction *action,
 
 	file_input (argvp, argcp);
 
+	tooltip = g_strconcat ("Soundcard: '", device, "'", NULL);
+	gtk_widget_set_tooltip_text (label_driver, tooltip);
+
 	g_print("%s\n", g_variant_get_string (parameter, NULL));
 }
 
@@ -155,7 +161,7 @@ alsa_device_names (GMenu *submenu)
 		GVariant *id;
 
 		gchar device[20];
-		gchar card_name[32]; 
+		gchar card_name[64]; 
 		gchar card_id[32];	
 				
 		/* Scans a list of alsa devices. With `card` 

@@ -1,17 +1,10 @@
 #include <gtk/gtk.h>
 
 #include "server_switch.h"
-#include "alsa_device_names.h"
 #include "display.h"
 
-/* Callback `print_alsa_driver_activate` is defined in `alsa_device_names.c` */
-const GActionEntry entries[] =
-	{
-		{"print_alsa_driver", print_alsa_driver_activate_cb, "s"}
-	};
-
-void
-run_app (GApplication *app, gpointer data)
+static void
+run_app_cb (GApplication *app, gpointer data)
 {
 	GtkWidget *window;	
 	GtkWidget *header_bar;
@@ -21,7 +14,6 @@ run_app (GApplication *app, gpointer data)
 	grid = gtk_grid_new ();
 	header_bar = gtk_header_bar_new ();
 
-	g_action_map_add_action_entries (G_ACTION_MAP (app), entries, G_N_ELEMENTS (entries), app);
 	gtk_grid_set_row_spacing (GTK_GRID (grid), 4);
 	gtk_grid_set_column_spacing (GTK_GRID (grid), 4);	
 
@@ -52,7 +44,7 @@ main (int argc, char *argv[])
 
 	app = gtk_application_new ("org.gnome.gjackctl", G_APPLICATION_FLAGS_NONE);
 
-	g_signal_connect (app, "activate", G_CALLBACK (run_app), NULL);
+	g_signal_connect (app, "activate", G_CALLBACK (run_app_cb), NULL);
 
 	status = g_application_run (G_APPLICATION (app), argc, argv);
 

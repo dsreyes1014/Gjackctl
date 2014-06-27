@@ -62,7 +62,7 @@ get_arg_vector ()
 	return argvp;
 }
 
-void
+static void
 err_msg_box (GtkWidget *window)
 {
 	GtkWidget *msg_dialog;

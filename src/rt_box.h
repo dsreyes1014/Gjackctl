@@ -9,12 +9,6 @@
 #include "jack_server_init.h"
 
 void
-rt_box (GtkWidget *grid);
-
-void
-real_time_cb (GtkToggleButton *button, gpointer data);
-
-void
-rt_arg_create (GtkToggleButton *button, const gchar *arg);
+rt_box (GtkWidget *grid, gint pos_x);
 
 #endif

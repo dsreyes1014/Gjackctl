@@ -23,13 +23,4 @@ typedef struct
 void
 gjackctl_settings (GtkWidget *grid, GtkWidget *window, GtkApplication *app);
 
-void
-gjackctl_settings_cb (GtkButton *widget, gpointer user_data);
-
-void
-popup_destroy_cb (GtkWidget *widget, gpointer user_data);
-
-void
-popup_clicked_ok_cb (GtkButton *button, gpointer user_data);
-
 #endif

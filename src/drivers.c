@@ -1,6 +1,9 @@
 #include "drivers.h"
 
-//GtkWidget *label_driver;
+const GActionEntry entries[] =
+	{
+		{"print_alsa_driver", print_alsa_driver_activate_cb, "s"}
+	};
 
 void
 driver_popover_cb (GtkWidget *button, gpointer user_data)
@@ -39,17 +42,22 @@ driver_popover_cb (GtkWidget *button, gpointer user_data)
 } 
 
 void
-drivers (GtkWidget *grid)
+drivers (GtkWidget *grid, GtkApplication *app)
 {
 	GtkWidget *driver_button;
 	GtkWidget *label_driver;
 	gchar **argvp;
 	gint i;
-	
+
 	argvp = get_arg_vector ();
 	label_driver = gtk_label_new_with_mnemonic ("_Driver");	
 	driver_button = gtk_button_new ();	
 	i = 0;
+
+	g_action_map_add_action_entries (G_ACTION_MAP (app),
+									 entries, 
+									 G_N_ELEMENTS (entries), 
+									 label_driver);
 	
 	while (argvp[i])
 	{
@@ -57,11 +65,13 @@ drivers (GtkWidget *grid)
 			(strncmp (argvp[i + 1], "-d", 2) == 0))	
 		{
 			gchar *tt_label;
+			gchar *tooltip;
 	
 			tt_label = g_strdup (argvp[i + 1]);
-			
+			tooltip = g_strconcat ("Soundcard: '", &tt_label[5], "'", NULL);
+
 			gtk_label_set_text (GTK_LABEL (label_driver), "ALSA");
-			gtk_widget_set_tooltip_text (label_driver, &tt_label[2]); 
+			gtk_widget_set_tooltip_text (label_driver, tooltip); 
 			break;	
 		}	
 		else
@@ -76,7 +86,7 @@ drivers (GtkWidget *grid)
 
 	/* Pack `grid`. */
 	gtk_container_add (GTK_CONTAINER (driver_button), label_driver);
-	gtk_grid_attach (GTK_GRID (grid), driver_button, 1, 3, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), driver_button, 1, 5, 1, 1);
 
 	g_signal_connect (driver_button, "clicked", 
 					  G_CALLBACK (driver_popover_cb), NULL);

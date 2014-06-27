@@ -1,6 +1,6 @@
 #include "gjackctl_settings.h"
 
-void
+static void
 popup_destroy_cb (GtkWidget *widget, gpointer user_data)
 {
 	GtkWidget *window;
@@ -11,7 +11,7 @@ popup_destroy_cb (GtkWidget *widget, gpointer user_data)
 	gtk_widget_show_all (window);
 }
 
-void
+static void
 popup_clicked_ok_cb (GtkButton *button, gpointer user_data)
 {
 	GtkWidget *widget1;
@@ -30,15 +30,36 @@ popup_clicked_ok_cb (GtkButton *button, gpointer user_data)
 	g_free (data_received);
 }
 
-void
+static PangoAttrList *
+label_settings_attr ()
+{
+	PangoAttrList *list;
+	PangoAttribute *attr;
+
+	list = pango_attr_list_new ();
+
+	attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
+	pango_attr_list_insert (list, attr);
+	attr = pango_attr_weight_new (PANGO_WEIGHT_ULTRABOLD);
+	pango_attr_list_insert (list, attr);	
+	attr = pango_attr_size_new (14500);
+	pango_attr_list_insert (list, attr);	
+
+	return list;
+}
+
+static void
 gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 {	
 	GtkWidget *popup;
 	GtkWidget *grid;
 	GtkWidget *header_bar;
 	GtkWidget *button1;
-	GtkWidget *separator;
 	GtkWidget *window;
+	GtkWidget *label;
+	GtkWidget *space;
+	gint i;
+	PangoAttrList *list;
 	GtkApplication *app;
 
 	/* This is a `struct` that holds variables passed by 
@@ -46,17 +67,22 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	pass_data *data_received;
 	pass_data_2 *data_to_pass;	
 
+	space = gtk_label_new ("");
+	list = label_settings_attr ();
 	data_to_pass = (pass_data_2 *) g_malloc (sizeof (pass_data_2));
 	data_received = user_data;
 	grid = gtk_grid_new ();
 	app = data_received -> data2;
 	button1 = gtk_button_new_with_label ("OK");
-	separator = gtk_separator_new (GTK_ORIENTATION_VERTICAL);
 	popup = gtk_application_window_new (GTK_APPLICATION (app));
 	header_bar = gtk_header_bar_new ();
 	window = data_received -> data1;
 	data_to_pass -> data1 = window;
 	data_to_pass -> data2 = popup;
+	label = gtk_label_new ("Server Settings");
+
+	gtk_label_set_attributes (GTK_LABEL (label), list);
+	pango_attr_list_unref (list);
 
 	gtk_grid_set_row_spacing (GTK_GRID (grid), 4);
 	gtk_grid_set_column_spacing (GTK_GRID (grid), 4);
@@ -68,16 +94,18 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	gtk_window_set_titlebar (GTK_WINDOW (popup), header_bar);
 	gtk_header_bar_pack_end (GTK_HEADER_BAR (header_bar), button1);
 
-	/* Pack popup. */
-	//server_name (grid);	
-	rt_box (grid);
+	/* Pack `grid` into `popup`. */
+	gtk_grid_attach (GTK_GRID (grid), space, 0, 0, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), label, 1, 0, 1, 1);
+	server_name (grid);	
+	rt_box (grid, 1);
 	//gtk_container_add (GTK_CONTAINER (hbox), separator);	
 	rt_priority (grid);
-	drivers (grid);
+	drivers (grid, app);
 	sample_rate (grid);
 	gtk_container_add (GTK_CONTAINER (popup), grid);
 	
-	gtk_widget_set_size_request (popup, 600, 400);
+	gtk_widget_set_size_request (popup, 450, 300);
 	
 	g_signal_connect (popup, "destroy", 
 					  G_CALLBACK (popup_destroy_cb), window);
@@ -96,7 +124,6 @@ void
 gjackctl_settings (GtkWidget *grid, GtkWidget *window, GtkApplication *app)
 {
 	GtkWidget *settings_button;
-	GtkWidget *grid_space;
 	pass_data *data_to_pass;
 
 	data_to_pass = (pass_data *) g_malloc (sizeof (pass_data));
@@ -104,12 +131,10 @@ gjackctl_settings (GtkWidget *grid, GtkWidget *window, GtkApplication *app)
 	data_to_pass -> data1 = window;
 	data_to_pass -> data2 = app;
 	settings_button = gtk_button_new_with_mnemonic ("_Settings");
-	grid_space = gtk_label_new ("");
 
 	gtk_widget_set_tooltip_text (settings_button, "JACK Server Settings");
 
 	gtk_grid_attach (GTK_GRID (grid), settings_button, 1, 2, 1, 1);	
-	//gtk_grid_attach (GTK_GRID (grid), grid_space, 91, 1, 1, 1);
 
 	g_signal_connect (settings_button, 
 					  "clicked", 

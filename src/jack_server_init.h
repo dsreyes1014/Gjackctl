@@ -11,12 +11,6 @@ gint
 jack_server_init (GtkSwitch *sw, GPid pid, GtkWidget *window);
 
 void
-child_watch (GPid pid, gint status, gpointer data);
-
-void
-err_msg_box (GtkWidget *window);
-
-void
 file_input (gchar **string, gint argc);
 
 gchar **

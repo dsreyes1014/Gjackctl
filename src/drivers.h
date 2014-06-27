@@ -6,7 +6,7 @@
 #include "alsa_device_names.h"
 
 void
-drivers (GtkWidget *grid);
+drivers (GtkWidget *grid, GtkApplication *app);
 
 void
 driver_popover_cb (GtkWidget *button, gpointer user_data);

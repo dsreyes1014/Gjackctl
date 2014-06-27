@@ -25,6 +25,8 @@ digit (gchar **argvp)
 		}
 	}
 
+	g_strfreev (argvp);
+
 	return number;	
 }
 
@@ -166,7 +168,7 @@ rt_priority (GtkWidget *grid)
 	/* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
 	in the `gjackctl_settings_cb` function. */
 	gtk_grid_attach (GTK_GRID (grid), space, 0, 0, 1, 1);
-	gtk_grid_attach (GTK_GRID (grid), label, 1, 0, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), label, 1, 3, 1, 1);
 	gtk_grid_attach_next_to (GTK_GRID (grid), 
 							 spin_button, 
 							 label, 
