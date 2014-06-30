@@ -8,27 +8,24 @@ run_app_cb (GApplication *app, gpointer data)
 {
 	GtkWidget *window;	
 	GtkWidget *header_bar;
-	GtkWidget *grid;
+	GtkWidget *stack;
 	
 	window = gtk_application_window_new (GTK_APPLICATION (app));
-	grid = gtk_grid_new ();
+	stack = gtk_stack_new ();
 	header_bar = gtk_header_bar_new ();
 
-	gtk_grid_set_row_spacing (GTK_GRID (grid), 4);
-	gtk_grid_set_column_spacing (GTK_GRID (grid), 4);	
-
-	server_switch (grid, window, GTK_APPLICATION (app));
-	display (grid);
+	server_switch (window, GTK_APPLICATION (app), header_bar);
+	display (stack, header_bar);
 
 	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "GJackCtl");
 	gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);
-	gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (header_bar), "close:");
+	gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (header_bar), ":close");
 	
 	/* Set `GtkHeaderBar *head_bar` as titlebar. */
 	gtk_window_set_titlebar (GTK_WINDOW (window), header_bar);
-	gtk_widget_set_size_request (window, 400, 200);
+	gtk_window_set_default_size (GTK_WINDOW (window), 600, 220);
 
-	gtk_container_add (GTK_CONTAINER (window), grid);	
+	gtk_container_add (GTK_CONTAINER (window), stack);	
 
 	/* Position `window` to show wherever current mouse position is located. */	
 	gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_MOUSE);

@@ -13,10 +13,4 @@ extern GtkWidget *popover;
 void
 sample_rate (GtkWidget *grid);
 
-void
-sample_rate_popover_cb (GtkWidget *button, gpointer data);
-
-void
-rates_cb (GtkToggleButton *tb, gpointer user_data);
-
 #endif

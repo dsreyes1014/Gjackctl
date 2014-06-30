@@ -3,7 +3,7 @@
 GtkWidget *srate_button;
 GtkWidget *popover;
 
-void
+static void
 rates_cb (GtkToggleButton *tb, gpointer user_data)
 {
 	GSList *list;
@@ -65,7 +65,7 @@ rates_cb (GtkToggleButton *tb, gpointer user_data)
 	gtk_widget_hide (popover);
 }
 
-void
+static void
 sample_rate_popover_cb (GtkWidget *button, gpointer data)
 {
 	GtkWidget *box;

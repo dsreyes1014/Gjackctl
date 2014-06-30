@@ -19,9 +19,8 @@
 #include "connections.h"
 
 void 
-server_switch (GtkWidget *grid, GtkWidget *window, GtkApplication *app);
-
-void
-switch_pos_cb (GtkSwitch *sw, gpointer user_data);
+server_switch (GtkWidget *window, 
+               GtkApplication *app,
+               GtkWidget *header_bar);
 
 #endif

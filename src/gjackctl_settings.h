@@ -21,6 +21,8 @@ typedef struct
 }pass_data_2;
 
 void
-gjackctl_settings (GtkWidget *grid, GtkWidget *window, GtkApplication *app);
+gjackctl_settings (GtkWidget *window,
+                   GtkApplication *app,
+                   GtkWidget *header_bar);
 
 #endif

@@ -58,7 +58,6 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	GtkWidget *window;
 	GtkWidget *label;
 	GtkWidget *space;
-	gint i;
 	PangoAttrList *list;
 	GtkApplication *app;
 
@@ -121,20 +120,26 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 }
 
 void
-gjackctl_settings (GtkWidget *grid, GtkWidget *window, GtkApplication *app)
+gjackctl_settings (GtkWidget *window,
+                   GtkApplication *app,
+                   GtkWidget *header_bar)
 {
 	GtkWidget *settings_button;
+	GtkWidget *gear;
 	pass_data *data_to_pass;
 
 	data_to_pass = (pass_data *) g_malloc (sizeof (pass_data));
 
 	data_to_pass -> data1 = window;
 	data_to_pass -> data2 = app;
-	settings_button = gtk_button_new_with_mnemonic ("_Settings");
+	settings_button = gtk_button_new ();
+	gear = gtk_image_new_from_file ("/usr/share/icons/gnome/scalable/emblems/emblem-system-symbolic.svg");
 
+	gtk_widget_set_size_request (settings_button, 30, 34);
 	gtk_widget_set_tooltip_text (settings_button, "JACK Server Settings");
-
-	gtk_grid_attach (GTK_GRID (grid), settings_button, 1, 2, 1, 1);	
+	gtk_button_set_image (GTK_BUTTON (settings_button), gear);
+	
+	gtk_header_bar_pack_end (GTK_HEADER_BAR (header_bar), settings_button);
 
 	g_signal_connect (settings_button, 
 					  "clicked", 

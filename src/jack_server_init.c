@@ -1,12 +1,6 @@
 #include "jack_server_init.h"
 
 void
-child_watch_cb (GPid pid, gint status, gpointer user_data)
-{
-	 g_spawn_close_pid (pid);
-}
-
-void
 file_input (gchar **string, gint argc)
 {
 	gchar file[128];	
@@ -74,9 +68,7 @@ err_msg_box (GtkWidget *window)
 										 "JACK Server Error");
 	
 	gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (msg_dialog),
-											  "Server could not be started!");
-
-	//gtk_window_set_transient_for (GTK_WINDOW (msg_dialog), GTK_WINDOW (window)); 
+											  "Server could not be started!"); 
 
 	gtk_dialog_run (GTK_DIALOG (msg_dialog));
 	gtk_widget_destroy (msg_dialog);

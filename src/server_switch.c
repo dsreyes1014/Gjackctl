@@ -1,6 +1,6 @@
 #include "server_switch.h"
 
-void
+static void
 switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 {	
 	/* This callback function will start JACK when switched on and terminate 
@@ -55,7 +55,9 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 }   
 
 void 
-server_switch (GtkWidget *grid, GtkWidget *window, GtkApplication *app)
+server_switch (GtkWidget *window, 
+               GtkApplication *app, 
+               GtkWidget *header_bar)
 {	
 	GtkWidget *jack_switch;
 	GtkWidget *grid_space;
@@ -88,15 +90,12 @@ server_switch (GtkWidget *grid, GtkWidget *window, GtkApplication *app)
 	{
 		dsp_init (jack_switch, pid);
 	}
-	
-	/* Position widgets inside of `grid`. */
-	gtk_widget_set_valign (jack_switch, GTK_ALIGN_START);
-	gtk_widget_set_valign (grid_space, GTK_ALIGN_END);
 
-	/* Pack `grid` which is declared in `main.c`. */
-	gtk_grid_attach (GTK_GRID (grid), grid_space, 0, 0, 1, 1);
-	gtk_grid_attach (GTK_GRID (grid), jack_switch, 1, 1, 1, 1);	
-	gjackctl_settings (grid, window, app);
+	gtk_header_bar_pack_start (GTK_HEADER_BAR (header_bar), jack_switch);
+
+	gtk_widget_set_valign (jack_switch, GTK_ALIGN_CENTER);
+	
+	gjackctl_settings (window, app, header_bar);
 	//connections (vbox);
 	
 	g_signal_connect (jack_switch, "notify::active", 
