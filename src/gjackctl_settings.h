@@ -7,18 +7,7 @@
 #include "rt_box.h"
 #include "rt_priority.h"
 #include "server_name.h"
-
-typedef struct 
-{
-	GtkWidget *data1;
-	GtkApplication *data2;
-}pass_data;
-
-typedef struct
-{
-	GtkWidget *data1;
-	GtkWidget *data2;
-}pass_data_2;
+#include "no_memlock.h"
 
 void
 gjackctl_settings (GtkWidget *window,

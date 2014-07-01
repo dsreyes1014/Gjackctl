@@ -60,7 +60,6 @@ server_switch (GtkWidget *window,
                GtkWidget *header_bar)
 {	
 	GtkWidget *jack_switch;
-	GtkWidget *grid_space;
 	gchar result[10];
 	gint check_pid;
 	gboolean check;	
@@ -70,7 +69,6 @@ server_switch (GtkWidget *window,
 	pid = -2;
 	cmd = popen ("pgrep jackd", "r");
 	jack_switch = gtk_switch_new ();
-	grid_space = gtk_label_new ("");
 	check = gtk_switch_get_active (GTK_SWITCH (jack_switch));
 
 	/* Here we get the `GPid pid` from the `cmd` statement and convert 

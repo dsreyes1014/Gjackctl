@@ -1,5 +1,17 @@
 #include "gjackctl_settings.h"
 
+typedef struct 
+{
+	GtkWidget *data1;
+	GtkApplication *data2;
+}pass_data;
+
+typedef struct
+{
+	GtkWidget *data1;
+	GtkWidget *data2;
+}pass_data_2;
+
 static void
 popup_destroy_cb (GtkWidget *widget, gpointer user_data)
 {
@@ -53,24 +65,25 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 {	
 	GtkWidget *popup;
 	GtkWidget *grid;
+	GtkWidget *grid2;
 	GtkWidget *header_bar;
 	GtkWidget *button1;
 	GtkWidget *window;
-	GtkWidget *label;
-	GtkWidget *space;
-	PangoAttrList *list;
+	GtkWidget *stack;
+	GtkWidget *sswitcher;	
 	GtkApplication *app;
-
+	
 	/* This is a `struct` that holds variables passed by 
 	the `g_signal_connect ()` function through `gpointer user_data`. */ 
 	pass_data *data_received;
 	pass_data_2 *data_to_pass;	
 
-	space = gtk_label_new ("");
-	list = label_settings_attr ();
+	stack = gtk_stack_new ();
+	sswitcher = gtk_stack_switcher_new ();
 	data_to_pass = (pass_data_2 *) g_malloc (sizeof (pass_data_2));
 	data_received = user_data;
 	grid = gtk_grid_new ();
+	grid2 = gtk_grid_new ();
 	app = data_received -> data2;
 	button1 = gtk_button_new_with_label ("OK");
 	popup = gtk_application_window_new (GTK_APPLICATION (app));
@@ -78,33 +91,44 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	window = data_received -> data1;
 	data_to_pass -> data1 = window;
 	data_to_pass -> data2 = popup;
-	label = gtk_label_new ("Server Settings");
 
-	gtk_label_set_attributes (GTK_LABEL (label), list);
-	pango_attr_list_unref (list);
-
+	/* `grid` and `grid2` attributes. */
 	gtk_grid_set_row_spacing (GTK_GRID (grid), 4);
 	gtk_grid_set_column_spacing (GTK_GRID (grid), 4);
 	gtk_grid_set_column_homogeneous (GTK_GRID (grid), FALSE);
 	gtk_grid_set_row_homogeneous (GTK_GRID (grid), FALSE);
+	gtk_grid_set_row_spacing (GTK_GRID (grid2), 4);
+	gtk_grid_set_column_spacing (GTK_GRID (grid2), 4);
+	gtk_grid_set_column_homogeneous (GTK_GRID (grid2), FALSE);
+	gtk_grid_set_row_homogeneous (GTK_GRID (grid2), FALSE);
 
-	/* Show header_bar. */
+	gtk_stack_add_titled (GTK_STACK (stack),
+						  grid,
+                          "server",
+                          "Server");
+	gtk_stack_add_titled (GTK_STACK (stack),
+						  grid2,
+                          "driver",
+                          "Driver");
+	gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER (sswitcher),
+                                  GTK_STACK (stack)); 
+	gtk_stack_set_transition_type (GTK_STACK (stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);
+
+	/* Pack `grid` into `stack` named `server`. */
+	server_name (grid);		
+	rt_box (grid);
+	no_memlock (grid);
+	rt_priority (grid);
+	drivers (grid2, app);
+	sample_rate (grid2);
+
+	/* Pack `header_bar`. */
+	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);
 	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "Settings");
 	gtk_window_set_titlebar (GTK_WINDOW (popup), header_bar);
 	gtk_header_bar_pack_end (GTK_HEADER_BAR (header_bar), button1);
 
-	/* Pack `grid` into `popup`. */
-	gtk_grid_attach (GTK_GRID (grid), space, 0, 0, 1, 1);
-	gtk_grid_attach (GTK_GRID (grid), label, 1, 0, 1, 1);
-	server_name (grid);	
-	rt_box (grid, 1);
-	//gtk_container_add (GTK_CONTAINER (hbox), separator);	
-	rt_priority (grid);
-	drivers (grid, app);
-	sample_rate (grid);
-	gtk_container_add (GTK_CONTAINER (popup), grid);
-	
-	gtk_widget_set_size_request (popup, 450, 300);
+	gtk_container_add (GTK_CONTAINER (popup), stack);
 	
 	g_signal_connect (popup, "destroy", 
 					  G_CALLBACK (popup_destroy_cb), window);
@@ -136,7 +160,7 @@ gjackctl_settings (GtkWidget *window,
 	gear = gtk_image_new_from_file ("/usr/share/icons/gnome/scalable/emblems/emblem-system-symbolic.svg");
 
 	gtk_widget_set_size_request (settings_button, 30, 34);
-	gtk_widget_set_tooltip_text (settings_button, "JACK Server Settings");
+	gtk_widget_set_tooltip_text (settings_button, "Settings");
 	gtk_button_set_image (GTK_BUTTON (settings_button), gear);
 	
 	gtk_header_bar_pack_end (GTK_HEADER_BAR (header_bar), settings_button);

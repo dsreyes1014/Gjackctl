@@ -9,108 +9,108 @@ print_alsa_driver_activate_cb (GSimpleAction *action,
 	This is for alsa devices in the `jackd -d` arg setup. */
 
 	GtkWidget *label_driver;
-	gchar **argvp;
+	gchar **argv;
 	gchar *device_arg;
 	gchar *tooltip;
-	gint argcp;
+	gint argc;
 	gint i;
 	gint j;
 	const gchar *device;
 	
-	argvp = get_arg_vector ();
-	argcp = 0;
+	argv = get_arg_vector ();
+	argc = 0;
 	i = 0;
 	j = 0;
 	device = g_variant_get_string (parameter, NULL);
 	device_arg = g_strconcat ("-dhw:", device, NULL);	
 	label_driver = user_data;
 
-	/* Get arg count */
-	while (argvp[argcp])
+	/* Get arg vector count. */
+	while (argv[argc])
 	{
-		argcp++;
+		argc++;
 	}
 
-	g_print ("From `alsa_device_names.c` line 31: %s\n", argvp[argcp - 1]);
+	g_print ("From `alsa_device_names.c` line 31: %s\n", argv[argc - 1]);
 
-	for (i = 0; i < argcp; i++)
+	for (i = 0; i < argc; i++)
 	{
 		
 		/* If device arg already exists from `.jackdrc` break loop. */
-		if ((g_strcmp0 (argvp[i], "-dalsa") == 0) &&
-			(g_strcmp0 (argvp[i + 1], device_arg) == 0))
+		if ((g_strcmp0 (argv[i], "-dalsa") == 0) &&
+			(g_strcmp0 (argv[i + 1], device_arg) == 0))
 		{
 			break;
 		}
 		/* If the alsa device arg matches but the actual device does not
 		change it to user-picked alsa device (i.e. -dalsa -dhw:xxx) then
 		break loop. */
-		else if ((g_strcmp0 (argvp[i], "-dalsa") == 0) &&
-				 (g_strcmp0 (argvp[i + 1], device_arg) != 0))
+		else if ((g_strcmp0 (argv[i], "-dalsa") == 0) &&
+				 (g_strcmp0 (argv[i + 1], device_arg) != 0))
 		{
-			argvp[i + 1] = g_strdup (device_arg);
+			argv[i + 1] = g_strdup (device_arg);
 			break;
 		}
 		/* Here we check to see if the alsa device arg exists at the end of 
 		argvp.  If it doesn't then we create it according to the conditions 
 		set. */
-		else if ((i == argcp -1) && (strncmp (argvp[i], "-dalsa", 6) != 0))
+		else if ((i == argc -1) && (strncmp (argv[i], "-dalsa", 6) != 0))
 		{
-			argcp = argcp + 2;
+			argc = argc + 2;
 
 			/* If priority arg exists at `vector [2]` then create alsa device
 			args right after that. */
-			if (strncmp (argvp[2], "-P", 2) == 0)
+			if (strncmp (argv[2], "-P", 2) == 0)
 			{
 				/* Move args over 2 spaces to input device args into vector. 
 				We move it 2 elements because the alsa device arg requires 
 				the `-dalsa` option and then its `-dhw:xxx` device backend
 				option. */
-				for (j = argcp; j > 2; j--)
+				for (j = argc; j > 2; j--)
 				{
-					argvp[j] = argvp[j - 2];
+					argv[j] = argv[j - 2];
 				} 
 
-				argvp[3] = g_strdup ("-dalsa");
-				argvp[4] = g_strdup (device_arg);
+				argv[3] = g_strdup ("-dalsa");
+				argv[4] = g_strdup (device_arg);
 				break;
 			}
-			else if ((strncmp (argvp[1], "-P", 2) == 0) || 
-					 ((g_strcmp0 (argvp[1], "-R") == 0) &&
-					  (strncmp (argvp[2], "-P", 2) != 0)) ||
-					 ((g_strcmp0 (argvp[1], "-r") == 0) &&
-					  (strncmp (argvp[2], "-P", 2) != 0)))
+			else if ((strncmp (argv[1], "-P", 2) == 0) || 
+					 ((g_strcmp0 (argv[1], "-R") == 0) &&
+					  (strncmp (argv[2], "-P", 2) != 0)) ||
+					 ((g_strcmp0 (argv[1], "-r") == 0) &&
+					  (strncmp (argv[2], "-P", 2) != 0)))
 			{
 				/* Again we move args over 2 elements for reasons stated 
 				above. */
-				for (j = argcp; j > 1; j--)
+				for (j = argc; j > 1; j--)
 				{
-					argvp[j] = argvp[j - 2];
+					argv[j] = argv[j - 2];
 				} 
 
-				argvp[2] = g_strdup ("-dalsa");
-				argvp[3] = g_strdup (device_arg);
+				argv[2] = g_strdup ("-dalsa");
+				argv[3] = g_strdup (device_arg);
 				break;
 			}	
-			else if ((strncmp (argvp[1], "-P", 2) != 0) ||
-					 (g_strcmp0 (argvp[1], "-R") != 0) ||
-					 (g_strcmp0 (argvp[1], "-r") != 0))
+			else if ((strncmp (argv[1], "-P", 2) != 0) ||
+					 (g_strcmp0 (argv[1], "-R") != 0) ||
+					 (g_strcmp0 (argv[1], "-r") != 0))
 			{
 				/* Again we move args over 2 elements for reasons stated 
 				above. */
-				for (j = argcp; j > 0; j--)
+				for (j = argc; j > 0; j--)
 				{
-					argvp[j] = argvp[j - 2];
+					argv[j] = argv[j - 2];
 				} 
 
-				argvp[1] = g_strdup ("-dalsa");
-				argvp[2] = g_strdup (device_arg);
+				argv[1] = g_strdup ("-dalsa");
+				argv[2] = g_strdup (device_arg);
 				break;
 			}	
 		}
 	}
 
-	file_input (argvp, argcp);
+	config_file_input (argv, argc);
 
 	tooltip = g_strconcat ("Soundcard: '", device, "'", NULL);
 	gtk_widget_set_tooltip_text (label_driver, tooltip);
