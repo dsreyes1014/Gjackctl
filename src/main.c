@@ -2,6 +2,7 @@
 
 #include "server_switch.h"
 #include "display.h"
+#include "config_file_init.h"
 
 static void
 run_app_cb (GApplication *app, gpointer data)
@@ -14,6 +15,7 @@ run_app_cb (GApplication *app, gpointer data)
 	stack = gtk_stack_new ();
 	header_bar = gtk_header_bar_new ();
 
+	config_file_init ();
 	server_switch (window, GTK_APPLICATION (app), header_bar);
 	display (stack, header_bar);
 

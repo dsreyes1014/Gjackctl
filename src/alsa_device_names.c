@@ -5,7 +5,7 @@ print_alsa_driver_activate_cb (GSimpleAction *action,
 							   GVariant *parameter,
 							   gpointer user_data)
 {	
-	/* Callback function for a `GActionEntry *entry` declared in `main.c`. 
+	/* Callback function for a `GActionEntry *entry` declared in `drivers.c`. 
 	This is for alsa devices in the `jackd -d` arg setup. */
 
 	GtkWidget *label_driver;

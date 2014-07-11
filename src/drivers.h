@@ -10,7 +10,4 @@
 void
 drivers (GtkWidget *grid, GtkApplication *app);
 
-void
-driver_popover_cb (GtkWidget *button, gpointer user_data);
-
 #endif

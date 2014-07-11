@@ -1,143 +1,104 @@
 #include "rt_box.h"
 
+static gboolean
+get_realtime (config_t config)
+{
+	gboolean realtime;
+	gchar config_file[128];
+
+	g_sprintf (config_file, "%s/.config/gjackctl/gjackctl.conf", g_getenv ("HOME"));
+
+	config_init (&config);
+	config_read_file (&config, config_file);
+	
+	config_lookup_bool (&config, "gjackctl.server.realtime", &realtime);
+
+	if (realtime == FALSE)
+	{
+		config_destroy (&config);
+
+		return FALSE;
+	}
+	else
+    {
+        config_destroy (&config);	
+
+        return TRUE;
+   	}
+}
+
 static void
-rt_arg_create (GtkToggleButton *button, const gchar *arg)
-{	
-	gchar **argv;
-	gint argc;
-	gint i;
-	gint j;
-	gboolean check_toggle;
+button_clicked_cb (GtkButton *button, gpointer user_data)
+{
+    GtkToggleButton *checkbox;
+    gboolean check;
+    gboolean value;
 
-	argc = 0;
-	check_toggle = gtk_toggle_button_get_active (button);
-	argv = get_arg_vector ();
+    checkbox = user_data;
+    check = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (checkbox));
 
-	/* Get arg vector count. */
-	while (argv[argc])
-	{
-		argc++;
-	}
+    if (check == TRUE)
+    {
+        value = TRUE;
 
-	/* Here we look for the jack arg `-R` with the for loop then the if 
-	statement. If it does not exist then we add it to arg vector with 
-	`else/if` statement at the end. */
-	for (i = 0; i < argc; i++)
-	{
-		if (g_strcmp0 (argv[i], arg) == 0)
-		{
-			g_print ("From `rt_box.c` line 57: %d\n", i);
+        config_file_input1 ("gjackctl.server.realtime",
+                            CONFIG_TYPE_BOOL,
+                            (gpointer) &value);
+    }
+    else
+    {	
+        value = FALSE;
 
-			break;
-		}
-		/* If the realtime arg is found but doesn't correlate to the 
-		`checkbox` (i.e.: unchecked = '-r' checked = '-R') then add the arg to 
-		the vector according to the `checkbox`. */
-		else if ((g_strcmp0 (argv[i], "-r") == 0) && (check_toggle == TRUE))
-		{
-			argv[i] = g_strdup (arg);
-
-			break;
-		} 
-		else if ((g_strcmp0 (argv[i], "-R") == 0) && (check_toggle == FALSE))
-		{
-			argv[i] = g_strdup (arg);
-
-			break;
-		} 
-		/* If `arg` isn't found before the end of `argc` is reached 
-		execute else/if statement. */
-		else if (i == argc - 1)
-		{
-			/* Add space to arg vector for the jackd arg `-R`. */
-			argc = argc + 1;
-		
-			/* Here we move the args over one to place `-R` as the 
-			second arg in the vector. */
-			for (j = argc; j > 1; j--)
-			{
-				argv[j] = argv[j - 1]; 
-			} 
-		
-			argv[1] = g_strdup (arg);
-
-			break;
-		}
-	}
-
-	config_file_input (argv, argc);	
+		config_file_input1 ("gjackctl.server.realtime",
+                            CONFIG_TYPE_BOOL,
+                            (gpointer) &value);
+    }
 }
 
 static void
 real_time_cb (GtkToggleButton *button, gpointer data)
 {
-	gboolean check;
+    gboolean check;
 		
-	check = gtk_toggle_button_get_active (button);
+    check = gtk_toggle_button_get_active (button);
 
-	if (check == TRUE)
-	{
-		gtk_widget_set_tooltip_text (GTK_WIDGET (button), 
-									 "Disable Realtime Audio");
-
-		rt_arg_create (button, "-R");
-	}
-	else
-	{	
-		gtk_widget_set_tooltip_text (GTK_WIDGET (button), 
-									 "Enable Realtime Audio");
-
-		rt_arg_create (button, "-r");
-	}
+    if (check == TRUE)
+    {
+        gtk_widget_set_tooltip_text (GTK_WIDGET (button), 
+                                     "Disable Realtime Audio");
+    }
+    else
+    {	
+        gtk_widget_set_tooltip_text (GTK_WIDGET (button), 
+                                     "Enable Realtime Audio");
+    }
 }
 
 void
-rt_box (GtkWidget *grid)
+rt_box (GtkWidget *grid, GtkWidget *button)
 {
 	/* This gets called from `gjackctl_setings_cb` that's in the 
 	`gjackctl_settings.c` module. */
 	
 	GtkWidget *checkbox;
-	gchar **argv;
-	gint argc;
-	gint i;
+    GtkWidget *label;
+	config_t config;
+	gboolean realtime;
 
-	checkbox = gtk_check_button_new_with_label ("Realtime");
-	argv = get_arg_vector ();	
-	i = 0;
+	checkbox = gtk_check_button_new ();
+    label = gtk_label_new ("Realtime");
+	config_init (&config);
 
-	/* Get arg vector count. */
-	while (argv[argc])
+	realtime = get_realtime (config);
+
+	if (realtime == FALSE)
 	{
-		argc++;
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbox), FALSE);
 	}
-
-	/* Check to see whether `.jackdrc` has `--realtime` enabled/disabled 
-	check/uncheck `checkbox` accordingly (i.e. checked = realtime/unchecked = 
-	no realtime). */
-	while (argv[i])
+	else
 	{
-		if ((g_strcmp0 (argv[i], "-R") == 0) ||
-			((g_strcmp0 (argv[i], "-R") != 0) &&
-			 (g_strcmp0 (argv[i], "-r") != 0) &&
-			 (i == argc -1)))
-		{
-			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbox), TRUE);
-
-			break;
-		}
-		else if (g_strcmp0 (argv[i], "-r") == 0)
-		{
-			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbox), FALSE);
-			break;
-		}
-		else 
-		{
-			i++;
-		}		
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbox), TRUE);
 	}
-
-	g_strfreev (argv);
 
 	/* Initiate tooltip for `checkbox` in the if/else statement. It won't 
 	show when app first starts if we don't. */
@@ -152,10 +113,13 @@ rt_box (GtkWidget *grid)
 
 	/* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
 	in the `gjackctl_settings_cb` function. */
-	gtk_grid_attach (GTK_GRID (grid), checkbox, 0, 1, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), label, 0, 1, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), checkbox, 1, 1, 1, 1);
 
-	gtk_widget_set_margin_start (checkbox, 5);
+	gtk_widget_set_margin_start (label, 40);
 	gtk_widget_set_margin_top (checkbox, 10);
-	
-	g_signal_connect (checkbox, "toggled", G_CALLBACK (real_time_cb), NULL);	
+	gtk_widget_set_margin_top (label, 10);
+
+    g_signal_connect (checkbox, "toggled", G_CALLBACK (real_time_cb), NULL);
+    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), checkbox);
 }

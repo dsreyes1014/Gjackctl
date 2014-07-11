@@ -1,20 +1,20 @@
 CC = gcc
-CFLAGS = -Wall -std=gnu99 `pkg-config --cflags gtk+-3.0 jack` -c
+CFLAGS = -Wall -std=gnu99 `pkg-config --cflags gtk+-3.0 jack alsa libconfig` -c
 PROGRAM = gjackctl
 OBJECTS = main.o server_switch.o rt_box.o drivers.o alsa_device_names.o \
 		  dsp_load.o jack_server_init.o sample_rate.o gjackctl_settings.o \
 		  connections.o rt_priority.o server_name.o display.o no_memlock.o \
-          get_arg_vector.o config_file_input.o
+          get_arg_vector.o config_file_input.o config_file_init.o
 HEADERS = server_switch.h rt_box.h drivers.h alsa_device_names.h dsp_load.h \
 		  jack_server_init.h sample_rate.h gjackctl_settings.h connections.h \
 		  rt_priority.h server_name.h display.h no_memlock.h get_arg_vector.h \
-          config_file_input.h
-LIBS= `pkg-config --libs gtk+-3.0 alsa jack`
+          config_file_input.h config_file_init.h
+LIBS= `pkg-config --libs gtk+-3.0 alsa jack libconfig`
 
 all: $(PROGRAM)
 $(PROGRAM): $(OBJECTS)
 	$(CC) $(OBJECTS) $(LIBS) -o $(PROGRAM)
-main.o: main.c server_switch.h display.h
+main.o: main.c server_switch.h display.h config_file_init.h
 	$(CC) $(CFLAGS) main.c 
 server_switch.o: server_switch.c dsp_load.h jack_server_init.h \
 					gjackctl_settings.h connections.h
@@ -48,6 +48,8 @@ get_arg_vector.o: get_arg_vector.c
 	$(CC) $(CFLAGS) get_arg_vector.c
 config_file_input.o: config_file_input.c
 	$(CC) $(CFLAGS) config_file_input.c
+config_file_init.o: config_file_init.c
+	$(CC) $(CFLAGS) config_file_init.c
 
 clean:
 	rm -vf *~ *.o $(PROGRAM)

@@ -5,8 +5,26 @@ const GActionEntry entries[] =
 		{"print_alsa_driver", print_alsa_driver_activate_cb, "s"}
 	};
 
-void
-driver_popover_cb (GtkWidget *button, gpointer user_data)
+static PangoAttrList *
+label_settings_attr ()
+{
+	PangoAttrList *list;
+	PangoAttribute *attr;
+
+	list = pango_attr_list_new ();
+
+	attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
+	pango_attr_list_insert (list, attr);
+	attr = pango_attr_weight_new (PANGO_WEIGHT_HEAVY);
+	pango_attr_list_insert (list, attr);	
+	attr = pango_attr_size_new (14000);
+	pango_attr_list_insert (list, attr);	
+
+	return list;
+}
+
+static void
+driver_popover_cb (GtkWidget *button, GdkEvent *event, gpointer user_data)
 {
 	/* Creates popover menu for drivers button. */
 
@@ -45,14 +63,20 @@ void
 drivers (GtkWidget *grid, GtkApplication *app)
 {
 	GtkWidget *driver_button;
+	GtkWidget *label;
 	GtkWidget *label_driver;
+	GtkWidget *event_box;
 	gchar **argvp;
 	gint i;
 
+	label = gtk_label_new ("Driver/Interface");
+	event_box = gtk_event_box_new ();
 	argvp = get_arg_vector ();
 	label_driver = gtk_label_new_with_mnemonic ("_Driver");	
 	driver_button = gtk_button_new ();	
 	i = 0;
+
+	gtk_label_set_attributes (GTK_LABEL (label), label_settings_attr ());
 
 	g_action_map_add_action_entries (G_ACTION_MAP (app),
 									 entries, 
@@ -77,17 +101,21 @@ drivers (GtkWidget *grid, GtkApplication *app)
 		else
 		{
 			i++;
+			gtk_widget_set_tooltip_text (label_driver, "Choose Soundcard");
 		}
-	}
+	} 
+
+	g_strfreev (argvp);
 
 	//gtk_widget_set_tooltip_text (label_driver, "Choose Driver");
 	gtk_widget_set_halign (driver_button, GTK_ALIGN_CENTER);
 	gtk_widget_set_size_request (driver_button, 96, 34);
 
 	/* Pack `grid`. */
-	gtk_container_add (GTK_CONTAINER (driver_button), label_driver);
-	gtk_grid_attach (GTK_GRID (grid), driver_button, 1, 5, 1, 1);
+	gtk_container_add (GTK_CONTAINER (event_box), label_driver);
+	gtk_grid_attach (GTK_GRID (grid), label, 1, 5, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), event_box, 1, 6, 1, 1);
 
-	g_signal_connect (driver_button, "clicked", 
+	g_signal_connect (event_box, "button-press-event", 
 					  G_CALLBACK (driver_popover_cb), NULL);
 }

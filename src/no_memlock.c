@@ -1,54 +1,58 @@
 #include "no_memlock.h"
 
-static void
-no_memlock_arg_create (GtkToggleButton *tb, const gchar *arg)
+static gboolean
+get_no_memlock (config_t config)
 {
-	gchar **argv;
-	gint argc;
-	gint i;
-	gint j;
-	gint k;
+	gboolean realtime;
+	gchar config_file[128];
 
-	argc = 0;
-	argv = get_arg_vector ();
+	g_sprintf (config_file, "%s/.config/gjackctl/gjackctl.conf", g_getenv ("HOME"));
 
-	/* Get arg vector count. */
-	while (argv[argc])
+	config_init (&config);
+	config_read_file (&config, config_file);
+	
+	config_lookup_bool (&config, "gjackctl.server.no_memlock", &realtime);
+
+	if (realtime == FALSE)
 	{
-		argc++;
+		config_destroy (&config);
+
+		return FALSE;
 	}
+	else
+    {
+        config_destroy (&config);	
 
-	for (i = 0; i < argc; i++)
-	{
-		if (g_strcmp0 (argv[i], arg) == 0)
-		{
-			break;	
-		}
-		else if ((i == argc -1) && (g_strcmp0 (argv[i], arg) != 0))
-        {
-			argc = argc + 1;
+        return TRUE;
+   	}
+}
 
-			/* Find `--driver` arg to place `-m` arg right before that. */
-			for (k = 0; (strncmp (argv[k], "-d", 2) != 0); ++k)
-			{
-				if (k == argc - 2)
-				{
-					break;
-				}
-			}
+static void
+button_clicked_cb (GtkButton *button, gpointer user_data)
+{
+    GtkToggleButton *checkbox;
+    gboolean check;
+    gboolean value;
 
-			for (j = argc; j > k; j--)
-			{
-				argv[j] = argv[j - 1];
-			}
+    checkbox = user_data;
+    check = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (checkbox));
 
-			argv[j] = g_strdup (arg);
-			
-			break;
-		}
-	}
+    if (check == TRUE)
+    {
+        value = TRUE;
 
-	config_file_input (argv, argc);
+        config_file_input1 ("gjackctl.server.no_memlock",
+                            CONFIG_TYPE_BOOL,
+                            (gpointer) &value);
+    }
+    else
+    {	
+        value = FALSE;
+
+		config_file_input1 ("gjackctl.server.no_memlock",
+                            CONFIG_TYPE_BOOL,
+                            (gpointer) &value);
+    }
 }
 
 static void
@@ -60,22 +64,48 @@ no_memlock_cb (GtkToggleButton *tb, gpointer user_data)
 
 	if (check == TRUE)
 	{
-		no_memlock_arg_create (tb, "-m");
+		gtk_widget_set_tooltip_text (GTK_WIDGET (tb), 
+                                     "Don't lock memory, even in realtime");
+	}
+	else
+	{
+		
 	}
 }
 
 void
-no_memlock (GtkWidget *grid)
+no_memlock (GtkWidget *grid, GtkWidget *button)
 {
 	GtkWidget *checkbutton;
+    GtkWidget *label;
+    gboolean memlock;
+    config_t config;
 
-	checkbutton = gtk_check_button_new_with_label ("No Memory Lock");
+	checkbutton = gtk_check_button_new ();
+    label = gtk_label_new ("No MemLock");
+    config_init (&config);
+    memlock = get_no_memlock (config);
 
-	gtk_grid_attach (GTK_GRID (grid), checkbutton, 0, 2, 1, 1);
+    if (memlock == FALSE)
+	{
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbutton), FALSE);
+	}
+	else
+	{
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbutton), TRUE);
+	}
 
-	gtk_widget_set_margin_start (checkbutton, 5);
+    gtk_grid_attach (GTK_GRID (grid), label, 0, 2, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), checkbutton, 1, 2, 1, 1);
 
-	gtk_widget_set_tooltip_text (checkbutton, "Do not attempt to lock memory, even if in `--realtime`.");
+	gtk_widget_set_margin_start (label, 10);
+
+	gtk_widget_set_tooltip_text (checkbutton, 
+                                 "Don't lock memory, even in realtime.");
 
 	g_signal_connect (checkbutton, "toggled", G_CALLBACK (no_memlock_cb), NULL);
+    g_signal_connect (button,
+                      "clicked",
+                      G_CALLBACK (button_clicked_cb), 
+                      checkbutton);
 }

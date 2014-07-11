@@ -7,6 +7,24 @@ typedef struct _passed_data
 	GSList *passed_list;
 }passed_data;
 
+static void
+warning_msg_box ()
+{
+	GtkWidget *msg_dialog;
+
+	msg_dialog = gtk_message_dialog_new (NULL, 
+										 GTK_DIALOG_MODAL, 
+										 GTK_MESSAGE_WARNING,
+										 GTK_BUTTONS_CLOSE,
+										 "Please choose driver first!");
+	
+	//gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (msg_dialog),
+											  //"Server could not be started!"); 
+
+	gtk_dialog_run (GTK_DIALOG (msg_dialog));
+	gtk_widget_destroy (msg_dialog);
+}
+
 static gchar *
 get_sample_rate_string ()
 {
@@ -34,7 +52,7 @@ get_sample_rate_string ()
 
 			break;
 		}
-		else if (i == argc)
+		else
 		{
 			return NULL;
 		}
@@ -89,6 +107,10 @@ rates_cb (GtkToggleButton *tb, gpointer user_data)
 				{
 					argv[i] = g_strdup (string);
 					break;
+				}
+				else if (argc == 1)
+				{
+					warning_msg_box ();
 				}
 			}
 	
@@ -199,14 +221,22 @@ sample_rate (GtkWidget *grid)
 	sample_rate_data = (passed_data *) g_malloc (sizeof (passed_data));
 
 	string = get_sample_rate_string ();
-	sample_rate_data -> passed_button = gtk_button_new_with_label (string);
+	
+	if (string == NULL)
+	{
+		sample_rate_data -> passed_button = gtk_button_new_with_label ("Rate");
+	}
+	else
+	{
+		sample_rate_data -> passed_button = gtk_button_new_with_label (string);
+	}
 
 	gtk_widget_set_tooltip_text (sample_rate_data -> passed_button,
 								 "Sample Rate (hz)");
 	gtk_widget_set_halign (sample_rate_data -> passed_button, GTK_ALIGN_CENTER);
 	gtk_widget_set_size_request (sample_rate_data -> passed_button, 96, 34);	
 
-	gtk_grid_attach (GTK_GRID (grid), sample_rate_data -> passed_button, 1, 6, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), sample_rate_data -> passed_button, 1, 7, 1, 1);
 	
 	g_signal_connect (sample_rate_data -> passed_button, "clicked", 
 					  G_CALLBACK (sample_rate_popover_cb), sample_rate_data);

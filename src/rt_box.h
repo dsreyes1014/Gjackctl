@@ -11,6 +11,6 @@
 #include "config_file_input.h"
 
 void
-rt_box (GtkWidget *grid);
+rt_box (GtkWidget *grid, GtkWidget *button);
 
 #endif

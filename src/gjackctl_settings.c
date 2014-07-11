@@ -23,8 +23,8 @@ popup_destroy_cb (GtkWidget *widget, gpointer user_data)
 	gtk_widget_show_all (window);
 }
 
-static void
-popup_clicked_ok_cb (GtkButton *button, gpointer user_data)
+void
+button_clicked_cb (GtkButton *button, gpointer user_data)
 {
 	GtkWidget *widget1;
 	GtkWidget *widget2;
@@ -42,7 +42,7 @@ popup_clicked_ok_cb (GtkButton *button, gpointer user_data)
 	g_free (data_received);
 }
 
-static PangoAttrList *
+/*static PangoAttrList *
 label_settings_attr ()
 {
 	PangoAttrList *list;
@@ -58,7 +58,7 @@ label_settings_attr ()
 	pango_attr_list_insert (list, attr);	
 
 	return list;
-}
+}*/
 
 static void
 gjackctl_settings_cb (GtkButton *button, gpointer user_data)
@@ -68,6 +68,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	GtkWidget *grid2;
 	GtkWidget *header_bar;
 	GtkWidget *button1;
+	GtkWidget *button2;
 	GtkWidget *window;
 	GtkWidget *stack;
 	GtkWidget *sswitcher;	
@@ -86,6 +87,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	grid2 = gtk_grid_new ();
 	app = data_received -> data2;
 	button1 = gtk_button_new_with_label ("OK");
+	button2 = gtk_button_new_with_label ("Cancel");
 	popup = gtk_application_window_new (GTK_APPLICATION (app));
 	header_bar = gtk_header_bar_new ();
 	window = data_received -> data1;
@@ -115,9 +117,9 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	gtk_stack_set_transition_type (GTK_STACK (stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);
 
 	/* Pack `grid` into `stack` named `server`. */
-	server_name (grid);		
-	rt_box (grid);
-	no_memlock (grid);
+	server_name (grid, button1);		
+	rt_box (grid, button1);
+	no_memlock (grid, button1);
 	rt_priority (grid);
 	drivers (grid2, app);
 	sample_rate (grid2);
@@ -126,15 +128,23 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);
 	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "Settings");
 	gtk_window_set_titlebar (GTK_WINDOW (popup), header_bar);
+	gtk_header_bar_pack_start (GTK_HEADER_BAR (header_bar), button2);
 	gtk_header_bar_pack_end (GTK_HEADER_BAR (header_bar), button1);
 
 	gtk_container_add (GTK_CONTAINER (popup), stack);
 	
-	g_signal_connect (popup, "destroy", 
-					  G_CALLBACK (popup_destroy_cb), window);
-	g_signal_connect (button1, "clicked", 
-					  G_CALLBACK (popup_clicked_ok_cb), 
+	g_signal_connect (popup, 
+                      "destroy", 
+					  G_CALLBACK (popup_destroy_cb), 
+                      window);
+	g_signal_connect (button1, 
+                      "clicked", 
+					  G_CALLBACK (button_clicked_cb), 
 					  (gpointer) data_to_pass);
+	g_signal_connect (button2, 
+                      "clicked", 
+                      G_CALLBACK (button_clicked_cb), 
+                      data_to_pass);
 
 	/* Position `popup` to show wherever current mouse position is located. */
 	gtk_window_set_position (GTK_WINDOW (popup), GTK_WIN_POS_MOUSE);

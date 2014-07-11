@@ -8,6 +8,6 @@
 #include "config_file_input.h"
 
 void
-no_memlock (GtkWidget *grid);
+no_memlock (GtkWidget *grid, GtkWidget *button);
 
 #endif

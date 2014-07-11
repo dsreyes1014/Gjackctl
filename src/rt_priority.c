@@ -55,7 +55,8 @@ priority_arg_create (gchar *arg)
 	{
 		/* If priority arg isn't found before end of `argv[i]` then create
 		it and add it to vector. */
-		if ((i == argc - 1) && (strncmp (argv[i], "-P", 2) != 0)) 
+		if (((i == argc - 1) && (strncmp (argv[i], "-P", 2) != 0)) ||
+            ((i == argc - 1) && (i == 1))) 
 		{
 			/* Add space to arg vector for the jackd arg `-R`. */
 			argc = argc + 1;
