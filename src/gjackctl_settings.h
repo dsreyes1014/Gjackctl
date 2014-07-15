@@ -8,6 +8,7 @@
 #include "rt_priority.h"
 #include "server_name.h"
 #include "no_memlock.h"
+#include "midi.h"
 
 void
 gjackctl_settings (GtkWidget *window,

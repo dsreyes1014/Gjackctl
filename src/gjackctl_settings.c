@@ -120,7 +120,8 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	server_name (grid, button1);		
 	rt_box (grid, button1);
 	no_memlock (grid, button1);
-	rt_priority (grid);
+    midi (grid, button1);
+	rt_priority (grid, button1);
 	drivers (grid2, app);
 	sample_rate (grid2);
 

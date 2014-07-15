@@ -7,12 +7,12 @@
 #include <glib/gstdio.h>
 #include <libconfig.h>
 
-void
-config_file_input (gchar **argv, gint argc);
+//void
+//config_file_input (gchar **argv, gint argc);
 
 gint 
-config_file_input1 (const gchar *config_path, 
-                    gint type, 
-                    gpointer user_data);
+config_file_input (const gchar *config_path, 
+                   gint type, 
+                   gpointer user_data);
 
 #endif

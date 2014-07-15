@@ -110,7 +110,7 @@ print_alsa_driver_activate_cb (GSimpleAction *action,
 		}
 	}
 
-	config_file_input (argv, argc);
+	//config_file_input (argv, argc);
 
 	tooltip = g_strconcat ("Soundcard: '", device, "'", NULL);
 	gtk_widget_set_tooltip_text (label_driver, tooltip);

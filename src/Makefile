@@ -4,11 +4,12 @@ PROGRAM = gjackctl
 OBJECTS = main.o server_switch.o rt_box.o drivers.o alsa_device_names.o \
 		  dsp_load.o jack_server_init.o sample_rate.o gjackctl_settings.o \
 		  connections.o rt_priority.o server_name.o display.o no_memlock.o \
-          get_arg_vector.o config_file_input.o config_file_init.o
+          get_arg_vector.o config_file_input.o config_file_init.o midi.o\
+          label_toggle_attr.o
 HEADERS = server_switch.h rt_box.h drivers.h alsa_device_names.h dsp_load.h \
 		  jack_server_init.h sample_rate.h gjackctl_settings.h connections.h \
 		  rt_priority.h server_name.h display.h no_memlock.h get_arg_vector.h \
-          config_file_input.h config_file_init.h
+          config_file_input.h config_file_init.h label_toggle_attr.h midi.h
 LIBS= `pkg-config --libs gtk+-3.0 alsa jack libconfig`
 
 all: $(PROGRAM)
@@ -19,7 +20,7 @@ main.o: main.c server_switch.h display.h config_file_init.h
 server_switch.o: server_switch.c dsp_load.h jack_server_init.h \
 					gjackctl_settings.h connections.h
 	$(CC) $(CFLAGS) server_switch.c
-rt_box.o: rt_box.c get_arg_vector.h config_file_input.h
+rt_box.o: rt_box.c get_arg_vector.h config_file_input.h label_toggle_attr.h
 	$(CC) $(CFLAGS) rt_box.c
 drivers.o: drivers.c alsa_device_names.h get_arg_vector.h
 	$(CC) $(CFLAGS) drivers.c
@@ -32,7 +33,7 @@ jack_server_init.o: jack_server_init.c dsp_load.h
 sample_rate.o: sample_rate.c jack_server_init.h get_arg_vector.h config_file_input.h
 	$(CC) $(CFLAGS) sample_rate.c
 gjackctl_settings.o: gjackctl_settings.c sample_rate.h rt_box.h rt_priority.h \
-                     server_name.h no_memlock.h
+                     server_name.h no_memlock.h midi.h
 	$(CC) $(CFLAGS) gjackctl_settings.c
 connections.o: connections.c
 	$(CC) $(CFLAGS) connections.c
@@ -50,6 +51,10 @@ config_file_input.o: config_file_input.c
 	$(CC) $(CFLAGS) config_file_input.c
 config_file_init.o: config_file_init.c
 	$(CC) $(CFLAGS) config_file_init.c
+label_toggle_attr.o: label_toggle_attr.c
+	$(CC) $(CFLAGS) label_toggle_attr.c
+midi.o: midi.c
+	$(CC) $(CFLAGS) midi.c
 
 clean:
 	rm -vf *~ *.o $(PROGRAM)

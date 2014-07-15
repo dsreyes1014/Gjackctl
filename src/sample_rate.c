@@ -114,7 +114,7 @@ rates_cb (GtkToggleButton *tb, gpointer user_data)
 				}
 			}
 	
-			config_file_input (argv, argc);			
+			//config_file_input (argv, argc);			
 
 			gtk_button_set_label (GTK_BUTTON (received_data -> passed_button), rate_string);
 

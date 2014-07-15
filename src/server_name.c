@@ -36,9 +36,9 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
 
 	entry = user_data;
 
-	config_file_input1 ("gjackctl.server.name", 
-                        CONFIG_TYPE_STRING, 
-                        (gpointer) gtk_entry_get_text (GTK_ENTRY (entry)));
+	config_file_input ("gjackctl.server.name", 
+                       CONFIG_TYPE_STRING, 
+                       (gpointer) gtk_entry_get_text (GTK_ENTRY (entry)));
 }
 
 void
@@ -68,7 +68,7 @@ server_name (GtkWidget *grid, GtkWidget *button)
 	gtk_grid_attach (GTK_GRID (grid), label_name, 0, 0, 1, 1);
 	gtk_grid_attach_next_to (GTK_GRID (grid), entry, label_name, GTK_POS_RIGHT, 1, 1);
 
-	gtk_widget_set_margin_start (label_name, 50);
+	gtk_widget_set_margin_start (label_name, 10);
 	gtk_widget_set_margin_top (entry, 10);
 	gtk_widget_set_margin_top (label_name, 5);
 

@@ -55,6 +55,7 @@ config_file_init ()
 		if (setting == NULL)
 		{
 			setting = config_setting_add (group_setting, "priority", CONFIG_TYPE_INT);
+            config_setting_set_int (setting, 75);
 		}
 
 		setting = config_setting_get_member (group_setting, "port_max");

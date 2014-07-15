@@ -30,82 +30,148 @@ get_no_memlock (config_t config)
 static void
 button_clicked_cb (GtkButton *button, gpointer user_data)
 {
-    GtkToggleButton *checkbox;
-    gboolean check;
+    GtkPassedData *data;
     gboolean value;
 
-    checkbox = user_data;
-    check = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (checkbox));
-
-    if (check == TRUE)
+    data = user_data;
+    
+    if (data -> passed_state == GTK_LABEL_NORMAL_ON)
     {
         value = TRUE;
 
-        config_file_input1 ("gjackctl.server.no_memlock",
-                            CONFIG_TYPE_BOOL,
-                            (gpointer) &value);
+        config_file_input ("gjackctl.server.no_memlock",
+                           CONFIG_TYPE_BOOL,
+                           (gpointer) &value);
     }
     else
     {	
         value = FALSE;
 
-		config_file_input1 ("gjackctl.server.no_memlock",
-                            CONFIG_TYPE_BOOL,
-                            (gpointer) &value);
+		config_file_input ("gjackctl.server.no_memlock",
+                           CONFIG_TYPE_BOOL,
+                           (gpointer) &value);
     }
 }
 
-static void
-no_memlock_cb (GtkToggleButton *tb, gpointer user_data)
+static gboolean
+leave_event_box_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
-	gboolean check;
+    GtkPassedData *data;
+        
+    data = user_data;
 
-	check = gtk_toggle_button_get_active (tb);
+    if (data -> passed_state == GTK_LABEL_NORMAL_ON)
+    {
+        label_normal_on (GTK_LABEL (data -> passed_label));
+    }
+    else
+    {
+        label_normal_off (GTK_LABEL (data -> passed_label));
+    }
 
-	if (check == TRUE)
-	{
-		gtk_widget_set_tooltip_text (GTK_WIDGET (tb), 
-                                     "Don't lock memory, even in realtime");
-	}
-	else
-	{
-		
-	}
+    return FALSE;
+}
+
+static gboolean
+enter_event_box_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
+{
+    GtkWidget *label;
+
+    label = user_data;
+    gtk_label_set_attributes (GTK_LABEL (label), label_prelight ());   
+    
+    return FALSE;                             
+}
+
+static gboolean
+event_box_released_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
+{
+    GtkPassedData *data;
+   
+    data = user_data;
+
+    if (data -> passed_state == GTK_LABEL_NORMAL_OFF)
+    {
+        data -> passed_state = label_normal_on (GTK_LABEL (data -> passed_label));
+        gtk_widget_set_tooltip_text (widget, "Lock memory");	
+        
+    }
+    else 
+    {
+        data -> passed_state = label_normal_off (GTK_LABEL (data -> passed_label));
+        gtk_widget_set_tooltip_text (widget, 
+                                     "Do not lock memory, even in realtime.");
+    }
+
+    return FALSE;
 }
 
 void
 no_memlock (GtkWidget *grid, GtkWidget *button)
 {
-	GtkWidget *checkbutton;
+	GtkWidget *event_box;
     GtkWidget *label;
     gboolean memlock;
     config_t config;
-
-	checkbutton = gtk_check_button_new ();
-    label = gtk_label_new ("No MemLock");
+    GtkPassedData *data;
+    gint state;
+    
+    data = (GtkPassedData *) g_malloc (sizeof (GtkPassedData));
+    label = gtk_label_new ("No Memlock");
+    event_box = gtk_event_box_new ();
     config_init (&config);
     memlock = get_no_memlock (config);
-
+    data -> passed_label = label;
+    
     if (memlock == FALSE)
 	{
-		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbutton), FALSE);
+        state = label_normal_off (GTK_LABEL (label));
+        data -> passed_state = state;
 	}
 	else
 	{
-		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbutton), TRUE);
+        state = label_normal_on (GTK_LABEL (label));
+        data -> passed_state = state;
 	}
 
-    gtk_grid_attach (GTK_GRID (grid), label, 0, 2, 1, 1);
-	gtk_grid_attach (GTK_GRID (grid), checkbutton, 1, 2, 1, 1);
+    /* Initiate tooltip for `checkbox` in the if/else statement. It won't 
+    show when app first starts if we don't. */
+    if (state == GTK_LABEL_NORMAL_ON)
+    {
+        gtk_widget_set_tooltip_text (event_box, "Lock memory");	
+    }
+    else
+    {	
+        gtk_widget_set_tooltip_text (event_box, 
+                                     "Do not lock memory, even in realtime.");
+    }
 
-	gtk_widget_set_margin_start (label, 10);
+    gtk_widget_add_events (event_box, GDK_BUTTON_PRESS_MASK);
+    gtk_widget_add_events (event_box, GDK_BUTTON_RELEASE_MASK);
+    gtk_widget_add_events (event_box, GDK_ENTER_NOTIFY_MASK);
+    gtk_widget_add_events (event_box, GDK_LEAVE_NOTIFY_MASK);
+    gtk_widget_add_events (event_box, GDK_PROPERTY_CHANGE_MASK);
 
-	gtk_widget_set_tooltip_text (checkbutton, 
-                                 "Don't lock memory, even in realtime.");
+    /* Pack grid. */
+    gtk_container_add (GTK_CONTAINER (event_box), label);
+    gtk_grid_attach (GTK_GRID (grid), event_box, 1, 2, 1, 1);
 
-	g_signal_connect (checkbutton, "toggled", G_CALLBACK (no_memlock_cb), NULL);
+	gtk_widget_set_margin_end (event_box, 76);
+
+    g_signal_connect (event_box,
+                      "button-release-event",
+                      G_CALLBACK (event_box_released_cb),
+                      data);
+    g_signal_connect (event_box,
+                      "enter-notify-event",
+                      G_CALLBACK (enter_event_box_cb),
+                      label);
+    g_signal_connect (event_box,
+                      "leave-notify-event",
+                      G_CALLBACK (leave_event_box_cb),
+                      data);
     g_signal_connect (button,
                       "clicked",
-                      G_CALLBACK (button_clicked_cb), 
-                      checkbutton);
+                      G_CALLBACK (button_clicked_cb),
+                      data);
 }

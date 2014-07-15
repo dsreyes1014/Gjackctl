@@ -1,18 +1,17 @@
-#include "rt_box.h"
+#include "midi.h"
 
 static gboolean
-get_realtime (config_t config)
+get_midi (config_t config)
 {
 	gboolean realtime;
-	gchar *file;
+	gchar config_file[128];
 
-    file = g_strconcat (g_getenv ("HOME"),
-                               "/.config/gjackctl/gjackctl.conf",
-                               NULL);
+	g_sprintf (config_file, "%s/.config/gjackctl/gjackctl.conf", g_getenv ("HOME"));
+
 	config_init (&config);
-	config_read_file (&config, file);
+	config_read_file (&config, config_file);
 	
-	config_lookup_bool (&config, "gjackctl.server.realtime", &realtime);
+	config_lookup_bool (&config, "gjackctl.server.midi", &realtime);
 
 	if (realtime == FALSE)
 	{
@@ -38,12 +37,12 @@ event_box_released_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
     if (data -> passed_state == GTK_LABEL_NORMAL_OFF)
     {
         data -> passed_state = label_normal_on (GTK_LABEL (data -> passed_label));
-        gtk_widget_set_tooltip_text (widget, "Disable realtime audio");
+        gtk_widget_set_tooltip_text (widget, "Disable MIDI");
     }
     else 
     {
         data -> passed_state = label_normal_off (GTK_LABEL (data -> passed_label));
-        gtk_widget_set_tooltip_text (widget, "Enable realtime audio");        
+        gtk_widget_set_tooltip_text (widget, "Enable MIDI");        
     }
 
     return FALSE;
@@ -62,7 +61,7 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
     {
         value = TRUE;
 
-        config_file_input ("gjackctl.server.realtime",
+        config_file_input ("gjackctl.server.midi",
                            CONFIG_TYPE_BOOL,
                            (gpointer) &value);
     }
@@ -70,7 +69,7 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
     {	
         value = FALSE;
 
-		config_file_input ("gjackctl.server.realtime",
+		config_file_input ("gjackctl.server.midi",
                            CONFIG_TYPE_BOOL,
                            (gpointer) &value);
     }
@@ -107,27 +106,27 @@ leave_event_box_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 }
 
 void
-rt_box (GtkWidget *grid, GtkWidget *button)
-{   
+midi (GtkWidget *grid, GtkWidget *button)
+{
     /* This gets called from `gjackctl_setings_cb` that's in the 
     `gjackctl_settings.c` module. */
 	
     GtkWidget *label;
     GtkWidget *event_box;
     config_t config;
-    gboolean realtime;
+    gboolean midi;
     gint state;
     GtkPassedData *data;
  
-    label = gtk_label_new ("Realtime");
+    label = gtk_label_new ("MIDI");
     event_box = gtk_event_box_new ();
     config_init (&config);
     state = label_normal_off (GTK_LABEL (label));
     data = (GtkPassedData *) g_malloc (sizeof (GtkPassedData));
     data -> passed_label = label;
   
-    realtime = get_realtime (config);
-    if (realtime == FALSE)
+    midi = get_midi (config);
+    if (midi == FALSE)
     {
         state = label_normal_off (GTK_LABEL (label));
         data -> passed_state = state;
@@ -142,11 +141,11 @@ rt_box (GtkWidget *grid, GtkWidget *button)
     show when app first starts if we don't. */
     if (state == GTK_LABEL_NORMAL_ON)
     {
-        gtk_widget_set_tooltip_text (event_box, "Disable realtime audio");	
+        gtk_widget_set_tooltip_text (event_box, "Disable MIDI");	
     }
     else
     {	
-        gtk_widget_set_tooltip_text (event_box, "Enable realtime audio");
+        gtk_widget_set_tooltip_text (event_box, "Enable MIDI");
     }
 
     gtk_event_box_set_visible_window (GTK_EVENT_BOX (event_box), TRUE);
@@ -154,12 +153,10 @@ rt_box (GtkWidget *grid, GtkWidget *button)
     /* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
     in the `gjackctl_settings_cb` function. */
     gtk_container_add (GTK_CONTAINER (event_box), label);
-    gtk_grid_attach (GTK_GRID (grid), event_box, 1, 1, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), event_box, 1, 3, 1, 1);
 
-
-    gtk_widget_set_margin_end (event_box, 100);
-    gtk_widget_set_margin_top (event_box, 10);
-      
+    gtk_widget_set_margin_end (event_box, 126);
+         
     gtk_widget_add_events (event_box, GDK_BUTTON_PRESS_MASK);
     gtk_widget_add_events (event_box, GDK_BUTTON_RELEASE_MASK);
     gtk_widget_add_events (event_box, GDK_ENTER_NOTIFY_MASK);

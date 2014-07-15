@@ -10,15 +10,6 @@
 #include "config_file_input.h"
 
 void
-rt_priority (GtkWidget *grid);
-
-void
-value_cb (GtkSpinButton *spin_button, gpointer data);
-
-void
-priority_arg_create (gchar *arg);
-
-gint
-digit (gchar **argvp);
+rt_priority (GtkWidget *grid, GtkWidget *button);
 
 #endif

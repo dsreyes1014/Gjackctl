@@ -1,6 +1,6 @@
 #include "config_file_input.h"
 
-void
+/*void
 config_file_input (gchar **argv, gint argc)
 {
 	gchar file[128];	
@@ -19,12 +19,12 @@ config_file_input (gchar **argv, gint argc)
 	fclose (jackdrc);
 
 	g_strfreev (argv);
-}
+}*/
 
 gint 
-config_file_input1 (const gchar *config_path, 
-                    gint type, 
-                    gpointer user_data)
+config_file_input (const gchar *config_path, 
+                   gint type, 
+                   gpointer user_data)
 {
 	gchar config_file[128];
 	config_t config;
