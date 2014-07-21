@@ -66,6 +66,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	GtkWidget *popup;
 	GtkWidget *grid;
 	GtkWidget *grid2;
+    GtkWidget *grid3;
 	GtkWidget *header_bar;
 	GtkWidget *button1;
 	GtkWidget *button2;
@@ -73,18 +74,21 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	GtkWidget *stack;
 	GtkWidget *sswitcher;	
 	GtkApplication *app;
+    GtkWidget *frame1;
 	
 	/* This is a `struct` that holds variables passed by 
 	the `g_signal_connect ()` function through `gpointer user_data`. */ 
 	pass_data *data_received;
 	pass_data_2 *data_to_pass;	
 
+    frame1 = gtk_frame_new ("On/Off");
 	stack = gtk_stack_new ();
 	sswitcher = gtk_stack_switcher_new ();
 	data_to_pass = (pass_data_2 *) g_malloc (sizeof (pass_data_2));
 	data_received = user_data;
 	grid = gtk_grid_new ();
 	grid2 = gtk_grid_new ();
+    grid3 = gtk_grid_new ();
 	app = data_received -> data2;
 	button1 = gtk_button_new_with_label ("OK");
 	button2 = gtk_button_new_with_label ("Cancel");
@@ -96,13 +100,10 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 
 	/* `grid` and `grid2` attributes. */
 	gtk_grid_set_row_spacing (GTK_GRID (grid), 4);
-	gtk_grid_set_column_spacing (GTK_GRID (grid), 4);
-	gtk_grid_set_column_homogeneous (GTK_GRID (grid), FALSE);
-	gtk_grid_set_row_homogeneous (GTK_GRID (grid), FALSE);
+	gtk_grid_set_column_spacing (GTK_GRID (grid), 20);
 	gtk_grid_set_row_spacing (GTK_GRID (grid2), 4);
 	gtk_grid_set_column_spacing (GTK_GRID (grid2), 4);
-	gtk_grid_set_column_homogeneous (GTK_GRID (grid2), FALSE);
-	gtk_grid_set_row_homogeneous (GTK_GRID (grid2), FALSE);
+	
 
 	gtk_stack_add_titled (GTK_STACK (stack),
 						  grid,
@@ -118,12 +119,19 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 
 	/* Pack `grid` into `stack` named `server`. */
 	server_name (grid, button1);		
-	rt_box (grid, button1);
-	no_memlock (grid, button1);
-    midi (grid, button1);
+	rt_box (grid3, button1);
+	no_memlock (grid3, button1);
+    midi (grid3, button1);
 	rt_priority (grid, button1);
+    port_max (grid, button1);
 	drivers (grid2, app);
 	sample_rate (grid2);
+    gtk_container_add (GTK_CONTAINER (frame1), grid3);
+    gtk_grid_attach (GTK_GRID (grid), frame1, 0, 1, 1, 1);
+
+    gtk_widget_set_margin_top (frame1, 6);
+    gtk_widget_set_margin_end (frame1, 14);
+    gtk_widget_set_margin_start (frame1, 24);
 
 	/* Pack `header_bar`. */
 	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);

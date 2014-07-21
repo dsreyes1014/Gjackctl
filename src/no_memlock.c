@@ -154,9 +154,10 @@ no_memlock (GtkWidget *grid, GtkWidget *button)
 
     /* Pack grid. */
     gtk_container_add (GTK_CONTAINER (event_box), label);
-    gtk_grid_attach (GTK_GRID (grid), event_box, 1, 2, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), event_box, 0, 1, 1, 1);
 
-	gtk_widget_set_margin_end (event_box, 76);
+	//gtk_widget_set_margin_end (event_box, 20);
+    gtk_widget_set_halign (event_box, GTK_ALIGN_CENTER);
 
     g_signal_connect (event_box,
                       "button-release-event",

@@ -9,6 +9,7 @@
 #include "server_name.h"
 #include "no_memlock.h"
 #include "midi.h"
+#include "port_max.h"
 
 void
 gjackctl_settings (GtkWidget *window,

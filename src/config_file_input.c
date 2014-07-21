@@ -9,7 +9,7 @@ config_file_input (gchar **argv, gint argc)
 	
 	g_sprintf (file, "%s/.jackdrc", g_getenv ("HOME"));
 
-	jackdrc = g_fopen (file, "w+");
+	jackdrc = g_fopen (file, "w+"c);
 
 	for (i = 0; i < argc; i++)
 	{

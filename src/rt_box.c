@@ -154,11 +154,11 @@ rt_box (GtkWidget *grid, GtkWidget *button)
     /* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
     in the `gjackctl_settings_cb` function. */
     gtk_container_add (GTK_CONTAINER (event_box), label);
-    gtk_grid_attach (GTK_GRID (grid), event_box, 1, 1, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid), event_box, 0, 0, 1, 1);
 
-
-    gtk_widget_set_margin_end (event_box, 100);
-    gtk_widget_set_margin_top (event_box, 10);
+    gtk_widget_set_halign (event_box, GTK_ALIGN_CENTER);
+    //gtk_widget_set_margin_end (event_box, );
+    //gtk_widget_set_margin_top (event_box, 10);
       
     gtk_widget_add_events (event_box, GDK_BUTTON_PRESS_MASK);
     gtk_widget_add_events (event_box, GDK_BUTTON_RELEASE_MASK);
