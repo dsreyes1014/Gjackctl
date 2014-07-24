@@ -7,11 +7,13 @@ label_prelight ()
     PangoAttribute *attr;
 
     list = pango_attr_list_new ();
-    attr = pango_attr_style_new (PANGO_STYLE_ITALIC);
-    pango_attr_list_insert (list, attr);
+    //attr = pango_attr_style_new (PANGO_STYLE_ITALIC);
+    //pango_attr_list_insert (list, attr);
     attr = pango_attr_foreground_new (65535, 65535, 65535);
     pango_attr_list_insert (list, attr);
-    attr = pango_attr_weight_new (PANGO_WEIGHT_ULTRABOLD);
+    attr = pango_attr_background_new (12000, 12000, 12000);
+    pango_attr_list_insert (list, attr);
+    attr = pango_attr_weight_new (PANGO_WEIGHT_ULTRAHEAVY);
     pango_attr_list_insert (list, attr);
 
     return list;

@@ -1,4 +1,4 @@
-#include "rt_box.h"
+#include "toggle_rt.h"
 
 static gboolean
 get_realtime (config_t config)
@@ -107,7 +107,7 @@ leave_event_box_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 }
 
 void
-rt_box (GtkWidget *grid, GtkWidget *button)
+toggle_rt (GtkWidget *grid, GtkWidget *button)
 {   
     /* This gets called from `gjackctl_setings_cb` that's in the 
     `gjackctl_settings.c` module. */

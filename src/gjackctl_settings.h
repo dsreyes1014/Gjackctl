@@ -4,12 +4,13 @@
 #include <gtk/gtk.h>
 
 #include "sample_rate.h"
-#include "rt_box.h"
+#include "toggle_rt.h"
 #include "rt_priority.h"
 #include "server_name.h"
-#include "no_memlock.h"
-#include "midi.h"
+#include "toggle_no_memlock.h"
+#include "toggle_midi.h"
 #include "port_max.h"
+#include "timeout.h"
 
 void
 gjackctl_settings (GtkWidget *window,

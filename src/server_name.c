@@ -68,16 +68,18 @@ server_name (GtkWidget *grid, GtkWidget *button)
     gtk_widget_set_size_request (frame, 10, 20);
 
     gtk_container_add (GTK_CONTAINER (frame), entry);
-	gtk_grid_attach (GTK_GRID (grid), frame, 0, 0, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), frame, 1, 0, 1, 1);
 
     gtk_entry_set_width_chars (GTK_ENTRY (entry), 10);
 
-	gtk_widget_set_margin_start (frame, 10);
-	gtk_widget_set_margin_top (frame, 6);
-	gtk_widget_set_margin_top (entry, 4);
+	//gtk_widget_set_margin_start (frame, 10);
+	//gtk_widget_set_margin_top (frame, 6);
+    //gtk_widget_set_margin_bottom (frame, 10);
+	//gtk_widget_set_margin_top (entry, 4);
     gtk_widget_set_margin_bottom (entry, 4);
     gtk_widget_set_margin_start (entry, 6);
     gtk_widget_set_margin_end (entry, 6);
+    gtk_widget_set_valign (frame, GTK_ALIGN_CENTER);
 
 	g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), entry);
 }

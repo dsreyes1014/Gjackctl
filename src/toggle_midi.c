@@ -1,4 +1,4 @@
-#include "midi.h"
+#include "toggle_midi.h"
 
 static gboolean
 get_midi (config_t config)
@@ -106,7 +106,7 @@ leave_event_box_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 }
 
 void
-midi (GtkWidget *grid, GtkWidget *button)
+toggle_midi (GtkWidget *grid, GtkWidget *button)
 {
     /* This gets called from `gjackctl_setings_cb` that's in the 
     `gjackctl_settings.c` module. */
@@ -157,6 +157,7 @@ midi (GtkWidget *grid, GtkWidget *button)
 
    // gtk_widget_set_margin_end (event_box, 20);
     gtk_widget_set_halign (event_box, GTK_ALIGN_CENTER);
+    gtk_widget_set_margin_bottom (event_box, 20);
          
     gtk_widget_add_events (event_box, GDK_BUTTON_PRESS_MASK);
     gtk_widget_add_events (event_box, GDK_BUTTON_RELEASE_MASK);

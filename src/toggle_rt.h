@@ -1,5 +1,5 @@
-#ifndef RADIO_RT_H
-#define RADIO_RT_H
+#ifndef TOGGLE_RT_H
+#define TOGGLE_RT_H
 
 #include <gtk/gtk.h>
 #include <glib.h>
@@ -12,6 +12,6 @@
 #include "label_toggle_attr.h"
 
 void
-rt_box (GtkWidget *grid, GtkWidget *button);
+toggle_rt (GtkWidget *grid, GtkWidget *button);
 
 #endif

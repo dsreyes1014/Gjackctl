@@ -41,6 +41,8 @@ jack_server_init (GtkSwitch *sw, GPid pid, GtkWidget *window)
 	{
 		gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
 		g_print ("Couldn't start JACK server.\n");
+
+        return -1;
 	}
 
 	/* We wait 2 seconds for server to initiate so we can create `gjackctl` 

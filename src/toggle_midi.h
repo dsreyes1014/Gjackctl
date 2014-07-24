@@ -1,5 +1,5 @@
-#ifndef MIDI_H
-#define MIDI_H
+#ifndef TOGGLE_MIDI_H
+#define TOGGLE_MIDI_H
 
 #include <gtk/gtk.h>
 #include <libconfig.h>
@@ -8,6 +8,6 @@
 #include "config_file_input.h"
 
 void
-midi (GtkWidget *grid, GtkWidget *button);
+toggle_midi (GtkWidget *grid, GtkWidget *button);
 
 #endif

@@ -75,12 +75,16 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	GtkWidget *sswitcher;	
 	GtkApplication *app;
     GtkWidget *frame1;
+    GtkWidget *box;
+    GtkWidget *box2;
 	
 	/* This is a `struct` that holds variables passed by 
 	the `g_signal_connect ()` function through `gpointer user_data`. */ 
 	pass_data *data_received;
 	pass_data_2 *data_to_pass;	
 
+    box2 = gtk_box_new (GTK_ORIENTATION_VERTICAL,6);
+    box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
     frame1 = gtk_frame_new ("On/Off");
 	stack = gtk_stack_new ();
 	sswitcher = gtk_stack_switcher_new ();
@@ -106,7 +110,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	
 
 	gtk_stack_add_titled (GTK_STACK (stack),
-						  grid,
+						  box,
                           "server",
                           "Server");
 	gtk_stack_add_titled (GTK_STACK (stack),
@@ -119,19 +123,23 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 
 	/* Pack `grid` into `stack` named `server`. */
 	server_name (grid, button1);		
-	rt_box (grid3, button1);
-	no_memlock (grid3, button1);
-    midi (grid3, button1);
+	toggle_rt (grid3, button1);
+	toggle_no_memlock (grid3, button1);
+    toggle_midi (grid3, button1);
 	rt_priority (grid, button1);
     port_max (grid, button1);
+    timeout (grid, button1);
 	drivers (grid2, app);
 	sample_rate (grid2);
     gtk_container_add (GTK_CONTAINER (frame1), grid3);
-    gtk_grid_attach (GTK_GRID (grid), frame1, 0, 1, 1, 1);
+    gtk_box_pack_start (GTK_BOX (box), frame1, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (box), grid, FALSE, FALSE, 2);
+    //gtk_grid_attach (GTK_GRID (grid), frame1, 0, 0, 1, 1);
 
-    gtk_widget_set_margin_top (frame1, 6);
-    gtk_widget_set_margin_end (frame1, 14);
-    gtk_widget_set_margin_start (frame1, 24);
+   // gtk_widget_set_margin_top (frame1, 6);
+   // gtk_widget_set_margin_end (frame1, 14);
+    gtk_widget_set_margin_start (frame1, 10);
+   /// gtk_widget_set_margin_bottom (frame1, 60);
 
 	/* Pack `header_bar`. */
 	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);

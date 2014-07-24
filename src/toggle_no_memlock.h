@@ -1,5 +1,5 @@
-#ifndef NO_MEMLOCK_C
-#define NO_MEMLOCK_C
+#ifndef TOGGLE_NO_MEMLOCK_C
+#define TOGGLE_NO_MEMLOCK_C
 
 #include <gtk/gtk.h>
 #include <string.h>
@@ -9,6 +9,6 @@
 #include "label_toggle_attr.h"
 
 void
-no_memlock (GtkWidget *grid, GtkWidget *button);
+toggle_no_memlock (GtkWidget *grid, GtkWidget *button);
 
 #endif

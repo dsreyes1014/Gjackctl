@@ -11,7 +11,7 @@
 #include <jack/jack.h>
 #include <gtk/gtk.h>
 
-#include "rt_box.h"
+//#include "rt_box.h"
 #include "drivers.h"
 #include "dsp_load.h"
 #include "jack_server_init.h"

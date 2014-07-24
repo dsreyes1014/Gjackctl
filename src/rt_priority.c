@@ -59,13 +59,13 @@ rt_priority (GtkWidget *grid, GtkWidget *button)
 	/* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
 	in the `gjackctl_settings_cb` function. */
     gtk_container_add (GTK_CONTAINER (frame), spin_button);
-	gtk_grid_attach (GTK_GRID (grid), frame, 1, 0, 1, 1);
+	gtk_grid_attach (GTK_GRID (grid), frame, 1, 1, 1, 1);
 	
-	gtk_widget_set_margin_top (frame, 6);
-	gtk_widget_set_margin_top (spin_button, 4);
+	//gtk_widget_set_margin_top (frame, 6);
+	//gtk_widget_set_margin_top (spin_button, 4);
 	gtk_widget_set_margin_end (spin_button, 6);
     gtk_widget_set_margin_start (spin_button, 6);
-    gtk_widget_set_margin_bottom (spin_button, 4);
+    //gtk_widget_set_margin_bottom (spin_button, 4);
 
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), spin_button);
 }

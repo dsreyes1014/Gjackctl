@@ -1,4 +1,4 @@
-#include "no_memlock.h"
+#include "toggle_no_memlock.h"
 
 static gboolean
 get_no_memlock (config_t config)
@@ -107,7 +107,7 @@ event_box_released_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 }
 
 void
-no_memlock (GtkWidget *grid, GtkWidget *button)
+toggle_no_memlock (GtkWidget *grid, GtkWidget *button)
 {
 	GtkWidget *event_box;
     GtkWidget *label;

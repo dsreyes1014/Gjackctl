@@ -63,7 +63,15 @@ config_file_init ()
 		if (setting == NULL)
 		{
 			setting = config_setting_add (group_setting, "port_max", CONFIG_TYPE_STRING);
-            config_setting_set_int (setting, 256);
+            config_setting_set_string (setting, "256");
+		}
+
+        setting = config_setting_get_member (group_setting, "timeout");
+
+		if (setting == NULL)
+		{
+			setting = config_setting_add (group_setting, "timeout", CONFIG_TYPE_STRING);
+            config_setting_set_string (setting, "500");
 		}
 	
 		setting = config_setting_get_member (group_setting, "realtime");

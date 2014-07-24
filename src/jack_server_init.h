@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 
 #include "server_switch.h"
-#include "rt_box.h"
+//#include "rt_box.h"
 #include "dsp_load.h"
 
 gint 
