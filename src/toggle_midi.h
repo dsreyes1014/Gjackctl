@@ -8,6 +8,6 @@
 #include "config_file_input.h"
 
 void
-toggle_midi (GtkWidget *grid, GtkWidget *button);
+toggle_midi (GtkWidget *box, GtkWidget *button);
 
 #endif

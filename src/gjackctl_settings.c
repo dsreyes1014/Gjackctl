@@ -74,18 +74,26 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	GtkWidget *stack;
 	GtkWidget *sswitcher;	
 	GtkApplication *app;
-    GtkWidget *frame1;
     GtkWidget *box;
     GtkWidget *box2;
-	
+    GtkWidget *box3;
+	GtkWidget *box4;
+    GtkWidget *box5;
+    GtkWidget *box6;
+    GtkWidget *frame;
+
 	/* This is a `struct` that holds variables passed by 
 	the `g_signal_connect ()` function through `gpointer user_data`. */ 
 	pass_data *data_received;
 	pass_data_2 *data_to_pass;	
 
-    box2 = gtk_box_new (GTK_ORIENTATION_VERTICAL,6);
-    box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
-    frame1 = gtk_frame_new ("On/Off");
+    frame = gtk_frame_new (NULL);
+    box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
+    box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+    box3 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
+    box4 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+    box5 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
+    box6 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
 	stack = gtk_stack_new ();
 	sswitcher = gtk_stack_switcher_new ();
 	data_to_pass = (pass_data_2 *) g_malloc (sizeof (pass_data_2));
@@ -122,25 +130,26 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	gtk_stack_set_transition_type (GTK_STACK (stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);
 
 	/* Pack `grid` into `stack` named `server`. */
-	server_name (grid, button1);		
-	toggle_rt (grid3, button1);
-	toggle_no_memlock (grid3, button1);
-    toggle_midi (grid3, button1);
-	rt_priority (grid, button1);
-    port_max (grid, button1);
-    timeout (grid, button1);
+    //gtk_container_add (GTK_CONTAINER (frame), box3);
+    gtk_box_pack_start (GTK_BOX (box), box2, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (box4), box5, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (box4), box6, FALSE, FALSE, 2);
+    //gtk_box_pack_start (GTK_BOX (box3), box4, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (box), box4, FALSE, FALSE, 2);
+	server_name (box2, button1);		
+	toggle_rt (box5, button1);
+	toggle_no_memlock (box5, button1);
+    toggle_midi (box5, button1);
+	rt_priority (box2, button1);
+    port_max (box, button1);
+    timeout (box, button1);
 	drivers (grid2, app);
 	sample_rate (grid2);
-    gtk_container_add (GTK_CONTAINER (frame1), grid3);
-    gtk_box_pack_start (GTK_BOX (box), frame1, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (box), grid, FALSE, FALSE, 2);
-    //gtk_grid_attach (GTK_GRID (grid), frame1, 0, 0, 1, 1);
 
-   // gtk_widget_set_margin_top (frame1, 6);
-   // gtk_widget_set_margin_end (frame1, 14);
-    gtk_widget_set_margin_start (frame1, 10);
-   /// gtk_widget_set_margin_bottom (frame1, 60);
-
+    gtk_widget_set_margin_start (frame, 40);
+    gtk_widget_set_margin_end (frame, 50);
+    gtk_widget_set_size_request (button1, 80, 30);
+    
 	/* Pack `header_bar`. */
 	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);
 	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "Settings");

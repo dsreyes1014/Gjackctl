@@ -73,6 +73,14 @@ config_file_init ()
 			setting = config_setting_add (group_setting, "timeout", CONFIG_TYPE_STRING);
             config_setting_set_string (setting, "500");
 		}
+
+        setting = config_setting_get_member (group_setting, "clocksource");
+
+		if (setting == NULL)
+		{
+			setting = config_setting_add (group_setting, "clocksource", CONFIG_TYPE_STRING);
+            config_setting_set_string (setting, "system");
+		}
 	
 		setting = config_setting_get_member (group_setting, "realtime");
 

@@ -10,6 +10,6 @@
 #include "config_file_input.h"
 
 void
-server_name (GtkWidget *grid, GtkWidget *button);
+server_name (GtkWidget *box, GtkWidget *button);
 
 #endif

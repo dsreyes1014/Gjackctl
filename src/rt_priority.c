@@ -34,38 +34,41 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
 }
 
 void
-rt_priority (GtkWidget *grid, GtkWidget *button)
+rt_priority (GtkWidget *box, GtkWidget *button)
 {
 	/* This gets called from `gjackctl_setings_cb` that's in the 
 	`gjackctl_settings.c` module. */
 
-	//GtkWidget *label;
+	GtkWidget *label;
 	GtkWidget *spin_button;
-    GtkWidget *frame;
+    GtkWidget *child_box;
 	GtkAdjustment *adjustment;
     gint priority;
     config_t config;
     const gchar *string;
 
-    frame = gtk_frame_new ("Priority");
+    label = gtk_label_new ("Priority");
 	adjustment = gtk_adjustment_new (75, 0, 99, 1, 0, 0);
 	spin_button = gtk_spin_button_new (adjustment, 1, 0);
     string = get_priority (config);
     priority = g_ascii_strtoll (string, NULL, 0);
+    child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
 
-    config_destroy (&config);
+    //config_destroy (&config);
+    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin_button), priority);
 
-	/* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
+	/* Pack `box` which is declared in `gjackctl_settings.c`
 	in the `gjackctl_settings_cb` function. */
-    gtk_container_add (GTK_CONTAINER (frame), spin_button);
-	gtk_grid_attach (GTK_GRID (grid), frame, 1, 1, 1, 1);
+    gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box), spin_button, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (box), child_box, FALSE, FALSE, 2);
 	
-	//gtk_widget_set_margin_top (frame, 6);
-	//gtk_widget_set_margin_top (spin_button, 4);
-	gtk_widget_set_margin_end (spin_button, 6);
-    gtk_widget_set_margin_start (spin_button, 6);
-    //gtk_widget_set_margin_bottom (spin_button, 4);
+    gtk_widget_set_halign (label, GTK_ALIGN_START);
+    gtk_widget_set_halign (spin_button, GTK_ALIGN_START);
+    gtk_widget_set_margin_start (label, 40);
+    gtk_widget_set_margin_start (spin_button, 40);
+    gtk_widget_set_margin_end (spin_button, 70);
 
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), spin_button);
 }

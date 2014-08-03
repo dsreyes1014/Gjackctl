@@ -8,6 +8,6 @@
 #include "label_toggle_attr.h"
 
 void
-port_max (GtkWidget *grid, GtkWidget *button);
+port_max (GtkWidget *box, GtkWidget *button);
 
 #endif

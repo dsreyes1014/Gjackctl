@@ -42,44 +42,40 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
 }
 
 void
-server_name (GtkWidget *grid, GtkWidget *button)
+server_name (GtkWidget *box, GtkWidget *button)
 {
 	/* This gets called from `gjackctl_setings_cb` that's in the 
 	`gjackctl_settings.c` module. */
 
-    GtkWidget *frame;
+    GtkWidget *label;
 	GtkWidget *entry;
+    GtkWidget *child_box;
 	const gchar *name;
 	config_t config;
 
-    frame = gtk_frame_new ("Name");
+    label = gtk_label_new ("Name");
 	entry = gtk_entry_new ();	
 	name = get_name (config);
+    child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
 	
 	if (!name)
 	{
 		config_destroy (&config);
 	}
 	
-	gtk_entry_set_placeholder_text (GTK_ENTRY (entry), "default");
+    gtk_entry_set_text (GTK_ENTRY (entry), name);	
+    gtk_entry_set_placeholder_text (GTK_ENTRY (entry), "default");
 	gtk_widget_set_tooltip_text (entry, "Enter the name of the JACK server");	
-	gtk_entry_set_text (GTK_ENTRY (entry), name);    
-    gtk_entry_set_max_width_chars (GTK_ENTRY (entry), 10);
-    gtk_widget_set_size_request (frame, 10, 20);
+	gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));    
 
-    gtk_container_add (GTK_CONTAINER (frame), entry);
-	gtk_grid_attach (GTK_GRID (grid), frame, 1, 0, 1, 1);
+    gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box), entry, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (box), child_box, FALSE, FALSE, 2);
 
-    gtk_entry_set_width_chars (GTK_ENTRY (entry), 10);
-
-	//gtk_widget_set_margin_start (frame, 10);
-	//gtk_widget_set_margin_top (frame, 6);
-    //gtk_widget_set_margin_bottom (frame, 10);
-	//gtk_widget_set_margin_top (entry, 4);
-    gtk_widget_set_margin_bottom (entry, 4);
-    gtk_widget_set_margin_start (entry, 6);
-    gtk_widget_set_margin_end (entry, 6);
-    gtk_widget_set_valign (frame, GTK_ALIGN_CENTER);
+    gtk_widget_set_halign (label, GTK_ALIGN_START);
+    gtk_widget_set_halign (entry, GTK_ALIGN_START);
+    gtk_widget_set_margin_start (label, 60);
+    gtk_widget_set_margin_start (entry, 60);
 
 	g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), entry);
 }

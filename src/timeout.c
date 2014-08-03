@@ -40,23 +40,27 @@ get_timeout (config_t config)
 }
 
 void
-timeout (GtkWidget *grid, GtkWidget *button)
+timeout (GtkWidget *box, GtkWidget *button)
 {
-    GtkWidget *frame;
+    GtkWidget *label;
     GtkWidget *radio1;
     GtkWidget *radio2;
     GtkWidget *radio3;
     GtkWidget *radio4;
     GtkWidget *radio5;
     GtkWidget *radio6;
-    GtkWidget *grid1;
+    GtkWidget *child_box1;
+    GtkWidget *child_box2;
+    GtkWidget *child_box3;
     GtkWidget *tb;
     const gchar *string;
     GSList *list;
     config_t config;
     
-    frame = gtk_frame_new ("Timeout (ms)"); 
-    grid1 = gtk_grid_new ();
+    label = gtk_label_new ("Timeout (ms)"); 
+    child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+    child_box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+    child_box3 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     radio1 = gtk_radio_button_new_with_label (NULL, "200");
     radio2 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1), "500");
     radio3 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1), "1000");
@@ -66,7 +70,7 @@ timeout (GtkWidget *grid, GtkWidget *button)
     list = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
     string = get_timeout (config);
 
-    gtk_widget_set_tooltip_text (frame, "Choose JACK client timeout in milliseconds.");
+    gtk_widget_set_tooltip_text (child_box1, "Choose JACK client timeout in milliseconds.");
 
     while (list)
     {
@@ -82,21 +86,25 @@ timeout (GtkWidget *grid, GtkWidget *button)
 
     list = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
 
-    /* Pack grid. */
-    gtk_grid_attach (GTK_GRID (grid1), radio1, 0, 0, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid1), radio2, 0, 1, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid1), radio3, 0, 2, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid1), radio4, 0, 3, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid1), radio5, 0, 4, 1, 1);
-    gtk_grid_attach (GTK_GRID (grid1), radio6, 0, 5, 1, 1);
-    gtk_container_add (GTK_CONTAINER (frame), grid1);                
-    gtk_grid_attach (GTK_GRID (grid), frame, 2, 1, 1, 1);
-    
-    //gtk_widget_set_margin_top (frame, 6);  
-    gtk_widget_set_margin_end (frame, 30);  
-    //gtk_widget_set_margin_bottom (frame, 10);
-    //gtk_widget_set_margin_start (frame, 14);
-    gtk_widget_set_valign (frame, GTK_ALIGN_CENTER);
+    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
+
+    /* Pack box. */
+    gtk_box_pack_start (GTK_BOX (child_box2), radio1, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box2), radio2, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box2), radio3, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box2), radio4, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box3), radio5, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box3), radio6, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box1), label, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box1), child_box2, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box1), child_box3, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (box), child_box1, FALSE, FALSE, 2);
+
+    gtk_widget_set_halign (label, GTK_ALIGN_START);
+    gtk_widget_set_margin_start (label, 60);
+    gtk_widget_set_margin_start (radio1, 80);
+    gtk_widget_set_margin_start (radio5, 146);
+    gtk_widget_set_margin_top (label, 10);
 
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), list);
 }

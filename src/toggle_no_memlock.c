@@ -107,7 +107,7 @@ event_box_released_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 }
 
 void
-toggle_no_memlock (GtkWidget *grid, GtkWidget *button)
+toggle_no_memlock (GtkWidget *box, GtkWidget *button)
 {
 	GtkWidget *event_box;
     GtkWidget *label;
@@ -154,10 +154,11 @@ toggle_no_memlock (GtkWidget *grid, GtkWidget *button)
 
     /* Pack grid. */
     gtk_container_add (GTK_CONTAINER (event_box), label);
-    gtk_grid_attach (GTK_GRID (grid), event_box, 0, 1, 1, 1);
+    gtk_box_pack_start (GTK_BOX (box), event_box, FALSE, FALSE, 2);
 
 	//gtk_widget_set_margin_end (event_box, 20);
     gtk_widget_set_halign (event_box, GTK_ALIGN_CENTER);
+    gtk_widget_set_margin_start (event_box, 110);
 
     g_signal_connect (event_box,
                       "button-release-event",

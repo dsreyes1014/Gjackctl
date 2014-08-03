@@ -7,6 +7,6 @@
 #include "config_file_input.h"
 
 void
-timeout (GtkWidget *grid, GtkWidget *button);
+timeout (GtkWidget *box, GtkWidget *button);
 
 #endif

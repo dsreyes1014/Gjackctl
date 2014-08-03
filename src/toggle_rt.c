@@ -107,7 +107,7 @@ leave_event_box_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 }
 
 void
-toggle_rt (GtkWidget *grid, GtkWidget *button)
+toggle_rt (GtkWidget *box, GtkWidget *button)
 {   
     /* This gets called from `gjackctl_setings_cb` that's in the 
     `gjackctl_settings.c` module. */
@@ -154,11 +154,11 @@ toggle_rt (GtkWidget *grid, GtkWidget *button)
     /* Pack `GtkGrid grid` which is declared in `gjackctl_settings.c`
     in the `gjackctl_settings_cb` function. */
     gtk_container_add (GTK_CONTAINER (event_box), label);
-    gtk_grid_attach (GTK_GRID (grid), event_box, 0, 0, 1, 1);
+    gtk_box_pack_start (GTK_BOX (box), event_box, FALSE, FALSE, 2);
 
-    gtk_widget_set_halign (event_box, GTK_ALIGN_CENTER);
-    //gtk_widget_set_margin_end (event_box, );
-    //gtk_widget_set_margin_top (event_box, 10);
+    //gtk_widget_set_halign (event_box, GTK_ALIGN_START);
+    gtk_widget_set_margin_start (event_box, 110);
+    gtk_widget_set_margin_top (event_box, 20);
       
     gtk_widget_add_events (event_box, GDK_BUTTON_PRESS_MASK);
     gtk_widget_add_events (event_box, GDK_BUTTON_RELEASE_MASK);

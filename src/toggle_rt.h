@@ -12,6 +12,6 @@
 #include "label_toggle_attr.h"
 
 void
-toggle_rt (GtkWidget *grid, GtkWidget *button);
+toggle_rt (GtkWidget *box, GtkWidget *button);
 
 #endif
