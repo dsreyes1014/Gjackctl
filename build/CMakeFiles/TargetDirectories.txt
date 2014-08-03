@@ -1,1 +1,0 @@
-/home/drew/Programs/gjackctl/build/CMakeFiles/gjackctl.dir
