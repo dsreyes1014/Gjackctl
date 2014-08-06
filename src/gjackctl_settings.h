@@ -11,6 +11,7 @@
 #include "toggle_midi.h"
 #include "port_max.h"
 #include "timeout.h"
+#include "clocksource.h"
 
 void
 gjackctl_settings (GtkWidget *window,

@@ -39,7 +39,8 @@ add_executable (gjackctl main.c
                          toggle_midi.c
                          label_toggle_attr.c
                          port_max.c
-                         timeout.c)
+                         timeout.c
+                         clocksource.c)
 
 target_link_libraries (gjackctl ${GTK3_LIBRARIES} 
                                 ${LIBCONFIG_LIBRARIES}

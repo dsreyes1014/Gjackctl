@@ -141,6 +141,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	toggle_no_memlock (box5, button1);
     toggle_midi (box5, button1);
 	rt_priority (box2, button1);
+    clocksource (box, button1);
     port_max (box, button1);
     timeout (box, button1);
 	drivers (grid2, app);
