@@ -12,6 +12,7 @@
 #include "port_max.h"
 #include "timeout.h"
 #include "clocksource.h"
+#include "toggle_no_zombies.h"
 
 void
 gjackctl_settings (GtkWidget *window,

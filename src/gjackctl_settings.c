@@ -88,12 +88,12 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	pass_data_2 *data_to_pass;	
 
     frame = gtk_frame_new (NULL);
-    box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
-    box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
-    box3 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
-    box4 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
-    box5 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
-    box6 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
+    box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);    /* Main settings server box. */
+    box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6); /* First box packed inside of `box`. */ 
+    box3 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);   /* */
+    box4 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6); /* Second box packed inside `box`. */
+    box5 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);   /* First box packed inside of `box4`. */
+    box6 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);   /* Second box packed inside of `box4`. */
 	stack = gtk_stack_new ();
 	sswitcher = gtk_stack_switcher_new ();
 	data_to_pass = (pass_data_2 *) g_malloc (sizeof (pass_data_2));
@@ -140,6 +140,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	toggle_rt (box5, button1);
 	toggle_no_memlock (box5, button1);
     toggle_midi (box5, button1);
+    toggle_no_zombies (box6, button1);
 	rt_priority (box2, button1);
     clocksource (box, button1);
     port_max (box, button1);
@@ -147,8 +148,8 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	drivers (grid2, app);
 	sample_rate (grid2);
 
-    gtk_widget_set_margin_start (frame, 40);
-    gtk_widget_set_margin_end (frame, 50);
+    //gtk_widget_set_margin_start (frame, 40);
+    //gtk_widget_set_margin_end (frame, 50);
     gtk_widget_set_size_request (button1, 80, 30);
     
 	/* Pack `header_bar`. */

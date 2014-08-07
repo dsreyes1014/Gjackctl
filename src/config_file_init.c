@@ -8,21 +8,24 @@ config_file_init ()
 	config_setting_t *root_setting;
 	config_setting_t *group_setting;
 	config_setting_t *setting;
-	gchar config_file[128];
-	gchar config_dir[128];
+	gchar *file;
 
-	g_sprintf (config_dir, "%s/.config/gjackctl", g_getenv ("HOME"));
-	g_sprintf (config_file, "%s/.config/gjackctl/gjackctl.conf", g_getenv ("HOME"));
+    file = g_strconcat (g_getenv ("HOME"),
+                        "/.config/gjackctl/gjackctl.conf",
+                        NULL);
 
-	g_mkdir (config_dir, S_IRWXU);
+	g_mkdir (g_strconcat (g_getenv ("HOME"),
+                          "/.config/gjackctl",
+                          NULL),
+             S_IRWXU);
 
-	if (g_file_test (config_file, G_FILE_TEST_EXISTS) == FALSE)
+	if (g_file_test (file, G_FILE_TEST_EXISTS) == FALSE)
 	{
-		FILE *file;
+		FILE *fp;
 
-		file = g_fopen (config_file, "w+");
+		fp = g_fopen (file, "w+");
 
-		fclose (file);
+		fclose (fp);
 	
 		/* Initialize `config`. */
 		config_init (&config);
@@ -89,6 +92,13 @@ config_file_init ()
 			setting = config_setting_add (group_setting, "realtime", CONFIG_TYPE_BOOL);
 		}
 	
+        setting = config_setting_get_member (group_setting, "no_zombies");
+
+		if (setting == NULL)
+		{
+			setting = config_setting_add (group_setting, "no_zombies", CONFIG_TYPE_BOOL);
+		}
+    
 		setting = config_setting_get_member (group_setting, "no_memlock");
 	
 		if (setting == NULL)
@@ -105,7 +115,7 @@ config_file_init ()
 
 		config_set_tab_width (&config, 4);
 
-		g_print ("Successful write to file: %d\n", config_write_file (&config, config_file));
+		g_print ("Successful write to file: %d\n", config_write_file (&config, file));
 
 		config_destroy (&config);
 	}
