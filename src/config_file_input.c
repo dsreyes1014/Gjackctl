@@ -9,7 +9,7 @@ config_file_input (gchar **argv, gint argc)
 	
 	g_sprintf (file, "%s/.jackdrc", g_getenv ("HOME"));
 
-	jackdrc = g_fopen (file, "w+"c);
+	jackdrc = g_fopen (file, "w+");
 
 	for (i = 0; i < argc; i++)
 	{
@@ -71,7 +71,6 @@ config_file_input (const gchar *config_path,
 	config_set_tab_width (&config, 4);
 	config_write_file (&config, config_file);
 	config_destroy (&config);
-
 
 	return 0;
 }

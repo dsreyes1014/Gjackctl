@@ -19,12 +19,6 @@ get_name (config_t config)
 
 		return NULL;
 	}
-	else if (g_strcmp0 (name, "default") == 0)
-	{
-		config_destroy (&config);
-
-		return "";
-	}
 
 	return name;
 }
@@ -74,8 +68,8 @@ server_name (GtkWidget *box, GtkWidget *button)
 
     gtk_widget_set_halign (label, GTK_ALIGN_START);
     gtk_widget_set_halign (entry, GTK_ALIGN_START);
-    gtk_widget_set_margin_start (label, 60);
-    gtk_widget_set_margin_start (entry, 60);
+    gtk_widget_set_margin_start (label, 40);
+    gtk_widget_set_margin_start (entry, 40);
 
 	g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), entry);
 }

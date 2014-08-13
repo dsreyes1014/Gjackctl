@@ -13,6 +13,7 @@
 #include "timeout.h"
 #include "clocksource.h"
 #include "toggle_no_zombies.h"
+#include "toggle_unlock_libs.h"
 
 void
 gjackctl_settings (GtkWidget *window,

@@ -1,19 +1,21 @@
-#include "toggle_midi.h"
+#include "toggle_no_zombies.h"
 
 static gboolean
-get_midi (config_t config)
+get_unlock_libs (config_t config)
 {
-	gboolean realtime;
-	gchar config_file[128];
+	gboolean no_zombies;
+	gchar *file;
 
-	g_sprintf (config_file, "%s/.config/gjackctl/gjackctl.conf", g_getenv ("HOME"));
+    file = g_strconcat (g_getenv ("HOME"),
+                        "/.config/gjackctl/gjackctl.conf",
+                        NULL);
 
 	config_init (&config);
-	config_read_file (&config, config_file);
+	config_read_file (&config, file);
 	
-	config_lookup_bool (&config, "gjackctl.server.midi", &realtime);
+	config_lookup_bool (&config, "gjackctl.server.unlock_libs", &no_zombies);
 
-	if (realtime == FALSE)
+	if (no_zombies == FALSE)
 	{
 		config_destroy (&config);
 
@@ -37,12 +39,12 @@ event_box_released_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
     if (data -> passed_state == GTK_LABEL_NORMAL_OFF)
     {
         data -> passed_state = label_normal_on (GTK_LABEL (data -> passed_label));
-        gtk_widget_set_tooltip_text (widget, "Disable MIDI");
+        gtk_widget_set_tooltip_text (widget, "Disable to lock memory of GTK+, QT, FLTK, or Wine libraries");
     }
     else 
     {
         data -> passed_state = label_normal_off (GTK_LABEL (data -> passed_label));
-        gtk_widget_set_tooltip_text (widget, "Enable MIDI");        
+        gtk_widget_set_tooltip_text (widget, "Enable to unlock memory of GTK+, QT, FLTK, or Wine libraries");        
     }
 
     return FALSE;
@@ -61,7 +63,7 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
     {
         value = TRUE;
 
-        config_file_input ("gjackctl.server.midi",
+        config_file_input ("gjackctl.server.unlock_libs",
                            CONFIG_TYPE_BOOL,
                            (gpointer) &value);
     }
@@ -69,7 +71,7 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
     {	
         value = FALSE;
 
-		config_file_input ("gjackctl.server.midi",
+		config_file_input ("gjackctl.server.unlock_libs",
                            CONFIG_TYPE_BOOL,
                            (gpointer) &value);
     }
@@ -106,27 +108,27 @@ leave_event_box_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 }
 
 void
-toggle_midi (GtkWidget *box, GtkWidget *button)
-{
+toggle_unlock_libs (GtkWidget *box, GtkWidget *button)
+{   
     /* This gets called from `gjackctl_setings_cb` that's in the 
     `gjackctl_settings.c` module. */
 	
     GtkWidget *label;
     GtkWidget *event_box;
     config_t config;
-    gboolean midi;
+    gboolean realtime;
     gint state;
     GtkPassedData *data;
  
-    label = gtk_label_new ("MIDI");
+    label = gtk_label_new ("Unlock Libs");
     event_box = gtk_event_box_new ();
     config_init (&config);
     state = label_normal_off (GTK_LABEL (label));
     data = (GtkPassedData *) g_malloc (sizeof (GtkPassedData));
     data -> passed_label = label;
   
-    midi = get_midi (config);
-    if (midi == FALSE)
+    realtime = get_unlock_libs (config);
+    if (realtime == FALSE)
     {
         state = label_normal_off (GTK_LABEL (label));
         data -> passed_state = state;
@@ -141,11 +143,11 @@ toggle_midi (GtkWidget *box, GtkWidget *button)
     show when app first starts if we don't. */
     if (state == GTK_LABEL_NORMAL_ON)
     {
-        gtk_widget_set_tooltip_text (event_box, "Disable MIDI");	
+        gtk_widget_set_tooltip_text (event_box, "Disable to lock memory of GTK+, QT, FLTK, or Wine libraries");	
     }
     else
     {	
-        gtk_widget_set_tooltip_text (event_box, "Enable MIDI");
+        gtk_widget_set_tooltip_text (event_box, "Enable to unlock memory of GTK+, QT, FLTK, or Wine libraries");
     }
 
     gtk_event_box_set_visible_window (GTK_EVENT_BOX (event_box), TRUE);
@@ -155,12 +157,9 @@ toggle_midi (GtkWidget *box, GtkWidget *button)
     gtk_container_add (GTK_CONTAINER (event_box), label);
     gtk_box_pack_start (GTK_BOX (box), event_box, FALSE, FALSE, 2);
 
-    //gtk_widget_set_margin_end (event_box, 20);
     gtk_widget_set_halign (event_box, GTK_ALIGN_CENTER);
-    //gtk_widget_set_margin_bottom (event_box, 20);
-    gtk_widget_set_margin_start (event_box, 80);
-    gtk_widget_set_margin_bottom (event_box, 20);
-         
+    gtk_widget_set_margin_start (event_box, 50);
+      
     gtk_widget_add_events (event_box, GDK_BUTTON_PRESS_MASK);
     gtk_widget_add_events (event_box, GDK_BUTTON_RELEASE_MASK);
     gtk_widget_add_events (event_box, GDK_ENTER_NOTIFY_MASK);

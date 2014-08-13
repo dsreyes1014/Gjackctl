@@ -41,7 +41,8 @@ add_executable (gjackctl main.c
                          port_max.c
                          timeout.c
                          clocksource.c
-                         toggle_no_zombies.c)
+                         toggle_no_zombies.c
+                         toggle_unlock_libs.c)
 
 target_link_libraries (gjackctl ${GTK3_LIBRARIES} 
                                 ${LIBCONFIG_LIBRARIES}

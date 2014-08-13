@@ -27,14 +27,14 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 		pid = atoi (pid_string);
 	}
 	
-	g_print ("From `server_switch.c` line 28: %s\n", pid_string);
+	//g_print ("From `server_switch.c` line 28: %s\n", pid_string);
 
 	pclose (get_pid);
 	
 	/* Check if `GPid pid` exists. */
 	check_pid = kill (pid, 0);
 
-	g_print ("From `server_switch.c` line 35: %d\n", pid);
+	//g_print ("From `server_switch.c` line 35: %d\n", pid);
 
 	if (check == TRUE)
 	{						

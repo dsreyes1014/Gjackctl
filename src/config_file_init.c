@@ -91,6 +91,13 @@ config_file_init ()
 		{
 			setting = config_setting_add (group_setting, "realtime", CONFIG_TYPE_BOOL);
 		}
+    
+        setting = config_setting_get_member (group_setting, "unlock_libs");
+
+		if (setting == NULL)
+		{
+			setting = config_setting_add (group_setting, "unlock_libs", CONFIG_TYPE_BOOL);
+		}
 	
         setting = config_setting_get_member (group_setting, "no_zombies");
 
