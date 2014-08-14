@@ -7,7 +7,12 @@
 #include "get_arg_vector.h"
 #include "config_file_input.h"
 
+typedef struct _GtkPassedDriverData {
+    GtkWidget *pbutton;
+    GtkWidget *label;
+} GtkPassedDriverData;
+
 void
-drivers (GtkWidget *grid, GtkApplication *app);
+drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button);
 
 #endif

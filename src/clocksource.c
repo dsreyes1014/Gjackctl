@@ -121,7 +121,7 @@ clocksource (GtkWidget *box, GtkWidget *button)
     gtk_box_pack_start (GTK_BOX (child_box1), pbutton, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (box), child_box1, FALSE, FALSE, 2);
   
-    gtk_widget_set_size_request (pbutton, 70, 10);
+    gtk_widget_set_size_request (pbutton, 80, 10);
     gtk_widget_set_halign (label, GTK_ALIGN_START);
     gtk_widget_set_margin_start (label, 40);
     gtk_widget_set_margin_start (pbutton, 40);

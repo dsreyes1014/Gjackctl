@@ -123,7 +123,7 @@ timeout (GtkWidget *box, GtkWidget *button)
     child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
-    gtk_widget_set_size_request (pbutton, 70, 10);
+    gtk_widget_set_size_request (pbutton, 80, 10);
     gtk_widget_set_tooltip_text (pbutton, "Set JACK client timeout in milliseconds");
 
     gtk_button_set_relief (GTK_BUTTON (pbutton), GTK_RELIEF_NONE);

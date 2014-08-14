@@ -5,26 +5,24 @@ const GActionEntry entries[] =
 		{"print_alsa_driver", print_alsa_driver_activate_cb, "s"}
 	};
 
-static PangoAttrList *
-label_settings_attr ()
+static void
+button_clicked_cb (GtkButton *button, gpointer user_data)
 {
-	PangoAttrList *list;
-	PangoAttribute *attr;
+    GtkPassedDriverData *rdata;
+   
+    rdata = user_data;
 
-	list = pango_attr_list_new ();
+    config_file_input ("gjackctl.driver.type",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) gtk_button_get_label (GTK_BUTTON (rdata -> pbutton)));
 
-	attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
-	pango_attr_list_insert (list, attr);
-	attr = pango_attr_weight_new (PANGO_WEIGHT_HEAVY);
-	pango_attr_list_insert (list, attr);	
-	attr = pango_attr_size_new (14000);
-	pango_attr_list_insert (list, attr);	
-
-	return list;
+    config_file_input ("gjackctl.driver.device",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) gtk_label_get_text (GTK_LABEL (rdata -> label))); 
 }
 
 static void
-driver_popover_cb (GtkWidget *button, GdkEvent *event, gpointer user_data)
+popover_button_clicked_cb (GtkWidget *button, GdkEvent *event, gpointer user_data)
 {
 	/* Creates popover menu for drivers button. */
 
@@ -39,7 +37,7 @@ driver_popover_cb (GtkWidget *button, GdkEvent *event, gpointer user_data)
 	menu = g_menu_new ();	
 	section = g_menu_new ();	
 	submenu = g_menu_new ();
-	item1 = g_menu_item_new ("firewire", NULL);
+	item1 = g_menu_item_new ("Dummy", NULL);
 	
 	alsa_device_names (submenu);	
 		
@@ -59,63 +57,77 @@ driver_popover_cb (GtkWidget *button, GdkEvent *event, gpointer user_data)
 	gtk_widget_show_all (popover);
 } 
 
-void
-drivers (GtkWidget *grid, GtkApplication *app)
+static const gchar *
+get_driver_type (config_t config)
 {
-	GtkWidget *driver_button;
+    const gchar *string;
+    gchar *file;
+
+    file = g_strconcat (g_getenv ("HOME"),
+                        "/.config/gjackctl/gjackctl.conf",
+                        NULL);
+
+    config_init (&config);
+    config_read_file (&config, file);
+    config_lookup_string (&config, "gjackctl.driver.type", &string);
+    
+    return string;
+}
+
+static const gchar *
+get_driver_device (config_t config)
+{
+    const gchar *string;
+    gchar *file;
+
+    file = g_strconcat (g_getenv ("HOME"),
+                        "/.config/gjackctl/gjackctl.conf",
+                        NULL);
+
+    config_init (&config);
+    config_read_file (&config, file);
+    config_lookup_string (&config, "gjackctl.driver.device", &string);
+    
+    return string;
+}
+
+void
+drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button)
+{
+    GtkWidget *child_box;
+    GtkWidget *child_box2;
 	GtkWidget *label;
 	GtkWidget *label_driver;
-	GtkWidget *event_box;
-	gchar **argvp;
-	gint i;
+    GtkPassedDriverData *pdata;
+	config_t config;
+	
+    pdata = (GtkPassedDriverData *) g_malloc (sizeof (GtkPassedDriverData));	
 
-	label = gtk_label_new ("Driver/Interface");
-	event_box = gtk_event_box_new ();
-	argvp = get_arg_vector ();
-	label_driver = gtk_label_new_with_mnemonic ("_Driver");	
-	driver_button = gtk_button_new ();	
-	i = 0;
-
-	gtk_label_set_attributes (GTK_LABEL (label), label_settings_attr ());
+    label = gtk_label_new ("Driver/Interface");	
+	pdata -> pbutton = gtk_button_new_with_label (get_driver_type (config));
+    pdata -> label = gtk_label_new (get_driver_device (config));	
+    child_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+    child_box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
 	g_action_map_add_action_entries (G_ACTION_MAP (app),
 									 entries, 
 									 G_N_ELEMENTS (entries), 
-									 label_driver);
+									 pdata);
 	
-	while (argvp[i])
-	{
-		if ((strncmp (argvp[i], "-dalsa", 2) == 0) &&
-			(strncmp (argvp[i + 1], "-d", 2) == 0))	
-		{
-			gchar *tt_label;
-			gchar *tooltip;
+    gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
+
+    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
+    gtk_widget_set_size_request (pdata -> pbutton, 80, 10);
+
+    gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box2), pdata -> pbutton, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (box), child_box, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (box), child_box2, FALSE, FALSE, 2);
+
+    //gtk_widget_set_halign (pdata -> pbutton, GTK_ALIGN_START);
+    gtk_widget_set_margin_start (pdata -> pbutton, 22);
+    gtk_widget_set_margin_start (label, 10);
 	
-			tt_label = g_strdup (argvp[i + 1]);
-			tooltip = g_strconcat ("Soundcard: '", &tt_label[5], "'", NULL);
-
-			gtk_label_set_text (GTK_LABEL (label_driver), "ALSA");
-			gtk_widget_set_tooltip_text (label_driver, tooltip); 
-			break;	
-		}	
-		else
-		{
-			i++;
-			gtk_widget_set_tooltip_text (label_driver, "Choose Soundcard");
-		}
-	} 
-
-	g_strfreev (argvp);
-
-	//gtk_widget_set_tooltip_text (label_driver, "Choose Driver");
-	gtk_widget_set_halign (driver_button, GTK_ALIGN_CENTER);
-	gtk_widget_set_size_request (driver_button, 96, 34);
-
-	/* Pack `grid`. */
-	gtk_container_add (GTK_CONTAINER (event_box), label_driver);
-	gtk_grid_attach (GTK_GRID (grid), label, 1, 5, 1, 1);
-	gtk_grid_attach (GTK_GRID (grid), event_box, 1, 6, 1, 1);
-
-	g_signal_connect (event_box, "button-press-event", 
-					  G_CALLBACK (driver_popover_cb), NULL);
+    g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), NULL);
+    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);
 }

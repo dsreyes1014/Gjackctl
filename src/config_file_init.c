@@ -120,6 +120,35 @@ config_file_init ()
 			setting = config_setting_add (group_setting, "midi", CONFIG_TYPE_BOOL);
 		}
 
+        group_setting = config_setting_get_member (root_setting, "driver");
+
+		if (group_setting == NULL)
+		{
+			group_setting = config_setting_add (root_setting, "driver", CONFIG_TYPE_GROUP);
+		}
+
+        setting = config_setting_get_member (group_setting, "type");
+
+		if (setting == NULL)
+		{
+			setting = config_setting_add (group_setting, "type", CONFIG_TYPE_STRING);
+            config_setting_set_string (setting, "Dummy");
+		}
+
+        setting = config_setting_get_member (group_setting, "device");
+
+		if (setting == NULL)
+		{
+			setting = config_setting_add (group_setting, "device", CONFIG_TYPE_STRING);
+		}
+        
+        setting = config_setting_get_member (group_setting, "sample_rate");
+
+		if (setting == NULL)
+		{
+			setting = config_setting_add (group_setting, "sample_rate", CONFIG_TYPE_STRING);
+		}
+
 		config_set_tab_width (&config, 4);
 
 		g_print ("Successful write to file: %d\n", config_write_file (&config, file));

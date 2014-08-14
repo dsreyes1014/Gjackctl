@@ -80,18 +80,20 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	GtkWidget *box4;
     GtkWidget *box5;
     GtkWidget *box6;
+    GtkWidget *dbox;
 
 	/* This is a `struct` that holds variables passed by 
 	the `g_signal_connect ()` function through `gpointer user_data`. */ 
 	pass_data *data_received;
 	pass_data_2 *data_to_pass;	
 
-    box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);    /* Main settings server box. */
-    box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6); /* First box packed inside of `box`. */ 
-    box3 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);   /* */
-    box4 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6); /* Second box packed inside `box`. */
-    box5 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);   /* First box packed inside of `box4`. */
-    box6 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);   /* Second box packed inside of `box4`. */
+    box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);    /* Main settings server box. */
+    box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2); /* First box packed inside of `box`. */ 
+    box3 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);   /* */
+    box4 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2); /* Second box packed inside `box`. */
+    box5 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);   /* First box packed inside of `box4`. */
+    box6 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);   /* Second box packed inside of `box4`. */
+    dbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);    
     stack = gtk_stack_new ();
 	sswitcher = gtk_stack_switcher_new ();
 	data_to_pass = (pass_data_2 *) g_malloc (sizeof (pass_data_2));
@@ -120,7 +122,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                           "server",
                           "Server");
 	gtk_stack_add_titled (GTK_STACK (stack),
-						  grid2,
+						  dbox,
                           "driver",
                           "Driver");
 	gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER (sswitcher),
@@ -143,7 +145,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     clocksource (box3, button1);
     port_max (box3, button1);
     timeout (box3, button1);
-	//drivers (grid2, app);
+	drivers (dbox, app, button1);
 	//sample_rate (grid2);
 
     gtk_widget_set_size_request (button1, 80, 30);
