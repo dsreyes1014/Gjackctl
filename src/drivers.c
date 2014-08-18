@@ -95,19 +95,26 @@ void
 drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button)
 {
     GtkWidget *child_box;
-    GtkWidget *child_box2;
+    //GtkWidget *child_box2;
 	GtkWidget *label;
-	GtkWidget *label_driver;
     GtkPassedDriverData *pdata;
-	config_t config;
+    gchar *tt;
+    config_t config;
 	
-    pdata = (GtkPassedDriverData *) g_malloc (sizeof (GtkPassedDriverData));	
+    pdata = g_malloc (sizeof (GtkPassedDriverData));	
 
     label = gtk_label_new ("Driver/Interface");	
 	pdata -> pbutton = gtk_button_new_with_label (get_driver_type (config));
     pdata -> label = gtk_label_new (get_driver_device (config));	
-    child_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
-    child_box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+    child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+    //child_box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+    tt = g_strconcat ("Current device is ", 
+                      "\"",
+                      get_driver_device (config),
+                      "\"", 
+                      "\n",
+                      "Click to choose driver/device",
+                      NULL);
 
 	g_action_map_add_action_entries (G_ACTION_MAP (app),
 									 entries, 
@@ -118,15 +125,16 @@ drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button)
 
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     gtk_widget_set_size_request (pdata -> pbutton, 80, 10);
+    gtk_widget_set_tooltip_text (pdata -> pbutton, tt);
 
     gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (child_box2), pdata -> pbutton, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box), pdata -> pbutton, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (box), child_box, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (box), child_box2, FALSE, FALSE, 2);
+    //gtk_box_pack_start (GTK_BOX (box), child_box2, FALSE, FALSE, 2);
 
     //gtk_widget_set_halign (pdata -> pbutton, GTK_ALIGN_START);
     gtk_widget_set_margin_start (pdata -> pbutton, 22);
-    gtk_widget_set_margin_start (label, 10);
+    gtk_widget_set_margin_start (label, 18);
 	
     g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), NULL);
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);

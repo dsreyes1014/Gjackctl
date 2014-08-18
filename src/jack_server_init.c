@@ -98,6 +98,39 @@ jackdrc_init_input ()
         g_fprintf (fp, " -Xalsa_midi");
     }
     /*********************************************************************/
+    config_lookup_string (&config, "gjackctl.driver.type", &value);
+
+    if ((g_strcmp0 (value, NULL) != 0) && (g_strcmp0 (value, "ALSA") == 0))
+    {
+        value = g_strconcat ("alsa", NULL);
+        g_fprintf (fp, " -d%s", value);
+    }
+    else if (g_strcmp0 (value, NULL) != 0)
+    {
+        g_fprintf (fp," -d%s", value);
+    }
+    /*********************************************************************/
+    config_lookup_string (&config, "gjackctl.driver.device", &value);
+
+    if (g_strcmp0 (value, NULL) != 0)
+    {
+        g_fprintf (fp, " -dhw:%s", value);
+    }    
+    /*********************************************************************/
+    config_lookup_string (&config, "gjackctl.driver.sample_rate", &value);
+
+    if (g_strcmp0 (value, NULL) != 0)
+    {
+        g_fprintf (fp, " -r%s", value);
+    }
+    /*********************************************************************/
+    config_lookup_string (&config, "gjackctl.driver.period", &value);
+
+    if (g_strcmp0 (value, NULL) != 0)
+    {
+        g_fprintf (fp, " -n%s", value);
+    }
+    /*********************************************************************/
 
     fclose (fp);
 

@@ -1,5 +1,5 @@
-#ifndef SAMPLE_RATE_H
-#define SAMPLE_RATE_H
+#ifndef PERIOD_H
+#define PERIOD_H
 
 #include <gtk/gtk.h>
 #include <glib.h>
@@ -9,10 +9,7 @@
 #include "get_arg_vector.h"
 #include "config_file_input.h"
 
-//extern GtkWidget *srate_button;
-//extern GtkWidget *popover;
-
 void
-sample_rate (GtkWidget *box, GtkWidget *button);
+period (GtkWidget *box, GtkWidget *button);
 
 #endif

@@ -82,7 +82,7 @@ config_file_init ()
 		if (setting == NULL)
 		{
 			setting = config_setting_add (group_setting, "clocksource", CONFIG_TYPE_STRING);
-            config_setting_set_string (setting, "system");
+            config_setting_set_string (setting, "System");
 		}
 	
 		setting = config_setting_get_member (group_setting, "realtime");
@@ -147,6 +147,13 @@ config_file_init ()
 		if (setting == NULL)
 		{
 			setting = config_setting_add (group_setting, "sample_rate", CONFIG_TYPE_STRING);
+		}
+
+        setting = config_setting_get_member (group_setting, "period");
+
+		if (setting == NULL)
+		{
+			setting = config_setting_add (group_setting, "period", CONFIG_TYPE_STRING);
 		}
 
 		config_set_tab_width (&config, 4);

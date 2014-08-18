@@ -59,7 +59,6 @@ popover_button_clicked_cb (GtkButton *button, gpointer user_data)
     GtkWidget *radio4;
     GtkWidget *radio5;
     GtkWidget *radio6;
-    GtkWidget *popover;
     GtkPassedTimeoutData *pdata;
     GSList *list; 
     config_t config;   
@@ -114,6 +113,7 @@ timeout (GtkWidget *box, GtkWidget *button)
 {
     GtkWidget *label;
     GtkWidget *child_box1;
+    GtkWidget *child_box2;
     GtkWidget *pbutton;
     gchar *string;
     config_t config;
@@ -121,6 +121,7 @@ timeout (GtkWidget *box, GtkWidget *button)
     pbutton = gtk_button_new_with_label (get_timeout (config));
     label = gtk_label_new ("Timeout (ms)"); 
     child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+    //child_box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     gtk_widget_set_size_request (pbutton, 80, 10);
@@ -132,6 +133,7 @@ timeout (GtkWidget *box, GtkWidget *button)
     gtk_box_pack_start (GTK_BOX (child_box1), label, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (child_box1), pbutton, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (box), child_box1, FALSE, FALSE, 2);
+    //gtk_box_pack_start (GTK_BOX (box), child_box2, FALSE, FALSE, 2);
 
     gtk_widget_set_margin_start (label, 16);
     gtk_widget_set_margin_start (pbutton, 16);

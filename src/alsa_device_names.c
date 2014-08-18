@@ -7,12 +7,21 @@ print_alsa_driver_activate_cb (GSimpleAction *action,
 {	
     GtkPassedDriverData *rdata;
     const gchar *string;
+    gchar *tt;
 
     rdata = user_data;
     string = g_variant_get_string (parameter, NULL);
+    tt = g_strconcat ("Current device is ",
+                      "\"",
+                      string,
+                      "\"",
+                      "\n",
+                      "Click to choose driver/device",
+                      NULL);
 
     gtk_button_set_label (GTK_BUTTON (rdata -> pbutton), "ALSA");
     gtk_label_set_text (GTK_LABEL (rdata -> label), string); 
+    gtk_widget_set_tooltip_text (rdata -> pbutton, tt);
 }
 
 void

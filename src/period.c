@@ -1,9 +1,9 @@
-#include "rt_priority.h"
+#include "period.h"
 
 static const gchar *
-get_priority (config_t config)
+get_period (config_t config)
 {
-    const gchar *priority;
+    const gchar *period;
     gchar *file;
 
     config_init (&config);
@@ -12,29 +12,29 @@ get_priority (config_t config)
                         NULL);
 
     config_read_file (&config, file);
-    config_lookup_string (&config, "gjackctl.server.priority", &priority);
+    config_lookup_string (&config, "gjackctl.driver.period", &period);
 
-    return priority;
+    return period;
 }
 
 static void
 button_clicked_cb (GtkButton *button, gpointer user_data)
 {
     GtkWidget *spin_button;
-    gint priority;
+    gint period;
     gchar string[10];
 
     spin_button = user_data;
-    priority = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (spin_button));        
-    g_sprintf (string, "%d", priority);
+    period = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (spin_button));        
+    g_sprintf (string, "%d", period);
 
-    config_file_input ("gjackctl.server.priority",
+    config_file_input ("gjackctl.driver.period",
                        CONFIG_TYPE_STRING,
                        (gpointer) string);    
 }
 
 void
-rt_priority (GtkWidget *box, GtkWidget *button)
+period (GtkWidget *box, GtkWidget *button)
 {
 	/* This gets called from `gjackctl_setings_cb` that's in the 
 	`gjackctl_settings.c` module. */
@@ -43,18 +43,19 @@ rt_priority (GtkWidget *box, GtkWidget *button)
 	GtkWidget *spin_button;
     GtkWidget *child_box;
 	GtkAdjustment *adjustment;
-    gint priority;
+    gint period;
     config_t config;
 
-    label = gtk_label_new ("Priority");
-	adjustment = gtk_adjustment_new (75, 0, 99, 1, 0, 0);
+    label = gtk_label_new ("Period");
+	adjustment = gtk_adjustment_new (2, 0, 6, 1, 0, 0);
 	spin_button = gtk_spin_button_new (adjustment, 1, 0);
-    priority = g_ascii_strtoll (get_priority (config), NULL, 0);
+    period = g_ascii_strtoll (get_period (config), NULL, 0);
     child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
 
-    //config_destroy (&config);
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
-    gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin_button), priority);
+    gtk_widget_set_tooltip_text (spin_button, "Number of periods of latency");
+
+    gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin_button), period);
 
 	/* Pack `box` which is declared in `gjackctl_settings.c`
 	in the `gjackctl_settings_cb` function. */

@@ -74,26 +74,28 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	GtkWidget *stack;
 	GtkWidget *sswitcher;	
 	GtkApplication *app;
-    GtkWidget *box;
-    GtkWidget *box2;
-    GtkWidget *box3;
-	GtkWidget *box4;
-    GtkWidget *box5;
-    GtkWidget *box6;
+    GtkWidget *sbox;
+    GtkWidget *sbox2;
+    GtkWidget *sbox3;
+	GtkWidget *sbox4;
+    GtkWidget *sbox5;
+    GtkWidget *sbox6;
     GtkWidget *dbox;
+    GtkWidget *dbox2;
 
 	/* This is a `struct` that holds variables passed by 
 	the `g_signal_connect ()` function through `gpointer user_data`. */ 
 	pass_data *data_received;
 	pass_data_2 *data_to_pass;	
 
-    box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);    /* Main settings server box. */
-    box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2); /* First box packed inside of `box`. */ 
-    box3 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);   /* */
-    box4 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2); /* Second box packed inside `box`. */
-    box5 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);   /* First box packed inside of `box4`. */
-    box6 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);   /* Second box packed inside of `box4`. */
-    dbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);    
+    sbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);    
+    sbox2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2); 
+    sbox3 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);   
+    sbox4 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2); 
+    sbox5 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);   
+    sbox6 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);   
+    dbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+    dbox2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);    
     stack = gtk_stack_new ();
 	sswitcher = gtk_stack_switcher_new ();
 	data_to_pass = (pass_data_2 *) g_malloc (sizeof (pass_data_2));
@@ -118,7 +120,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	
 
 	gtk_stack_add_titled (GTK_STACK (stack),
-						  box,
+						  sbox,
                           "server",
                           "Server");
 	gtk_stack_add_titled (GTK_STACK (stack),
@@ -130,23 +132,25 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	gtk_stack_set_transition_type (GTK_STACK (stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);
 
 	/* Pack `box` into `stack` named `server`. */
-    gtk_box_pack_start (GTK_BOX (box), box2, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (box4), box5, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (box4), box6, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (box), box4, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (box), box3, FALSE, FALSE, 2);
-	server_name (box2, button1);		
-	toggle_rt (box5, button1);
-	toggle_no_memlock (box5, button1);
-    toggle_midi (box5, button1);
-    toggle_no_zombies (box6, button1);
-    toggle_unlock_libs (box6, button1);
-	rt_priority (box2, button1);
-    clocksource (box3, button1);
-    port_max (box3, button1);
-    timeout (box3, button1);
-	drivers (dbox, app, button1);
-	//sample_rate (grid2);
+    gtk_box_pack_start (GTK_BOX (sbox), sbox2, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (sbox4), sbox5, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (sbox4), sbox6, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (sbox), sbox4, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (sbox), sbox3, FALSE, FALSE, 2);
+	server_name (sbox2, button1);		
+	toggle_rt (sbox5, button1);
+	toggle_no_memlock (sbox5, button1);
+    toggle_midi (sbox5, button1);
+    toggle_no_zombies (sbox6, button1);
+    toggle_unlock_libs (sbox6, button1);
+	rt_priority (sbox2, button1);
+    clocksource (sbox3, button1);
+    port_max (sbox3, button1);
+    timeout (sbox3, button1);
+    gtk_box_pack_start (GTK_BOX (dbox), dbox2, FALSE, FALSE, 2);
+	drivers (dbox2, app, button1);
+	sample_rate (dbox2, button1);
+    period (dbox2, button1);
 
     gtk_widget_set_size_request (button1, 80, 30);
     
