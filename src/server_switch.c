@@ -1,5 +1,10 @@
 #include "server_switch.h"
 
+typedef struct _GtkPassedServerSwitchData {
+    GtkWidget *window;
+    GtkTextView *text;
+} GtkPassedServerSwitchData;
+
 static void
 switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 {	
@@ -12,10 +17,19 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 	FILE *get_pid;
 	gchar pid_string[16];
 	GtkWidget *window;
+    GtkPassedServerSwitchData *rdata;
+    GtkTextBuffer *buffer;
 
 	check = gtk_switch_get_active (sw);	
 	pid = -2;
-	window = user_data;
+	rdata = user_data;
+    //buffer = gtk_text_buffer_new (NULL);
+    
+    //gtk_text_view_set_buffer (GTK_TEXT_VIEW (rdata -> text),
+                              //buffer);
+    //gtk_text_buffer_insert_at_cursor (buffer, "Hello test", 1024);
+
+    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (rdata -> text), TRUE);
 
 	/* Here we get the `GPid pid` from the `get_pid` statement, which
 	uses the `pgrep` command to obtain the pid, and convert it to a gint 
@@ -26,8 +40,6 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 	{
 		pid = atoi (pid_string);
 	}
-	
-	//g_print ("From `server_switch.c` line 28: %s\n", pid_string);
 
 	pclose (get_pid);
 	
@@ -44,7 +56,7 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 		turned on. */
 		if (check_pid != 0)
 		{
-			jack_server_init (sw, pid, window);
+			jack_server_init (sw, pid, rdata -> text, rdata -> window);
 		}
 	}
 	else
@@ -56,6 +68,7 @@ switch_pos_cb (GtkSwitch *sw, gpointer user_data)
 
 void 
 server_switch (GtkWidget *window, 
+               GtkTextView *text,
                GtkApplication *app, 
                GtkWidget *header_bar)
 {	
@@ -65,11 +78,20 @@ server_switch (GtkWidget *window,
 	gboolean check;	
 	FILE *cmd;
 	GPid pid;
-
+    GtkPassedServerSwitchData *pdata;
+    //GtkTextBuffer *buffer;
+    
 	pid = -2;
 	cmd = popen ("pgrep jackd", "r");
 	jack_switch = gtk_switch_new ();
 	check = gtk_switch_get_active (GTK_SWITCH (jack_switch));
+
+    pdata = g_malloc (sizeof (GtkPassedServerSwitchData));
+    pdata -> window = window;
+    pdata -> text = text;
+    //pdata -> buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (pdata -> text));
+
+    //gtk_text_buffer_set_text (pdata -> buffer, "Hello test", -1);
 
 	/* Here we get the `GPid pid` from the `cmd` statement and convert 
 	it to a gint using the `g_ascii_strtoll ()` function. */
@@ -96,8 +118,7 @@ server_switch (GtkWidget *window,
 	gjackctl_settings (window, app, header_bar);
 	//connections (vbox);
 	
-	g_signal_connect (jack_switch, "notify::active", 
-					  G_CALLBACK (switch_pos_cb), window);
+	
 	
 	/* Initiate tooltip for `jack_switch` here or else it won't show when 
 	app first starts. */
@@ -111,4 +132,9 @@ server_switch (GtkWidget *window,
 		gtk_widget_set_tooltip_text (GTK_WIDGET (jack_switch),
 									 "Start Server");	
 	}
+
+    g_signal_connect (jack_switch,
+                      "notify::active", 
+                   	  G_CALLBACK (switch_pos_cb),
+                      pdata);
 }

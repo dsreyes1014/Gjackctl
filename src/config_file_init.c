@@ -149,6 +149,14 @@ config_file_init ()
 			setting = config_setting_add (group_setting, "sample_rate", CONFIG_TYPE_STRING);
 		}
 
+        setting = config_setting_get_member (group_setting, "frames");
+
+		if (setting == NULL)
+		{
+			setting = config_setting_add (group_setting, "frames", CONFIG_TYPE_STRING);
+            config_setting_set_string (setting, "1024");
+		}
+
         setting = config_setting_get_member (group_setting, "period");
 
 		if (setting == NULL)

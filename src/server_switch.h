@@ -17,9 +17,11 @@
 #include "jack_server_init.h"
 #include "gjackctl_settings.h"
 #include "connections.h"
+//#include "jack_log.h"
 
 void 
 server_switch (GtkWidget *window, 
+               GtkTextView *text,
                GtkApplication *app,
                GtkWidget *header_bar);
 

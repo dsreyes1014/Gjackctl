@@ -2,6 +2,7 @@
 
 #include "server_switch.h"
 #include "display.h"
+#include "jack_log.h"
 #include "config_file_init.h"
 
 static void
@@ -10,18 +11,32 @@ run_app_cb (GApplication *app, gpointer data)
 	GtkWidget *window;	
 	GtkWidget *header_bar;
 	GtkWidget *stack;
-	
+    GtkWidget *text;
+    GtkWidget *sswitcher;	
+
 	window = gtk_application_window_new (GTK_APPLICATION (app));
 	stack = gtk_stack_new ();
 	header_bar = gtk_header_bar_new ();
+    text = gtk_text_view_new ();
+    sswitcher = gtk_stack_switcher_new ();
 
 	config_file_init ();
-	server_switch (window, GTK_APPLICATION (app), header_bar);
-	display (stack, header_bar);
+	server_switch (window, 
+                   GTK_TEXT_VIEW (text),
+                   GTK_APPLICATION (app),
+                   header_bar);
 
-	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "GJackCtl");
+	display (stack);
+    jack_log (stack, text);
+
+	//gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "GJackCtl");
 	gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);
 	gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (header_bar), ":close");
+
+    gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER (sswitcher),
+                                  GTK_STACK (stack));
+
+	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);
 	
 	/* Set `GtkHeaderBar *head_bar` as titlebar. */
 	gtk_window_set_titlebar (GTK_WINDOW (window), header_bar);

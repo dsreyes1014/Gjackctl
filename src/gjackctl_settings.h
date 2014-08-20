@@ -15,6 +15,7 @@
 #include "toggle_no_zombies.h"
 #include "toggle_unlock_libs.h"
 #include "period.h"
+#include "frames.h"
 
 void
 gjackctl_settings (GtkWidget *window,

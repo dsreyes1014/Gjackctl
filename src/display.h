@@ -6,6 +6,6 @@
 extern GtkWidget *label_dsp;
 
 void
-display (GtkWidget *stack, GtkWidget *header_bar);
+display (GtkWidget *stack);
 
 #endif

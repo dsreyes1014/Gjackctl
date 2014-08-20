@@ -150,7 +150,9 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     gtk_box_pack_start (GTK_BOX (dbox), dbox2, FALSE, FALSE, 2);
 	drivers (dbox2, app, button1);
 	sample_rate (dbox2, button1);
+    frames (dbox2, button1);    
     period (dbox2, button1);
+    
 
     gtk_widget_set_size_request (button1, 80, 30);
     
