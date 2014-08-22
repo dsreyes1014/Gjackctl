@@ -6,6 +6,35 @@
 #include "config_file_init.h"
 
 static void
+visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
+{
+    const gchar *stack_name;
+
+    stack_name = gtk_stack_get_visible_child_name (GTK_STACK (stack));
+
+    if (g_strcmp0 (stack_name, "display") == 0)
+    {
+        gtk_window_resize (GTK_WINDOW (user_data), 600, 220);
+    }
+    
+    if (g_strcmp0 (stack_name, "log") == 0)
+    {
+        GdkRGBA bg_color;
+
+        bg_color.red = 0.0;
+	    bg_color.green = 0.0;
+	    bg_color.blue = 0.0;
+	    bg_color.alpha = 0.5;
+
+        gtk_widget_override_background_color (user_data, GTK_STATE_FLAG_NORMAL, &bg_color);
+
+        gtk_window_resize (GTK_WINDOW (user_data), 870, 500);
+    }
+
+    g_print ("Display: %s\n", stack_name);    
+}
+
+static void
 run_app_cb (GApplication *app, gpointer data)
 {
 	GtkWidget *window;	
@@ -13,20 +42,24 @@ run_app_cb (GApplication *app, gpointer data)
 	GtkWidget *stack;
     GtkWidget *text;
     GtkWidget *sswitcher;	
+    //const gchar *stack_name;
 
 	window = gtk_application_window_new (GTK_APPLICATION (app));
 	stack = gtk_stack_new ();
 	header_bar = gtk_header_bar_new ();
+    
     text = gtk_text_view_new ();
     sswitcher = gtk_stack_switcher_new ();
 
+    gtk_stack_set_homogeneous (GTK_STACK (stack), FALSE);
+
 	config_file_init ();
+    display (stack, window);
 	server_switch (window, 
-                   GTK_TEXT_VIEW (text),
+                   text,
                    GTK_APPLICATION (app),
                    header_bar);
 
-	display (stack);
     jack_log (stack, text);
 
 	//gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "GJackCtl");
@@ -46,6 +79,8 @@ run_app_cb (GApplication *app, gpointer data)
 
 	/* Position `window` to show wherever current mouse position is located. */	
 	gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_MOUSE);
+
+    g_signal_connect (stack, "notify::visible-child-name", G_CALLBACK (visible_child_cb), window);
 
 	gtk_widget_show_all (window);
 }

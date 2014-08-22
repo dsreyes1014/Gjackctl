@@ -1,9 +1,9 @@
 #include "jack_server_init.h"
 
 typedef struct _GtkPassedServerData {
-    GtkTextView *text;
-    GtkWidget *progress;
-    gint timeout_id;
+    GtkWidget *text;
+    //GtkWidget *progress;
+    //gint timeout_id;
 } GtkPassedServerData;
 
 static gchar **
@@ -206,7 +206,7 @@ out_watch_cb (GIOChannel *channel,
               GIOCondition cond,
               gpointer user_data)
 {
-    gchar buf[2048];
+    gchar *log;
     gchar *string;
     gsize  size;
     GtkPassedServerData *rdata;
@@ -221,9 +221,10 @@ out_watch_cb (GIOChannel *channel,
         return FALSE;
     }
 
-    g_io_channel_read_chars (channel, buf, sizeof (buf), &size, NULL);
-    string = g_strconcat (buf, NULL);
-    gtk_text_buffer_set_text (buffer, string, -1);
+    g_io_channel_read_line (channel, &log, &size, NULL, NULL);
+    string = g_strdup (log);
+
+    gtk_text_buffer_insert_at_cursor (buffer, string, -1);
     g_free (string);
 
     return TRUE; 
@@ -234,6 +235,7 @@ err_watch_cb (GIOChannel *channel,
               GIOCondition cond,
               gpointer user_data)
 {
+    gchar *log;
     gchar *string;
     gsize  size;
     GtkPassedServerData *rdata;
@@ -248,14 +250,16 @@ err_watch_cb (GIOChannel *channel,
         return FALSE;
     }
 
-    g_io_channel_read_to_end (channel, &string, &size, NULL);
+    g_io_channel_read_line (channel, &log, &size, NULL, NULL);
+    string = g_strdup (log);
+
     gtk_text_buffer_insert_at_cursor (buffer, string, -1);
     g_free (string);
 
     return TRUE; 
 }
 
-static gboolean
+/*static gboolean
 timeout_cb (gpointer user_data)
 {
     GtkPassedServerData *rdata;
@@ -265,29 +269,29 @@ timeout_cb (gpointer user_data)
     gtk_progress_bar_pulse (GTK_PROGRESS_BAR (rdata -> progress));
 
     return( TRUE );
-}
+}*/
 
 static void
 child_watch_cb (GPid pid, gint status, gpointer user_data)
 {
-    GtkPassedServerData *rdata;
+    //GtkPassedServerData *rdata;
 
-    rdata = user_data;
+    //rdata = user_data;
 
-    g_source_remove (rdata -> timeout_id);
+    //g_source_remove (rdata -> timeout_id);
 
-    //g_spawn_close_pid (pid);
+    g_spawn_close_pid (pid);
 }
 
 gint 
 jack_server_init (GtkSwitch *sw, 
                   GPid pid, 
-                  GtkTextView *text, 
+                  GtkWidget *text, 
                   GtkWidget *window)
 {
 	/* Starts the JACK server using `g_spawn_async ()` with the
 	 `GPid pid` as an out. */
-    GtkWidget *progress;
+    //GtkWidget *progress;
 	jack_client_t *client;
 	jack_status_t status;
 	gint check_pid;
@@ -299,20 +303,13 @@ jack_server_init (GtkSwitch *sw,
     GIOChannel *ch_out;
     GIOChannel *ch_err;
     GtkPassedServerData *pdata;
-    //GtkTextBuffer *buffer;
 
-    pdata = g_malloc (sizeof (GtkPassedServerData));
-
+    pdata = g_slice_new (GtkPassedServerData);
     pdata -> text = text;
-	argv = get_arg_vector ();
-    pdata -> progress = gtk_progress_bar_new ();
-    //buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (pdata -> text));
-
-    //gtk_text_buffer_set_text (buffer, "Hello test", -1);
-
 
     jackdrc_init_input ();
-
+	argv = get_arg_vector ();
+  
 	ret = g_spawn_async_with_pipes (NULL, 
                                     argv, 
 						            NULL,
@@ -335,7 +332,7 @@ jack_server_init (GtkSwitch *sw,
         return -1;
 	}
 
-    pdata -> timeout_id = g_timeout_add (1500, (GSourceFunc) timeout_cb, pdata);
+    //pdata -> timeout_id = g_timeout_add (1500, (GSourceFunc) timeout_cb, pdata);
 
     g_child_watch_add (pid, (GChildWatchFunc) child_watch_cb, pdata);
 
@@ -347,9 +344,19 @@ jack_server_init (GtkSwitch *sw,
     ch_err = g_io_channel_unix_new (err);
 #endif
 
-    //g_io_add_watch (ch_out, G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP, (GIOFunc) out_watch_cb, pdata);
-    //g_io_add_watch (ch_err, G_IO_IN | G_IO_HUP, (GIOFunc) err_watch_cb, pdata);
-
+    if (gtk_switch_get_active (GTK_SWITCH (sw)) == TRUE)
+    {
+        g_io_add_watch (ch_out, G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP, (GIOFunc) out_watch_cb, pdata);
+        g_io_add_watch (ch_err, G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP, (GIOFunc) err_watch_cb, pdata);
+    }
+    else
+    {
+        g_io_add_watch (ch_out, 
+                        G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP,
+                        (GIOFunc) out_watch_cb,
+                        pdata);
+        g_io_add_watch (ch_err, G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP, (GIOFunc) err_watch_cb, pdata);
+    }
 
 	/* We wait 2 seconds for server to initiate so we can create `gjackctl` 
 	jack client. */

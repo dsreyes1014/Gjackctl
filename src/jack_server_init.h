@@ -9,6 +9,6 @@
 #include "dsp_load.h"
 
 gint 
-jack_server_init (GtkSwitch *sw, GPid pid, GtkTextView *text, GtkWidget *window);
+jack_server_init (GtkSwitch *sw, GPid pid, GtkWidget *text, GtkWidget *window);
 
 #endif

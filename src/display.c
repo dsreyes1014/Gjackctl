@@ -3,17 +3,14 @@
 GtkWidget *label_dsp;
 
 void
-display (GtkWidget *stack)
+display (GtkWidget *stack, GtkWidget *window)
 {
 	GtkWidget *layout;
 	GtkWidget *label;
 	GtkWidget *sc_window;
-	GtkWidget *test;
-	GtkWidget *test2;
 	GdkRGBA bg_color;
-	
-	test2 = gtk_label_new ("Test");
-	test = gtk_grid_new ();
+    const gchar *stack_name;	
+
 	layout = gtk_layout_new (NULL, NULL);
 	label = gtk_label_new ("CPU Load");
 	sc_window = gtk_scrolled_window_new (NULL, NULL);
@@ -27,16 +24,9 @@ display (GtkWidget *stack)
 									GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_widget_override_background_color (layout, GTK_STATE_FLAG_NORMAL, &bg_color);
 
-	
-
 	/* Pack `header_bar` & `sc_window`. */
 	gtk_layout_put (GTK_LAYOUT (layout), label, 10, 16);
 	gtk_layout_put (GTK_LAYOUT (layout), label_dsp, 80, 16);
 	gtk_container_add (GTK_CONTAINER (sc_window), layout);
-	gtk_grid_attach (GTK_GRID (test), test2, 1, 1, 1, 1);
 	gtk_stack_add_titled (GTK_STACK (stack), sc_window, "display", "Display");
-	gtk_stack_add_titled (GTK_STACK (stack), 
-                          test,
-                          "connections",
-                          "Ports");
 }
