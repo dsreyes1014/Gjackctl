@@ -10,9 +10,9 @@ jack_log (GtkWidget *stack,
 
     box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     scwindow = gtk_scrolled_window_new (NULL, NULL);
-    bg_color.red = 0.0;
-	bg_color.green = 0.0;
-	bg_color.blue = 0.0;
+    bg_color.red = 0.2;
+	bg_color.green = 0.2;
+	bg_color.blue = 0.2;
 	bg_color.alpha = 0.5;
 
     gtk_widget_override_background_color (text, GTK_STATE_FLAG_NORMAL, &bg_color);

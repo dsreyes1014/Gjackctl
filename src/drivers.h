@@ -2,6 +2,7 @@
 #define DRIVERS_H
 
 #include <gtk/gtk.h>
+#include <libconfig.h>
 
 #include "alsa_device_names.h"
 //#include "get_arg_vector.h"

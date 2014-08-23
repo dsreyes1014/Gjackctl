@@ -2,10 +2,13 @@
 #define DISPLAY_H
 
 #include <gtk/gtk.h>
+#include <libconfig.h>
+
+#include "dsp_load.h"
 
 extern GtkWidget *label_dsp;
 
 void
-display (GtkWidget *stack, GtkWidget *window);
+display (GtkWidget *stack, GtkWidget *sw);
 
 #endif

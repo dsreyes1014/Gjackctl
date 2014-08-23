@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <jack/jack.h>
 
 #include "server_switch.h"
 #include "display.h"
@@ -14,9 +15,18 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
 
     if (g_strcmp0 (stack_name, "display") == 0)
     {
+        GdkRGBA bg_color;
+
+        bg_color.red = 0.0;
+	    bg_color.green = 0.0;
+	    bg_color.blue = 0.0;
+	    bg_color.alpha = 0.5;
+
+        gtk_widget_override_background_color (user_data, GTK_STATE_FLAG_NORMAL, &bg_color);
+
         gtk_window_resize (GTK_WINDOW (user_data), 600, 220);
     }
-    
+   
     if (g_strcmp0 (stack_name, "log") == 0)
     {
         GdkRGBA bg_color;
@@ -31,7 +41,7 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
         gtk_window_resize (GTK_WINDOW (user_data), 870, 500);
     }
 
-    g_print ("Display: %s\n", stack_name);    
+    g_print ("Main line 43: %s\n", stack_name);    
 }
 
 static void
@@ -42,24 +52,31 @@ run_app_cb (GApplication *app, gpointer data)
 	GtkWidget *stack;
     GtkWidget *text;
     GtkWidget *sswitcher;	
-    //const gchar *stack_name;
+    GtkWidget *sw;
+    //jack_client_t *client;
+    //jack_status_t status;
 
 	window = gtk_application_window_new (GTK_APPLICATION (app));
 	stack = gtk_stack_new ();
 	header_bar = gtk_header_bar_new ();
-    
+    sw = gtk_switch_new ();    
     text = gtk_text_view_new ();
     sswitcher = gtk_stack_switcher_new ();
+    /*client = jack_client_open ("gjackctl", 
+                               JackNoStartServer || JackUseExactName,
+                               &status); */   
 
     gtk_stack_set_homogeneous (GTK_STACK (stack), FALSE);
 
 	config_file_init ();
-    display (stack, window);
+    
 	server_switch (window, 
                    text,
                    GTK_APPLICATION (app),
-                   header_bar);
+                   header_bar,
+                   sw);
 
+    display (stack, sw);
     jack_log (stack, text);
 
 	//gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "GJackCtl");

@@ -32,10 +32,6 @@ get_arg_vector ()
 
 	g_free (contents);
 
-	/* reallocate argvp to provide enough room for adding arguments to the 
-	vector. */
-	//argvp = g_realloc (argvp, (argcp + 8) * sizeof *argvp);
-
 	return argvp;
 }
 
@@ -184,7 +180,7 @@ jackdrc_init_input ()
 }
 
 static void
-err_msg_box (GtkWidget *window)
+err_msg_box ()
 {
 	GtkWidget *msg_dialog;
 
@@ -274,24 +270,18 @@ timeout_cb (gpointer user_data)
 static void
 child_watch_cb (GPid pid, gint status, gpointer user_data)
 {
-    //GtkPassedServerData *rdata;
-
-    //rdata = user_data;
-
-    //g_source_remove (rdata -> timeout_id);
-
     g_spawn_close_pid (pid);
 }
 
-gint 
+void 
 jack_server_init (GtkSwitch *sw, 
-                  GPid pid, 
-                  GtkWidget *text, 
-                  GtkWidget *window)
+                  GtkWidget *text,
+                  GPid pid)
 {
 	/* Starts the JACK server using `g_spawn_async ()` with the
 	 `GPid pid` as an out. */
     //GtkWidget *progress;
+    //GPid pid;
 	jack_client_t *client;
 	jack_status_t status;
 	gint check_pid;
@@ -304,7 +294,7 @@ jack_server_init (GtkSwitch *sw,
     GIOChannel *ch_err;
     GtkPassedServerData *pdata;
 
-    pdata = g_slice_new (GtkPassedServerData);
+    pdata = g_malloc (sizeof (GtkPassedServerData));
     pdata -> text = text;
 
     jackdrc_init_input ();
@@ -327,9 +317,9 @@ jack_server_init (GtkSwitch *sw,
 	{
 		gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
 		g_print ("Couldn't start JACK server.\n");
-        err_msg_box (window);
+        err_msg_box ();
 
-        return -1;
+        //return -1;
 	}
 
     //pdata -> timeout_id = g_timeout_add (1500, (GSourceFunc) timeout_cb, pdata);
@@ -355,7 +345,11 @@ jack_server_init (GtkSwitch *sw,
                         G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP,
                         (GIOFunc) out_watch_cb,
                         pdata);
-        g_io_add_watch (ch_err, G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP, (GIOFunc) err_watch_cb, pdata);
+
+        g_io_add_watch (ch_err,
+                        G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP,
+                        (GIOFunc) err_watch_cb,
+                        pdata);
     }
 
 	/* We wait 2 seconds for server to initiate so we can create `gjackctl` 
@@ -379,5 +373,5 @@ jack_server_init (GtkSwitch *sw,
 		err_msg_box (window);
 	}*/
 
-	return 0;
+	//return 0;
 }
