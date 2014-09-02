@@ -46,9 +46,5 @@ dsp_init (GtkWidget *sw, GtkWidget *label, jack_client_t *client)
     pdata -> sw = sw;
     pdata -> label = label;
 
-    sleep (2);
-
-    jack_activate (pdata -> client);
-
-    g_timeout_add (1000, (GSourceFunc) dsp_load, pdata);
+    g_timeout_add (1500, (GSourceFunc) dsp_load, pdata);
 }

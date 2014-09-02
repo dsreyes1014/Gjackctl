@@ -46,7 +46,8 @@ add_executable (gjackctl main.c
                          period.c
                          frames.c
                          jack_log.c
-                         get_jack_gpid.c)
+                         get_jack_gpid.c
+                         create_jack_client.c)
 
 target_link_libraries (gjackctl ${GTK3_LIBRARIES} 
                                 ${LIBCONFIG_LIBRARIES}

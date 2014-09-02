@@ -236,10 +236,14 @@ err_watch_cb (GIOChannel *channel,
     gsize  size;
     GtkPassedServerData *rdata;
     GtkTextBuffer *buffer;
+    GtkTextTag *tag;
+    GtkTextIter start;
+    GtkTextIter end;
 
     rdata = user_data;
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> text));
-
+    tag = gtk_text_buffer_create_tag (buffer, NULL, "foreground", "red", NULL);
+    
     if (cond == G_IO_HUP)
     {
         g_io_channel_unref (channel);
@@ -247,9 +251,14 @@ err_watch_cb (GIOChannel *channel,
     }
 
     g_io_channel_read_line (channel, &log, &size, NULL, NULL);
-    string = g_strdup (log);
+    string = g_strdup (log);    
 
     gtk_text_buffer_insert_at_cursor (buffer, string, -1);
+
+    gtk_text_buffer_get_start_iter (buffer, &start);
+    gtk_text_buffer_get_end_iter (buffer, &end);
+    gtk_text_buffer_apply_tag (buffer, tag, &start, &end);
+    
     g_free (string);
 
     return TRUE; 
@@ -273,15 +282,14 @@ child_watch_cb (GPid pid, gint status, gpointer user_data)
     g_spawn_close_pid (pid);
 }
 
-void 
-jack_server_init (GtkSwitch *sw, 
-                  GtkWidget *text,
-                  GPid pid)
+gint 
+jack_server_init (GtkWidget *sw, 
+                  GtkWidget *text)
 {
 	/* Starts the JACK server using `g_spawn_async ()` with the
 	 `GPid pid` as an out. */
     //GtkWidget *progress;
-    //GPid pid;
+    GPid pid;
 	jack_client_t *client;
 	jack_status_t status;
 	gint check_pid;
@@ -294,7 +302,7 @@ jack_server_init (GtkSwitch *sw,
     GIOChannel *ch_err;
     GtkPassedServerData *pdata;
 
-    pdata = g_malloc (sizeof (GtkPassedServerData));
+    pdata = g_slice_new (GtkPassedServerData);
     pdata -> text = text;
 
     jackdrc_init_input ();
@@ -319,7 +327,7 @@ jack_server_init (GtkSwitch *sw,
 		g_print ("Couldn't start JACK server.\n");
         err_msg_box ();
 
-        //return -1;
+        return -1;
 	}
 
     //pdata -> timeout_id = g_timeout_add (1500, (GSourceFunc) timeout_cb, pdata);
@@ -336,42 +344,28 @@ jack_server_init (GtkSwitch *sw,
 
     if (gtk_switch_get_active (GTK_SWITCH (sw)) == TRUE)
     {
-        g_io_add_watch (ch_out, G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP, (GIOFunc) out_watch_cb, pdata);
-        g_io_add_watch (ch_err, G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP, (GIOFunc) err_watch_cb, pdata);
-    }
-    else
-    {
-        g_io_add_watch (ch_out, 
-                        G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP,
+        g_io_add_watch (ch_out,
+                        G_IO_IN | G_IO_HUP,
                         (GIOFunc) out_watch_cb,
                         pdata);
 
         g_io_add_watch (ch_err,
-                        G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_NVAL | G_IO_HUP,
+                        G_IO_ERR | G_IO_HUP,
+                        (GIOFunc) err_watch_cb,
+                        pdata);
+    }
+    else
+    {
+        g_io_add_watch (ch_out, 
+                        G_IO_IN | G_IO_HUP,
+                        (GIOFunc) out_watch_cb,
+                        pdata);
+
+        g_io_add_watch (ch_err,
+                        G_IO_ERR | G_IO_HUP,
                         (GIOFunc) err_watch_cb,
                         pdata);
     }
 
-	/* We wait 2 seconds for server to initiate so we can create `gjackctl` 
-	jack client. */
-	// (2);
-
-	/* `if/else` statement does a final check to see if `GPid pid` is actually
-	running/initiated.  We use the `check_pid` statement for this. */
-	//check_pid = kill (pid, 0);
-
-	/*if (check_pid == 0)
-	{
-		client = jack_client_open ("gjackctl", JackServerName,
-									 &status, "default");
-		jack_activate (client);
-		g_timeout_add_seconds (2, (GSourceFunc) dsp_load, (gpointer) client);
-	}
-	else
-	{
-		gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
-		err_msg_box (window);
-	}*/
-
-	//return 0;
+	return 0;
 }

@@ -5,8 +5,7 @@
 #include <libconfig.h>
 
 #include "dsp_load.h"
-
-extern GtkWidget *label_dsp;
+#include "create_jack_client.h"
 
 void
 display (GtkWidget *stack, GtkWidget *sw);

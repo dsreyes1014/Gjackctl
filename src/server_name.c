@@ -59,6 +59,7 @@ server_name (GtkWidget *box, GtkWidget *button)
 	
     gtk_entry_set_text (GTK_ENTRY (entry), name);	
     gtk_entry_set_placeholder_text (GTK_ENTRY (entry), "default");
+
 	gtk_widget_set_tooltip_text (entry, "Enter the name of the JACK server");	
 	gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));    
 
@@ -68,8 +69,8 @@ server_name (GtkWidget *box, GtkWidget *button)
 
     gtk_widget_set_halign (label, GTK_ALIGN_START);
     gtk_widget_set_halign (entry, GTK_ALIGN_START);
-    gtk_widget_set_margin_start (label, 40);
-    gtk_widget_set_margin_start (entry, 40);
+    gtk_widget_set_margin_start (label, 100);
+    gtk_widget_set_margin_start (entry, 100);
 
 	g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), entry);
 }

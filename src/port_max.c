@@ -1,7 +1,7 @@
 #include "port_max.h"
 
 typedef struct _GtkPassedPortMaxData {
-    GtkWidget *button;
+    GtkWidget *pbutton;
     GtkWidget *popover;
 } GtkPassedPortMaxData;
 
@@ -14,7 +14,7 @@ button_toggled_cb (GtkToggleButton *tb, gpointer user_data)
 
     if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (tb)) == TRUE)
     {
-        gtk_button_set_label (GTK_BUTTON (rdata -> button), gtk_button_get_label (GTK_BUTTON (tb)));
+        gtk_button_set_label (GTK_BUTTON (rdata -> pbutton), gtk_button_get_label (GTK_BUTTON (tb)));
     }
 
     gtk_widget_hide (rdata -> popover);
@@ -23,13 +23,15 @@ button_toggled_cb (GtkToggleButton *tb, gpointer user_data)
 static void
 button_clicked_cb (GtkButton *button, gpointer user_data)
 {
-    GtkWidget *pbutton;
+    GtkPassedPortMaxData *rdata;
    
-    pbutton = user_data;
+    rdata = user_data;
 
     config_file_input ("gjackctl.server.port_max",
                        CONFIG_TYPE_STRING,
-                       (gpointer) gtk_button_get_label (GTK_BUTTON (pbutton))); 
+                       (gpointer) gtk_button_get_label (GTK_BUTTON (rdata -> pbutton))); 
+
+    g_slice_free (GtkPassedPortMaxData, rdata);
 }
 
 static const gchar *
@@ -69,9 +71,9 @@ popover_button_clicked_cb (GtkButton *button, gpointer user_data)
     radio4 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1), "1024");
     list = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
 
-    pdata = (GtkPassedPortMaxData *) g_malloc (sizeof (GtkPassedPortMaxData));
+    pdata = user_data;
     pdata -> popover = gtk_popover_new (GTK_WIDGET (button));
-    pdata -> button = (GTK_WIDGET (button));    
+    //pdata -> button = (GTK_WIDGET (button));    
    
     while (list)
     {
@@ -105,30 +107,34 @@ void
 port_max (GtkWidget *box, GtkWidget *button)
 {
     GtkWidget *label;
-    GtkWidget *pbutton;
+    //GtkWidget *pbutton;
     GtkWidget *child_box1;
     GtkWidget *child_box2;
     config_t config;
+    GtkPassedPortMaxData *pdata;
     
-    pbutton = gtk_button_new_with_label (get_port_max (config));
+    //pbutton = gtk_button_new_with_label (get_port_max (config));
     child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     child_box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     label = gtk_label_new ("Port Max"); 
 
-    gtk_button_set_relief (GTK_BUTTON (pbutton), GTK_RELIEF_NONE);
+    pdata = g_slice_new (GtkPassedPortMaxData);
+    pdata -> pbutton = gtk_button_new_with_label (get_port_max (config));
 
-    gtk_widget_set_tooltip_text (pbutton, "Choose maximum number of ports \n for the JACK server to manage.");
+    gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
+
+    gtk_widget_set_tooltip_text (pdata -> pbutton, "Choose maximum number of ports \n for the JACK server to manage.");
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
-    gtk_widget_set_size_request (pbutton, 80, 10);
+    gtk_widget_set_size_request (pdata -> pbutton, 80, 10);
 
     /* Pack box. */
     gtk_box_pack_start (GTK_BOX (child_box1), label, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (child_box1), pbutton, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box1), pdata -> pbutton, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (box), child_box1, FALSE, FALSE, 2);
 
     gtk_widget_set_margin_start (label, 16);
-    gtk_widget_set_margin_start (pbutton, 16);
+    gtk_widget_set_margin_start (pdata -> pbutton, 16);
 
-    g_signal_connect (pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), NULL);
-    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pbutton);
+    g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), pdata);
+    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);
 }

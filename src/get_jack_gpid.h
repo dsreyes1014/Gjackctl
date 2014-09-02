@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 #include <glib.h>
 
-GPid
+GPid 
 get_jack_gpid ();
 
 #endif

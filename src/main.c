@@ -40,8 +40,6 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
 
         gtk_window_resize (GTK_WINDOW (user_data), 870, 500);
     }
-
-    g_print ("Main line 43: %s\n", stack_name);    
 }
 
 static void
@@ -53,8 +51,6 @@ run_app_cb (GApplication *app, gpointer data)
     GtkWidget *text;
     GtkWidget *sswitcher;	
     GtkWidget *sw;
-    //jack_client_t *client;
-    //jack_status_t status;
 
 	window = gtk_application_window_new (GTK_APPLICATION (app));
 	stack = gtk_stack_new ();
@@ -62,10 +58,7 @@ run_app_cb (GApplication *app, gpointer data)
     sw = gtk_switch_new ();    
     text = gtk_text_view_new ();
     sswitcher = gtk_stack_switcher_new ();
-    /*client = jack_client_open ("gjackctl", 
-                               JackNoStartServer || JackUseExactName,
-                               &status); */   
-
+    
     gtk_stack_set_homogeneous (GTK_STACK (stack), FALSE);
 
 	config_file_init ();

@@ -1,20 +1,22 @@
 #include "timeout.h"
 
 typedef struct _GtkPassedTimeoutData {
-    GtkWidget *button;
+    GtkWidget *pbutton;
     GtkWidget *popover;
 } GtkPassedTimeoutData;
 
 static void
 button_clicked_cb (GtkButton *button, gpointer user_data)
 {
-    GtkWidget *pbutton;
+    GtkPassedTimeoutData *rdata;
 
-    pbutton = user_data;
+    rdata = user_data;
     
     config_file_input ("gjackctl.server.timeout",
                        CONFIG_TYPE_STRING,
-                       (gpointer) gtk_button_get_label (GTK_BUTTON (pbutton)));
+                       (gpointer) gtk_button_get_label (GTK_BUTTON (rdata -> pbutton)));
+
+    g_slice_free (GtkPassedTimeoutData, rdata);
 }
 
 static void
@@ -26,7 +28,7 @@ button_toggled_cb (GtkToggleButton *tb, gpointer user_data)
 
     if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (tb)) == TRUE)
     {
-        gtk_button_set_label (GTK_BUTTON (rdata -> button), gtk_button_get_label (GTK_BUTTON (tb)));
+        gtk_button_set_label (GTK_BUTTON (rdata -> pbutton), gtk_button_get_label (GTK_BUTTON (tb)));
     }
 
     gtk_widget_hide (rdata -> popover);
@@ -72,9 +74,9 @@ popover_button_clicked_cb (GtkButton *button, gpointer user_data)
     radio6 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1), "10000");    
     list = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
 
-    pdata = (GtkPassedTimeoutData *) g_malloc (sizeof (GtkPassedTimeoutData));
+    pdata = user_data;
     pdata -> popover = gtk_popover_new (GTK_WIDGET (button));
-    pdata -> button = (GTK_WIDGET (button));    
+    //pdata -> pbutton = (GTK_WIDGET (button));    
    
     while (list)
     {
@@ -113,31 +115,32 @@ timeout (GtkWidget *box, GtkWidget *button)
 {
     GtkWidget *label;
     GtkWidget *child_box1;
-    GtkWidget *child_box2;
-    GtkWidget *pbutton;
+    //GtkWidget *pbutton;
     gchar *string;
     config_t config;
+    GtkPassedTimeoutData *pdata;
     
-    pbutton = gtk_button_new_with_label (get_timeout (config));
     label = gtk_label_new ("Timeout (ms)"); 
     child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-    //child_box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+
+    pdata = g_slice_new (GtkPassedTimeoutData);
+    pdata -> pbutton = gtk_button_new_with_label (get_timeout (config));
+    
     
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
-    gtk_widget_set_size_request (pbutton, 80, 10);
-    gtk_widget_set_tooltip_text (pbutton, "Set JACK client timeout in milliseconds");
+    gtk_widget_set_size_request (pdata -> pbutton, 80, 10);
+    gtk_widget_set_tooltip_text (pdata -> pbutton, "Set JACK client timeout in milliseconds");
 
-    gtk_button_set_relief (GTK_BUTTON (pbutton), GTK_RELIEF_NONE);
+    gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
 
     /* Pack box. */
     gtk_box_pack_start (GTK_BOX (child_box1), label, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (child_box1), pbutton, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box1), pdata -> pbutton, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (box), child_box1, FALSE, FALSE, 2);
-    //gtk_box_pack_start (GTK_BOX (box), child_box2, FALSE, FALSE, 2);
 
     gtk_widget_set_margin_start (label, 16);
-    gtk_widget_set_margin_start (pbutton, 16);
+    gtk_widget_set_margin_start (pdata -> pbutton, 16);
 
-    g_signal_connect (pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), NULL);
-    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pbutton);
+    g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), pdata);
+    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);
 }

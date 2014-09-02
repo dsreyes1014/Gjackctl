@@ -8,7 +8,7 @@
 #include "server_switch.h"
 #include "dsp_load.h"
 
-void 
-jack_server_init (GtkSwitch *sw, GtkWidget *text, GPid pid);
+gint 
+jack_server_init (GtkWidget *sw, GtkWidget *text);
 
 #endif

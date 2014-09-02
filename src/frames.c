@@ -79,7 +79,7 @@ popover_button_clicked_cb (GtkButton *button, gpointer user_data)
       
     list = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
 
-    pdata = (GtkPassedFramesData *) g_malloc (sizeof (GtkPassedFramesData));
+    pdata = g_slice_new (GtkPassedFramesData);
     pdata -> popover = gtk_popover_new (GTK_WIDGET (button));
     pdata -> button = (GTK_WIDGET (button));    
    

@@ -1,7 +1,7 @@
 #include "sample_rate.h"
 
 typedef struct _GtkPassedSampleRateData {
-    GtkWidget *button;
+    GtkWidget *pbutton;
     GtkWidget *popover;
 } GtkPassedSampleRateData;
 
@@ -26,13 +26,13 @@ warning_msg_box ()
 static void
 button_clicked_cb (GtkButton *button, gpointer user_data)
 {
-    GtkWidget *pbutton;
+    GtkPassedSampleRateData *rdata;
 
-    pbutton = user_data;
+    rdata = user_data;
     
     config_file_input ("gjackctl.driver.sample_rate",
                        CONFIG_TYPE_STRING,
-                       (gpointer) gtk_button_get_label (GTK_BUTTON (pbutton)));
+                       (gpointer) gtk_button_get_label (GTK_BUTTON (rdata -> pbutton)));
 }
 
 static void
@@ -44,7 +44,7 @@ button_toggled_cb (GtkToggleButton *tb, gpointer user_data)
 
     if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (tb)) == TRUE)
     {
-        gtk_button_set_label (GTK_BUTTON (rdata -> button), gtk_button_get_label (GTK_BUTTON (tb)));
+        gtk_button_set_label (GTK_BUTTON (rdata -> pbutton), gtk_button_get_label (GTK_BUTTON (tb)));
     }
 
     gtk_widget_hide (rdata -> popover);
@@ -83,9 +83,9 @@ popover_button_clicked_cb (GtkWidget *button, gpointer user_data)
     config_t config;  
 	gchar *string;
 
-    pdata = (GtkPassedSampleRateData *) g_malloc (sizeof (GtkPassedSampleRateData));
+    pdata = user_data;
     pdata -> popover = gtk_popover_new (GTK_WIDGET (button));
-    pdata -> button = (GTK_WIDGET (button));
+    //pdata -> button = (GTK_WIDGET (button));
 
 	box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
 	
@@ -136,29 +136,30 @@ popover_button_clicked_cb (GtkWidget *button, gpointer user_data)
 void
 sample_rate (GtkWidget *box, GtkWidget *button)
 {
-    GtkWidget *pbutton;
     GtkWidget *label;
     GtkWidget *child_box;
 	gchar *string;
     config_t config;
-
-    pbutton = gtk_button_new_with_label (get_sample_rate (config));
+    GtkPassedSampleRateData *pdata;
+    
     label = gtk_label_new ("Sample Rate");
     child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
 
-	gtk_widget_set_tooltip_text (pbutton, "Choose sample rate (hz)");
-	gtk_widget_set_size_request (pbutton, 80, 10);	
-    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
+    pdata = g_slice_new (GtkPassedSampleRateData);
+    pdata -> pbutton = gtk_button_new_with_label (get_sample_rate (config));
 
-    gtk_button_set_relief (GTK_BUTTON (pbutton), GTK_RELIEF_NONE);
+    gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
 
     gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (child_box), pbutton, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box), pdata -> pbutton, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (box), child_box, FALSE, FALSE, 2);
 
+    gtk_widget_set_tooltip_text (pdata -> pbutton, "Choose sample rate (hz)");
+	gtk_widget_set_size_request (pdata -> pbutton, 80, 10);	
+    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     gtk_widget_set_margin_start (label, 20);
-    gtk_widget_set_margin_start (pbutton, 20);
+    gtk_widget_set_margin_start (pdata -> pbutton, 20);
 	
-	g_signal_connect (pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), NULL);
-    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pbutton);
+	g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), pdata);
+    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);
 }

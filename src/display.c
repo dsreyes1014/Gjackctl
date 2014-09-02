@@ -4,7 +4,6 @@ GtkWidget *label_dsp;
 
 typedef struct _GtkPassedDisplayData GtkPassedDisplayData;
 struct _GtkPassedDisplayData {
-    jack_client_t *client;
     GtkWidget *layout;
     GtkWidget *scwindow;
 };
@@ -46,26 +45,34 @@ layout_on (GtkWidget *sw, GtkWidget *layout)
     GtkWidget *label2a;
     GtkWidget *label3;
     GtkWidget *label3a;
+    GtkWidget *label4;
+    GtkWidget *label4a;
 
     label = gtk_label_new ("CPU Load");
     labela = gtk_label_new (NULL);
     label2 = gtk_label_new ("Sample Rate");
-    label2a = gtk_label_new (get_config_setting_string ("gjackctl.driver.sample_rate"));    
+    label2a = gtk_label_new (NULL);    
     label3 = gtk_label_new ("Driver");
     label3a = gtk_label_new (get_config_setting_string ("gjackctl.driver.type"));
+    label4 = gtk_label_new ("Device");
+    label4a = gtk_label_new (get_config_setting_string ("gjackctl.driver.device"));
 
-    //dsp_init (sw, labela, client);
-
-    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 12"));
+    jack_client_init (sw, labela, label2a);
+    
+    gtk_widget_override_font (labela, pango_font_description_from_string ("Cantarell Bold 32"));
     gtk_widget_override_font (label2, pango_font_description_from_string ("Cantarell Bold 12"));
     gtk_widget_override_font (label3, pango_font_description_from_string ("Cantarell Bold 12"));
+    gtk_widget_override_font (label4, pango_font_description_from_string ("Cantarell Bold 12"));
+    gtk_widget_set_tooltip_text (labela, "CPU Load");
 
-    gtk_layout_put (GTK_LAYOUT (layout), label, 310, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), labela, 360, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), label2, 120, 14);
-    gtk_layout_put (GTK_LAYOUT (layout), label2a, 216, 16);
+    //gtk_layout_put (GTK_LAYOUT (layout), label, 310, 16);
+    gtk_layout_put (GTK_LAYOUT (layout), labela, 220, 46);
+    gtk_layout_put (GTK_LAYOUT (layout), label2, 260, 15);
+    gtk_layout_put (GTK_LAYOUT (layout), label2a, 356, 16);
     gtk_layout_put (GTK_LAYOUT (layout), label3, 10, 15);
     gtk_layout_put (GTK_LAYOUT (layout), label3a, 60, 16);
+    gtk_layout_put (GTK_LAYOUT (layout), label4, 120, 15);
+    gtk_layout_put (GTK_LAYOUT (layout), label4a, 174, 16);
 }
 
 static void
@@ -85,15 +92,14 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 {
     GtkWidget *layout;
     GdkRGBA color = {0.0, 0.0, 0.0, 0.5};
-    gboolean check;
     GtkPassedDisplayData *rdata;
-
+    
     rdata = user_data;
-    check = gtk_switch_get_active (GTK_SWITCH (sw));
 
     gtk_widget_destroy (rdata -> layout);
+    g_print ("display.c: test\n");
 
-    if (check == TRUE)
+    if (gtk_switch_get_active (sw) == TRUE)
     {
         layout = gtk_layout_new_with_bg_color_override (color);
         layout_on (GTK_WIDGET (sw), layout);
@@ -127,6 +133,7 @@ display (GtkWidget *stack, GtkWidget *sw)
 	/* Pack `header_bar` & `sc_window`. */
     if (gtk_switch_get_active (GTK_SWITCH (sw)) == TRUE)
     {
+
         layout = gtk_layout_new_with_bg_color_override (bg_color);
         layout_on (sw, layout);
         pdata -> layout = layout;
@@ -139,10 +146,12 @@ display (GtkWidget *stack, GtkWidget *sw)
     }
 
     gtk_container_add (GTK_CONTAINER (pdata -> scwindow), layout);
-	gtk_stack_add_titled (GTK_STACK (stack), pdata -> scwindow, "display", "Display");
+	gtk_stack_add_titled (GTK_STACK (stack), pdata -> scwindow,
+                          "display", 
+                          "Display");
 
-    g_signal_connect (sw,
-                      "notify::active", 
-                   	  G_CALLBACK (switch_pos_cb),
-                      pdata);
+    g_signal_connect_after (sw,
+                            "notify::active", 
+                   	        G_CALLBACK (switch_pos_cb),
+                            pdata);
 }

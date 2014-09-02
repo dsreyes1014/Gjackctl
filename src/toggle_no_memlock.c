@@ -51,6 +51,8 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
                            CONFIG_TYPE_BOOL,
                            (gpointer) &value);
     }
+
+    g_slice_free (GtkPassedData, data);
 }
 
 static gboolean
@@ -116,7 +118,7 @@ toggle_no_memlock (GtkWidget *box, GtkWidget *button)
     GtkPassedData *data;
     gint state;
     
-    data = (GtkPassedData *) g_malloc (sizeof (GtkPassedData));
+    data = g_slice_new (GtkPassedData);
     label = gtk_label_new ("No Memlock");
     event_box = gtk_event_box_new ();
     config_init (&config);

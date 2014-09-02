@@ -1,5 +1,7 @@
 #include "toggle_rt.h"
 
+typedef struct _GtkPassedRtData GtkPassedRtData;
+
 static gboolean
 get_realtime (config_t config)
 {
@@ -74,6 +76,8 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
                            CONFIG_TYPE_BOOL,
                            (gpointer) &value);
     }
+
+    g_slice_free (GtkPassedData, data);
 }
 
 static gboolean
@@ -123,7 +127,8 @@ toggle_rt (GtkWidget *box, GtkWidget *button)
     event_box = gtk_event_box_new ();
     config_init (&config);
     state = label_normal_off (GTK_LABEL (label));
-    data = (GtkPassedData *) g_malloc (sizeof (GtkPassedData));
+
+    data = g_slice_new (GtkPassedData);
     data -> passed_label = label;
   
     realtime = get_realtime (config);

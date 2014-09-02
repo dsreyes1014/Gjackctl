@@ -155,6 +155,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     
 
     gtk_widget_set_size_request (button1, 80, 30);
+    gtk_widget_set_margin_start (sbox5, 80);
     
 	/* Pack `header_bar`. */
 	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);

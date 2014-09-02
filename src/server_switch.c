@@ -26,31 +26,20 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 	/* This callback function will start JACK when switched on and terminate 
 	it when switched off. */
 
-    GPid pid;
     GtkPassedServerSwitchData *rdata;
     
- 
 	rdata = user_data;
-    pid = -2;
 
 	/* Check if `GPid pid` exists. */
 	if (gtk_switch_get_active (sw) == TRUE)
 	{						
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw) , "Shutdown Server");
-		
-	    jack_server_init (sw, rdata -> text, pid);
+	    jack_server_init (GTK_WIDGET (sw), rdata -> text);
 	}
 	else
-	{	
-           
-
-        GPid pid;
-
-        pid = get_jack_gpid ();
-        
+	{	        
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw), "Start Server");
-        g_print ("server_switch.c: test\n");
-		kill (pid, SIGTERM);	
+		kill (get_jack_gpid (), SIGTERM);	
         clear_log_view (rdata -> text);     
 	}
 }   
@@ -68,7 +57,7 @@ server_switch (GtkWidget *window,
     
 	check = gtk_switch_get_active (GTK_SWITCH (sw));
     
-    pdata = g_malloc (sizeof (GtkPassedServerSwitchData));    
+    pdata = g_slice_new (GtkPassedServerSwitchData);    
     pdata -> text = text;
 
     gtk_text_view_set_editable (GTK_TEXT_VIEW (text), FALSE);
@@ -92,17 +81,12 @@ server_switch (GtkWidget *window,
 	app first starts. */
 	if (gtk_switch_get_active (GTK_SWITCH (sw)) == TRUE)
 	{	
-		gtk_widget_set_tooltip_text (GTK_WIDGET (sw), 
-									 "Shutdown Server");
+		gtk_widget_set_tooltip_text (GTK_WIDGET (sw), "Shutdown Server");
 	}
 	else
 	{
-		gtk_widget_set_tooltip_text (GTK_WIDGET (sw),
-									 "Start Server");	
+		gtk_widget_set_tooltip_text (GTK_WIDGET (sw), "Start Server");	
 	}
 
-    g_signal_connect (sw,
-                      "notify::active", 
-                   	  G_CALLBACK (switch_pos_cb),
-                      pdata);
+    g_signal_connect (sw, "notify::active", G_CALLBACK (switch_pos_cb), pdata);
 }
