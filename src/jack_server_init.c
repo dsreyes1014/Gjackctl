@@ -175,6 +175,9 @@ jackdrc_init_input ()
     /*********************************************************************/
 
     fclose (fp);
+    config_destroy (&config);
+    g_free (jackdrc);
+    g_free (file);
 
     return TRUE;
 }
@@ -222,6 +225,7 @@ out_watch_cb (GIOChannel *channel,
 
     gtk_text_buffer_insert_at_cursor (buffer, string, -1);
     g_free (string);
+    g_free (log);
 
     return TRUE; 
 }
@@ -260,6 +264,7 @@ err_watch_cb (GIOChannel *channel,
     gtk_text_buffer_apply_tag (buffer, tag, &start, &end);
     
     g_free (string);
+    g_free (log);
 
     return TRUE; 
 }

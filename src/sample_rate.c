@@ -62,6 +62,8 @@ get_sample_rate (config_t config)
     config_init (&config);
     config_read_file (&config, file);
     config_lookup_string (&config, "gjackctl.driver.sample_rate", &string);
+
+    g_free (file);
     
     return string;
 }

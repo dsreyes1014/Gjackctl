@@ -1,7 +1,5 @@
 #include "display.h"
 
-GtkWidget *label_dsp;
-
 typedef struct _GtkPassedDisplayData GtkPassedDisplayData;
 struct _GtkPassedDisplayData {
     GtkWidget *layout;
@@ -67,11 +65,11 @@ layout_on (GtkWidget *sw, GtkWidget *layout)
 
     //gtk_layout_put (GTK_LAYOUT (layout), label, 310, 16);
     gtk_layout_put (GTK_LAYOUT (layout), labela, 220, 46);
-    gtk_layout_put (GTK_LAYOUT (layout), label2, 260, 15);
-    gtk_layout_put (GTK_LAYOUT (layout), label2a, 356, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), label3, 10, 15);
+    gtk_layout_put (GTK_LAYOUT (layout), label2, 400, 15);
+    gtk_layout_put (GTK_LAYOUT (layout), label2a, 496, 16);
+    gtk_layout_put (GTK_LAYOUT (layout), label3, 10, 16);
     gtk_layout_put (GTK_LAYOUT (layout), label3a, 60, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), label4, 120, 15);
+    gtk_layout_put (GTK_LAYOUT (layout), label4, 120, 16);
     gtk_layout_put (GTK_LAYOUT (layout), label4a, 174, 16);
 }
 
@@ -80,7 +78,7 @@ layout_off (GtkWidget *layout)
 {
     GtkWidget *label;
 
-    label = gtk_label_new ("Server not running\n    Nothing to display");
+    label = gtk_label_new ("Server not running\n Nothing to display");
 
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold Italic 14"));
 
@@ -124,7 +122,7 @@ display (GtkWidget *stack, GtkWidget *sw)
 	GdkRGBA bg_color = {0.0, 0.0, 0.0, 0.5};
     GtkPassedDisplayData *pdata;
 
-    pdata = g_malloc (sizeof (GtkPassedDisplayData));
+    pdata = g_slice_new (GtkPassedDisplayData);
     pdata -> scwindow = gtk_scrolled_window_new (NULL, NULL);
 
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (pdata -> scwindow), 
