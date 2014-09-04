@@ -89,7 +89,7 @@ jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2)
         i++;
     }*/
 
-    jack_set_process_callback (client, process_cb, NULL);
+    //jack_set_process_callback (client, process_cb, NULL);
     jack_on_shutdown (client, jack_shutdown_cb, client);
     jack_set_sample_rate_callback (client, srate_cb, label2);
 

@@ -20,9 +20,11 @@ dsp_load (gpointer user_data)
 
 	if (gtk_switch_get_active (GTK_SWITCH (rdata -> sw)) == FALSE)
 	{
+        g_slice_free (GtkPassedDspData, rdata);
+
 		return FALSE;
 
-        //g_slice_free (GtkPassedDspData, rdata);
+        
 	}
 	else
 	{		
