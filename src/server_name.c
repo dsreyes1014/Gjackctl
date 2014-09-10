@@ -71,7 +71,7 @@ server_name (GtkWidget *box, GtkWidget *button)
     gtk_widget_set_halign (entry, GTK_ALIGN_START);
     gtk_widget_set_margin_start (label, 20);
     gtk_widget_set_margin_start (entry, 20);
-    gtk_widget_set_margin_top (label, 6);
+    gtk_widget_set_margin_top (label, 30);
 
 	g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), entry);
 }

@@ -159,7 +159,7 @@ toggle_no_memlock (GtkWidget *box, GtkWidget *button)
     gtk_box_pack_start (GTK_BOX (box), event_box, FALSE, FALSE, 2);
 
 	//gtk_widget_set_margin_end (event_box, 20);
-    gtk_widget_set_halign (event_box, GTK_ALIGN_END);
+    gtk_widget_set_halign (event_box, GTK_ALIGN_CENTER);
     //gtk_widget_set_margin_start (event_box, 80);
 
     g_signal_connect (event_box,

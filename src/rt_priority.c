@@ -67,7 +67,7 @@ rt_priority (GtkWidget *box, GtkWidget *button)
     gtk_widget_set_margin_start (label, 40);
     gtk_widget_set_margin_start (spin_button, 40);
     gtk_widget_set_margin_end (spin_button, 70);
-    gtk_widget_set_margin_top (label, 6);
+    gtk_widget_set_margin_top (label, 30);
 
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), spin_button);
 }
