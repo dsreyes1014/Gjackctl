@@ -8,6 +8,7 @@ get_jack_gpid ()
     GPid pid;
     
     cmd = popen ("pgrep jackd", "r");
+    pid = -2;
 
     /* Here we get the `GPid pid` from the `cmd` statement and convert 
 	it to a gint using the `g_ascii_strtoll ()` function. */
@@ -17,6 +18,13 @@ get_jack_gpid ()
 	}
 	
 	pclose (cmd);
+
+    //g_print ("From `get_jack_gpid.c`: %d\n", pid);
+
+    if (kill (pid, 0) == -1)
+    {
+        g_print ("jackd process id doesn't exist\n");
+    }
   
     return pid;
 }

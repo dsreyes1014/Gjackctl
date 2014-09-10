@@ -3,6 +3,8 @@
 
 #include <gtk/gtk.h>
 #include <glib.h>
+#include <signal.h>
+#include <sys/types.h>
 
 GPid 
 get_jack_gpid ();
