@@ -115,8 +115,6 @@ timeout (GtkWidget *box, GtkWidget *button)
 {
     GtkWidget *label;
     GtkWidget *child_box1;
-    //GtkWidget *pbutton;
-    gchar *string;
     config_t config;
     GtkPassedTimeoutData *pdata;
     
@@ -125,7 +123,6 @@ timeout (GtkWidget *box, GtkWidget *button)
 
     pdata = g_slice_new (GtkPassedTimeoutData);
     pdata -> pbutton = gtk_button_new_with_label (get_timeout (config));
-    
     
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     gtk_widget_set_size_request (pdata -> pbutton, 80, 10);
@@ -138,8 +135,8 @@ timeout (GtkWidget *box, GtkWidget *button)
     gtk_box_pack_start (GTK_BOX (child_box1), pdata -> pbutton, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (box), child_box1, FALSE, FALSE, 2);
 
-    gtk_widget_set_margin_start (label, 16);
-    gtk_widget_set_margin_start (pdata -> pbutton, 16);
+    gtk_widget_set_margin_start (label, 10);
+    gtk_widget_set_margin_start (pdata -> pbutton, 10);
 
     g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), pdata);
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);

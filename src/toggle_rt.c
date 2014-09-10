@@ -162,7 +162,8 @@ toggle_rt (GtkWidget *box, GtkWidget *button)
     gtk_box_pack_start (GTK_BOX (box), event_box, FALSE, FALSE, 2);
 
     //gtk_widget_set_halign (event_box, GTK_ALIGN_START);
-    gtk_widget_set_margin_start (event_box, 80);
+    //gtk_widget_set_margin_start (event_box, 30);
+    gtk_widget_set_halign (event_box, GTK_ALIGN_END);
     gtk_widget_set_margin_top (event_box, 20);
       
     gtk_widget_add_events (event_box, GDK_BUTTON_PRESS_MASK);

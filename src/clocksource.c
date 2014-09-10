@@ -104,13 +104,13 @@ clocksource (GtkWidget *box, GtkWidget *button)
     GtkWidget *label;
     GtkWidget *pbutton;
     GtkWidget *child_box1;
-    GtkWidget *child_box2;
+    GtkWidget *separator;
     config_t config;
     GtkPassedClockSourceData *pdata;
     
     child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-    child_box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     label = gtk_label_new ("Clock Source"); 
+    separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
 
     pdata = g_slice_new (GtkPassedClockSourceData);
     pdata -> pbutton = gtk_button_new_with_label (get_clocksource (config));
@@ -122,12 +122,15 @@ clocksource (GtkWidget *box, GtkWidget *button)
     /* Pack box. */
     gtk_box_pack_start (GTK_BOX (child_box1), label, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (child_box1), pdata -> pbutton, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box1), separator, FALSE, FALSE, 2);    
     gtk_box_pack_start (GTK_BOX (box), child_box1, FALSE, FALSE, 2);
   
     gtk_widget_set_size_request (pdata -> pbutton, 80, 10);
     gtk_widget_set_halign (label, GTK_ALIGN_START);
-    gtk_widget_set_margin_start (label, 100);
-    gtk_widget_set_margin_start (pdata -> pbutton, 100);
+    gtk_widget_set_margin_start (label, 10);
+    gtk_widget_set_margin_start (pdata -> pbutton, 10);
+    gtk_widget_set_margin_top (separator, 6);
+    gtk_widget_set_margin_top (child_box1, 6);
 
     g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), pdata);
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);

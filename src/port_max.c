@@ -107,16 +107,14 @@ void
 port_max (GtkWidget *box, GtkWidget *button)
 {
     GtkWidget *label;
-    //GtkWidget *pbutton;
     GtkWidget *child_box1;
-    GtkWidget *child_box2;
+    GtkWidget *separator;
     config_t config;
     GtkPassedPortMaxData *pdata;
     
-    //pbutton = gtk_button_new_with_label (get_port_max (config));
     child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-    child_box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     label = gtk_label_new ("Port Max"); 
+    separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
 
     pdata = g_slice_new (GtkPassedPortMaxData);
     pdata -> pbutton = gtk_button_new_with_label (get_port_max (config));
@@ -130,10 +128,12 @@ port_max (GtkWidget *box, GtkWidget *button)
     /* Pack box. */
     gtk_box_pack_start (GTK_BOX (child_box1), label, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (child_box1), pdata -> pbutton, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box1), separator, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (box), child_box1, FALSE, FALSE, 2);
 
-    gtk_widget_set_margin_start (label, 16);
-    gtk_widget_set_margin_start (pdata -> pbutton, 16);
+    gtk_widget_set_margin_start (label, 10);
+    gtk_widget_set_margin_start (pdata -> pbutton, 10);
+    gtk_widget_set_margin_top (separator, 6);
 
     g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), pdata);
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);
