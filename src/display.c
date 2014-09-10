@@ -55,7 +55,7 @@ layout_on (GtkWidget *sw, GtkWidget *layout)
     label4 = gtk_label_new ("Device");
     label4a = gtk_label_new (get_config_setting_string ("gjackctl.driver.device"));
 
-    //jack_client_init (sw, labela, label2a);
+    jack_client_init (sw, labela, label2a);
     
     gtk_widget_override_font (labela, pango_font_description_from_string ("Cantarell Bold 32"));
     gtk_widget_override_font (label2, pango_font_description_from_string ("Cantarell Bold 12"));
