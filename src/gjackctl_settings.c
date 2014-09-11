@@ -13,6 +13,20 @@ typedef struct
 }pass_data_2;
 
 static void
+visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
+{
+    if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "server") == 0)
+    {
+        gtk_window_resize (GTK_WINDOW (user_data), 550, 350);
+    }
+   
+    if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "driver") == 0)
+    {
+        gtk_window_resize (GTK_WINDOW (user_data), 530, 200);
+    } 
+}
+
+static void
 popup_destroy_cb (GtkWidget *widget, gpointer user_data)
 {
 	GtkWidget *window;
@@ -94,7 +108,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	data_to_pass -> data2 = popup;
     separator = gtk_separator_new (GTK_ORIENTATION_VERTICAL);	
 
-	gtk_stack_add_titled (GTK_STACK (stack),
+    gtk_stack_add_titled (GTK_STACK (stack),
 						  sbox0,
                           "server",
                           "Server");
@@ -102,6 +116,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 						  dbox,
                           "driver",
                           "Driver");
+    
 	gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER (sswitcher),
                                   GTK_STACK (stack)); 
 	gtk_stack_set_transition_type (GTK_STACK (stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);
@@ -132,7 +147,8 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	sample_rate (dbox2, button1);
     frames (dbox2, button1);    
     period (dbox2, button1);
-    
+
+    gtk_window_set_default_size (GTK_WINDOW (popup), 600, 220);    
     gtk_widget_set_size_request (button1, 80, 30);
     gtk_widget_set_margin_start (sbox5, 60);
     
@@ -157,6 +173,11 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                       "clicked", 
                       G_CALLBACK (button_clicked_cb), 
                       data_to_pass);
+
+    g_signal_connect (stack,
+                      "notify::visible-child-name",
+                      G_CALLBACK (visible_child_cb),
+                      popup);
 
 	/* Position `popup` to show wherever current mouse position is located. */
 	gtk_window_set_position (GTK_WINDOW (popup), GTK_WIN_POS_MOUSE);

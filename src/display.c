@@ -64,13 +64,13 @@ layout_on (GtkWidget *sw, GtkWidget *layout)
     gtk_widget_set_tooltip_text (labela, "CPU Load");
 
     //gtk_layout_put (GTK_LAYOUT (layout), label, 310, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), labela, 220, 46);
-    gtk_layout_put (GTK_LAYOUT (layout), label2, 400, 15);
+    gtk_layout_put (GTK_LAYOUT (layout), labela, 220, 42);
+    gtk_layout_put (GTK_LAYOUT (layout), label2, 400, 16);
     gtk_layout_put (GTK_LAYOUT (layout), label2a, 496, 16);
     gtk_layout_put (GTK_LAYOUT (layout), label3, 10, 16);
     gtk_layout_put (GTK_LAYOUT (layout), label3a, 60, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), label4, 120, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), label4a, 174, 16);
+    gtk_layout_put (GTK_LAYOUT (layout), label4, 110, 16);
+    gtk_layout_put (GTK_LAYOUT (layout), label4a, 164, 16);
 }
 
 static void
@@ -78,11 +78,11 @@ layout_off (GtkWidget *layout)
 {
     GtkWidget *label;
 
-    label = gtk_label_new ("Server not running\n Nothing to display");
+    label = gtk_label_new ("jackd server not running");
 
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold Italic 14"));
 
-    gtk_layout_put (GTK_LAYOUT (layout), label, 170, 36);
+    gtk_layout_put (GTK_LAYOUT (layout), label, 170, 40);
 }
 
 static void
