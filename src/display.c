@@ -1,6 +1,7 @@
 #include "display.h"
 
 typedef struct _GtkPassedDisplayData GtkPassedDisplayData;
+
 struct _GtkPassedDisplayData {
     GtkWidget *layout;
     GtkWidget *scwindow;
@@ -95,7 +96,7 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
     rdata = user_data;
 
     gtk_widget_destroy (rdata -> layout);
-    g_print ("display.c: test\n");
+    //g_print ("display.c: test\n");
 
     if (gtk_switch_get_active (sw) == TRUE)
     {

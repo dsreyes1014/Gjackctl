@@ -9,10 +9,6 @@
 static void
 visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
 {
-    //gchar *stack_name;
-
-    //stack_name = gtk_stack_get_visible_child_name (GTK_STACK (stack));
-
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "display") == 0)
     {
         GdkRGBA bg_color;
@@ -40,8 +36,6 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
 
         gtk_window_resize (GTK_WINDOW (user_data), 870, 500);
     }
-
-    //g_free (stack_name);
 }
 
 static void
