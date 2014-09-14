@@ -17,12 +17,12 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
 {
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "server") == 0)
     {
-        gtk_window_resize (GTK_WINDOW (user_data), 550, 350);
+        gtk_window_resize (GTK_WINDOW (user_data), 516, 300);
     }
    
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "driver") == 0)
     {
-        gtk_window_resize (GTK_WINDOW (user_data), 530, 200);
+        gtk_window_resize (GTK_WINDOW (user_data), 536, 300);
     } 
 }
 
@@ -75,9 +75,11 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     GtkWidget *sbox5;
     GtkWidget *sbox6;
     GtkWidget *sbox7;
-    GtkWidget *dbox;
+    GtkWidget *dbox0;
+    GtkWidget *dbox1;
     GtkWidget *dbox2;
     GtkWidget *separator;
+    GtkWidget *separator1;
 
 	/* This is a `struct` that holds variables passed by 
 	the `g_signal_connect ()` function through `gpointer user_data`. */ 
@@ -92,7 +94,8 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     sbox5 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);   
     sbox6 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     sbox7 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);  
-    dbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+    dbox0 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+    dbox1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     dbox2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);    
     stack = gtk_stack_new ();
 	sswitcher = gtk_stack_switcher_new ();
@@ -106,14 +109,15 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	window = data_received -> data1;
 	data_to_pass -> data1 = window;
 	data_to_pass -> data2 = popup;
-    separator = gtk_separator_new (GTK_ORIENTATION_VERTICAL);	
+    separator = gtk_separator_new (GTK_ORIENTATION_VERTICAL);
+    separator1 = gtk_separator_new (GTK_ORIENTATION_VERTICAL);	
 
     gtk_stack_add_titled (GTK_STACK (stack),
 						  sbox0,
                           "server",
                           "Server");
 	gtk_stack_add_titled (GTK_STACK (stack),
-						  dbox,
+						  dbox0,
                           "driver",
                           "Driver");
     
@@ -130,7 +134,9 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     gtk_box_pack_start (GTK_BOX (sbox4), sbox6, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (sbox1), sbox4, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (sbox3), sbox7, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (dbox), dbox2, FALSE, FALSE, 2);    
+    gtk_box_pack_start (GTK_BOX (dbox0), dbox2, FALSE, FALSE, 2);
+    gtk_box_pack_end (GTK_BOX (dbox0), dbox1, FALSE, FALSE, 2);  
+    gtk_box_pack_end (GTK_BOX (dbox0), separator1, FALSE, FALSE, 2);   
     /**************************************************************************/
 	server_name (sbox2, button1);		
 	toggle_rt (sbox5, button1);
@@ -143,9 +149,9 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     port_max (sbox7, button1);
     timeout (sbox7, button1);
     /**************************************************************************/    
-	drivers (dbox2, app, button1);
-	sample_rate (dbox2, button1);
-    frames (dbox2, button1);    
+	drivers (dbox1, app, button1);
+	sample_rate (dbox1, button1);
+    frames (dbox1, button1);    
     period (dbox2, button1);
 
     gtk_window_set_default_size (GTK_WINDOW (popup), 600, 220);    

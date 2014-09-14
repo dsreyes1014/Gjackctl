@@ -65,8 +65,8 @@ period (GtkWidget *box, GtkWidget *button)
 	
     //gtk_widget_set_halign (label, GTK_ALIGN_START);
     //gtk_widget_set_halign (spin_button, GTK_ALIGN_START);
-    gtk_widget_set_margin_start (label, 20);
-    gtk_widget_set_margin_start (spin_button, 20);
+    gtk_widget_set_margin_start (label, 10);
+    gtk_widget_set_margin_start (spin_button, 10);
     //gtk_widget_set_margin_end (spin_button, 70);
 
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), spin_button);

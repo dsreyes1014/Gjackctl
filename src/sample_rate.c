@@ -140,12 +140,14 @@ sample_rate (GtkWidget *box, GtkWidget *button)
 {
     GtkWidget *label;
     GtkWidget *child_box;
+    GtkWidget *separator;
 	gchar *string;
     config_t config;
     GtkPassedSampleRateData *pdata;
     
     label = gtk_label_new ("Sample Rate");
     child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+    separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
 
     pdata = g_slice_new (GtkPassedSampleRateData);
     pdata -> pbutton = gtk_button_new_with_label (get_sample_rate (config));
@@ -154,13 +156,14 @@ sample_rate (GtkWidget *box, GtkWidget *button)
 
     gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (child_box), pdata -> pbutton, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box), separator, FALSE, FALSE, 2); 
     gtk_box_pack_start (GTK_BOX (box), child_box, FALSE, FALSE, 2);
 
     gtk_widget_set_tooltip_text (pdata -> pbutton, "Choose sample rate (hz)");
 	gtk_widget_set_size_request (pdata -> pbutton, 80, 10);	
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
-    gtk_widget_set_margin_start (label, 20);
-    gtk_widget_set_margin_start (pdata -> pbutton, 20);
+    //gtk_widget_set_margin_start (label, 20);
+    //gtk_widget_set_margin_start (pdata -> pbutton, 20);
 	
 	g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), pdata);
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);

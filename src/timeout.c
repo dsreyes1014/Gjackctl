@@ -118,7 +118,7 @@ timeout (GtkWidget *box, GtkWidget *button)
     config_t config;
     GtkPassedTimeoutData *pdata;
     
-    label = gtk_label_new ("Timeout (ms)"); 
+    label = gtk_label_new ("Timeout"); 
     child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
 
     pdata = g_slice_new (GtkPassedTimeoutData);

@@ -95,8 +95,8 @@ void
 drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button)
 {
     GtkWidget *child_box;
-    //GtkWidget *child_box2;
 	GtkWidget *label;
+    GtkWidget *separator;
     GtkPassedDriverData *pdata;
     gchar *tt;
     config_t config;
@@ -107,7 +107,8 @@ drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button)
 	pdata -> pbutton = gtk_button_new_with_label (get_driver_type (config));
     pdata -> label = gtk_label_new (get_driver_device (config));	
     child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-    //child_box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+    separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
+
     tt = g_strconcat ("Current device is ", 
                       "\"",
                       get_driver_device (config),
@@ -129,12 +130,13 @@ drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button)
 
     gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (child_box), pdata -> pbutton, FALSE, FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (child_box), separator, FALSE, FALSE, 2); 
     gtk_box_pack_start (GTK_BOX (box), child_box, FALSE, FALSE, 2);
-    //gtk_box_pack_start (GTK_BOX (box), child_box2, FALSE, FALSE, 2);
 
     //gtk_widget_set_halign (pdata -> pbutton, GTK_ALIGN_START);
-    gtk_widget_set_margin_start (pdata -> pbutton, 22);
-    gtk_widget_set_margin_start (label, 18);
+    //tk_widget_set_margin_start (pdata -> pbutton, 22);
+    //gtk_widget_set_margin_start (label, 18);
+    gtk_widget_set_margin_top (child_box, 6);
 	
     g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), NULL);
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);
