@@ -7,12 +7,14 @@ label_prelight ()
     PangoAttribute *attr;
 
     list = pango_attr_list_new ();
-    attr = pango_attr_foreground_new (65535, 65535, 65535);
-    pango_attr_list_insert (list, attr);
+    //attr = pango_attr_foreground_new (65535, 65535, 65535);
+    //pango_attr_list_insert (list, attr);
     //attr = pango_attr_background_new (13000, 13000, 13000);
     //pango_attr_list_insert (list, attr);
-    attr = pango_attr_weight_new (PANGO_WEIGHT_ULTRAHEAVY);
+    attr = pango_attr_weight_new (PANGO_WEIGHT_ULTRALIGHT);
     pango_attr_list_insert (list, attr);
+    //attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
+    //pango_attr_list_insert (list, attr);
 
     return list;
 }
@@ -24,9 +26,9 @@ label_normal_on (GtkLabel *label)
     PangoAttribute *attr;
 
     list = pango_attr_list_new ();
-    attr = pango_attr_foreground_new (58535, 58535, 58535);
-    pango_attr_list_insert (list, attr);
-    attr = pango_attr_weight_new (PANGO_WEIGHT_NORMAL);
+    //attr = pango_attr_foreground_new (58535, 58535, 58535);
+    //pango_attr_list_insert (list, attr);
+    attr = pango_attr_weight_new (PANGO_WEIGHT_SEMIBOLD);
     pango_attr_list_insert (list, attr);
 
     gtk_label_set_attributes (GTK_LABEL (label), list);

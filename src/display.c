@@ -7,17 +7,17 @@ struct _GtkPassedDisplayData {
     GtkWidget *scwindow;
 };
 
-static GtkWidget *
+/*static GtkWidget *
 gtk_layout_new_with_bg_color_override (GdkRGBA bg_color)
 {
     GtkWidget *layout;
 
     layout = gtk_layout_new (NULL, NULL);
 
-    gtk_widget_override_background_color (layout, GTK_STATE_FLAG_NORMAL, &bg_color);
+    //gtk_widget_override_background_color (layout, GTK_STATE_FLAG_NORMAL, &bg_color);
 
     return layout;
-}
+}*/
 
 static const gchar *
 get_config_setting_string (const gchar *path)
@@ -90,23 +90,21 @@ static void
 switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 {
     GtkWidget *layout;
-    GdkRGBA color = {0.0, 0.0, 0.0, 0.5};
     GtkPassedDisplayData *rdata;
     
     rdata = user_data;
+    layout = gtk_layout_new (NULL, NULL);
 
     gtk_widget_destroy (rdata -> layout);
     //g_print ("display.c: test\n");
 
     if (gtk_switch_get_active (sw) == TRUE)
     {
-        layout = gtk_layout_new_with_bg_color_override (color);
         layout_on (GTK_WIDGET (sw), layout);
         rdata -> layout = layout;
     }
     else
     {
-        layout = gtk_layout_new_with_bg_color_override (color);
         layout_off (layout);
         rdata -> layout = layout;
     }
@@ -120,11 +118,11 @@ display (GtkWidget *stack, GtkWidget *sw)
 {
 	GtkWidget *layout;
 	GtkWidget *scwindow;
-	GdkRGBA bg_color = {0.0, 0.0, 0.0, 0.5};
     GtkPassedDisplayData *pdata;
 
     pdata = g_slice_new (GtkPassedDisplayData);
     pdata -> scwindow = gtk_scrolled_window_new (NULL, NULL);
+    layout = gtk_layout_new (NULL, NULL);
 
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (pdata -> scwindow), 
 									GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -132,19 +130,16 @@ display (GtkWidget *stack, GtkWidget *sw)
 	/* Pack `header_bar` & `sc_window`. */
     if (gtk_switch_get_active (GTK_SWITCH (sw)) == TRUE)
     {
-
-        layout = gtk_layout_new_with_bg_color_override (bg_color);
         layout_on (sw, layout);
         pdata -> layout = layout;
     }
 	else
     {
-        layout = gtk_layout_new_with_bg_color_override (bg_color);
         layout_off (layout);
         pdata -> layout = layout;
     }
 
-    gtk_container_add (GTK_CONTAINER (pdata -> scwindow), layout);
+    gtk_container_add (GTK_CONTAINER (pdata -> scwindow), pdata -> layout);
 	gtk_stack_add_titled (GTK_STACK (stack), pdata -> scwindow,
                           "display", 
                           "Display");

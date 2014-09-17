@@ -23,12 +23,12 @@ static void
 jack_shutdown_cb (gpointer user_data)
 {
     //exit (1);
-    jack_client_t *client;
+    //jack_client_t *client;
 
-    client = user_data;
+    //client = user_data;
 
-    jack_deactivate (client);
-    jack_client_close (client);   
+    //jack_deactivate (client);
+    //jack_client_close (client);   
 }
 
 static gint

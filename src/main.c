@@ -11,29 +11,11 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
 {
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "display") == 0)
     {
-        GdkRGBA bg_color;
-
-        bg_color.red = 0.0;
-	    bg_color.green = 0.0;
-	    bg_color.blue = 0.0;
-	    bg_color.alpha = 0.5;
-
-        gtk_widget_override_background_color (user_data, GTK_STATE_FLAG_NORMAL, &bg_color);
-
         gtk_window_resize (GTK_WINDOW (user_data), 600, 220);
     }
    
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "log") == 0)
     {
-        GdkRGBA bg_color;
-
-        bg_color.red = 0.0;
-	    bg_color.green = 0.0;
-	    bg_color.blue = 0.0;
-	    bg_color.alpha = 0.5;
-
-        gtk_widget_override_background_color (user_data, GTK_STATE_FLAG_NORMAL, &bg_color);
-
         gtk_window_resize (GTK_WINDOW (user_data), 870, 500);
     }
 }

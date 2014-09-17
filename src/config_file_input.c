@@ -30,7 +30,9 @@ config_file_input (const gchar *config_path,
 	config_t config;
 	config_setting_t *setting;
 
-	g_sprintf (config_file, "%s/.config/gjackctl/gjackctl.conf", g_getenv ("HOME"));	
+	g_sprintf (config_file,
+               "%s/.config/gjackctl/gjackctl.conf",
+               g_getenv ("HOME"));	
 
 	config_init (&config);
 	config_read_file (&config, config_file);

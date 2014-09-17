@@ -15,7 +15,7 @@ jack_log (GtkWidget *stack,
 	bg_color.blue = 0.0;
 	bg_color.alpha = 0.5;
 
-    gtk_widget_override_background_color (text, GTK_STATE_FLAG_NORMAL, &bg_color);
+    //gtk_widget_override_background_color (text, GTK_STATE_FLAG_NORMAL, &bg_color);
 
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scwindow), 
 									GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
