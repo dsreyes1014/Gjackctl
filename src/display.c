@@ -79,7 +79,7 @@ layout_off (GtkWidget *layout)
 {
     GtkWidget *label;
 
-    label = gtk_label_new ("jackd server not running");
+    label = gtk_label_new ("jackd not running");
 
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold Italic 14"));
 
