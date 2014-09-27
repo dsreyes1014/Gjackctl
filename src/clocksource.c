@@ -128,7 +128,7 @@ clocksource (GtkWidget *box, GtkWidget *button)
     GtkPassedClockSourceData *pdata;
     
     child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-    label = gtk_label_new ("Clock Source"); 
+    label = gtk_label_new ("Clocksource"); 
     separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
 
     pdata = g_slice_new (GtkPassedClockSourceData);
@@ -138,6 +138,7 @@ clocksource (GtkWidget *box, GtkWidget *button)
     gtk_widget_set_tooltip_text (pdata -> pbutton, "Choose a specific wall clock.");
     gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
+    //label_underline (label);
 
     /* Pack box. */
     gtk_box_pack_start (GTK_BOX (child_box1), label, FALSE, FALSE, 2);

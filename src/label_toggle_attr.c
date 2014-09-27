@@ -1,5 +1,19 @@
 #include "label_toggle_attr.h"
 
+void
+label_underline (GtkWidget *label)
+{
+    PangoAttrList *list;
+    PangoAttribute *attr;
+
+    list = pango_attr_list_new ();
+    attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
+
+    pango_attr_list_insert (list, attr);
+
+    gtk_label_set_attributes (GTK_LABEL (label), list);
+}
+
 PangoAttrList *
 label_prelight ()
 {

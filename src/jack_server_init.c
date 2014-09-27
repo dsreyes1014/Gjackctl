@@ -350,7 +350,9 @@ jack_server_init (GtkWidget *sw,
     if (gtk_switch_get_active (GTK_SWITCH (sw)) == TRUE)
     {
         g_io_add_watch (ch_out,
-                        G_IO_IN | G_IO_HUP,
+                        G_IO_IN | G_IO_ERR | 
+                        G_IO_OUT | G_IO_PRI | 
+                        G_IO_HUP | G_IO_NVAL, 
                         (GIOFunc) out_watch_cb,
                         pdata);
 

@@ -18,6 +18,9 @@ typedef struct _GtkPassedData
 PangoAttrList *
 label_prelight ();
 
+void
+label_underline (GtkWidget *label);
+
 gint
 label_normal_on (GtkLabel *label);
 

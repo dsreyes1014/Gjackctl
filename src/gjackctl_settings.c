@@ -171,10 +171,12 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                       "destroy", 
 					  G_CALLBACK (popup_destroy_cb), 
                       window);
+
 	g_signal_connect (button1, 
                       "clicked", 
 					  G_CALLBACK (button_clicked_cb), 
 					  (gpointer) data_to_pass);
+
 	g_signal_connect (button2, 
                       "clicked", 
                       G_CALLBACK (button_clicked_cb), 

@@ -5,6 +5,7 @@
 #include <libconfig.h>
 
 #include "config_file_input.h"
+#include "label_toggle_attr.h"
 
 void
 clocksource (GtkWidget *box, GtkWidget *button);

@@ -157,11 +157,7 @@ toggle_midi (GtkWidget *box, GtkWidget *button)
     gtk_container_add (GTK_CONTAINER (event_box), label);
     gtk_box_pack_start (GTK_BOX (box), event_box, FALSE, FALSE, 2);
 
-    //gtk_widget_set_margin_end (event_box, 20);
     gtk_widget_set_halign (event_box, GTK_ALIGN_CENTER);
-    //gtk_widget_set_margin_bottom (event_box, 20);
-    //gtk_widget_set_margin_start (event_box, 80);
-    //gtk_widget_set_margin_bottom (event_box, 20);
          
     gtk_widget_add_events (event_box, GDK_BUTTON_PRESS_MASK);
     gtk_widget_add_events (event_box, GDK_BUTTON_RELEASE_MASK);

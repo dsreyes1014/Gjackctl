@@ -7,18 +7,6 @@ struct _GtkPassedDisplayData {
     GtkWidget *scwindow;
 };
 
-/*static GtkWidget *
-gtk_layout_new_with_bg_color_override (GdkRGBA bg_color)
-{
-    GtkWidget *layout;
-
-    layout = gtk_layout_new (NULL, NULL);
-
-    //gtk_widget_override_background_color (layout, GTK_STATE_FLAG_NORMAL, &bg_color);
-
-    return layout;
-}*/
-
 static const gchar *
 get_config_setting_string (const gchar *path)
 {
@@ -96,7 +84,6 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
     layout = gtk_layout_new (NULL, NULL);
 
     gtk_widget_destroy (rdata -> layout);
-    //g_print ("display.c: test\n");
 
     if (gtk_switch_get_active (sw) == TRUE)
     {
