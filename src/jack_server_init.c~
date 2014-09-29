@@ -137,7 +137,7 @@ jackdrc_init_input ()
 
     if (value2 == TRUE)
     {
-        g_fprintf (fp, " -v");
+        g_fprintf (fp, " -vvv");
     }
     /*********************************************************************/
     config_lookup_string (&config, "gjackctl.driver.type", &value);

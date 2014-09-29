@@ -144,7 +144,6 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     toggle_midi (sbox5, button1);
     toggle_no_zombies (sbox6, button1);
     toggle_unlock_libs (sbox6, button1);
-    toggle_verbose (sbox6, button1);
 	rt_priority (sbox2, button1);
     clocksource (sbox7, button1);
     port_max (sbox7, button1);

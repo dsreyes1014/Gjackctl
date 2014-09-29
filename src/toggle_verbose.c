@@ -1,11 +1,9 @@
-#include "toggle_rt.h"
-
-typedef struct _GtkPassedRtData GtkPassedRtData;
+#include "toggle_verbose.h"
 
 static gboolean
-get_realtime ()
+get_verbose ()
 {
-	gboolean realtime;
+	gboolean verbose;
 	gchar *file;
     config_t config;
 
@@ -16,22 +14,22 @@ get_realtime ()
 	config_init (&config);
 	config_read_file (&config, file);
 	
-	if (config_lookup_bool (&config, "gjackctl.server.realtime", &realtime) == CONFIG_FALSE)
+	if (config_lookup_bool (&config, "gjackctl.server.verbose", &verbose) == CONFIG_FALSE)
     {
         config_setting_t *group;
         config_setting_t *setting;
         
-        g_print ("Realtime config option not available\n");
+        g_print ("Verbose config option not available\n");
         g_print ("Creating config setting now...\n");
 
         group = config_lookup (&config, "gjackctl.server");
 
-        setting = config_setting_add (group, "realtime", CONFIG_TYPE_BOOL);
-        config_setting_set_bool (setting, TRUE);
+        setting = config_setting_add (group, "verbose", CONFIG_TYPE_BOOL);
+        config_setting_set_bool (setting, FALSE);
         config_write_file (&config, file);       
     }
 
-	if (realtime == FALSE)
+	if (verbose == FALSE)
 	{
 		config_destroy (&config);
 
@@ -55,12 +53,12 @@ event_box_released_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
     if (data -> passed_state == GTK_LABEL_NORMAL_OFF)
     {
         data -> passed_state = label_normal_on (GTK_LABEL (data -> passed_label));
-        gtk_widget_set_tooltip_text (widget, "Disable realtime audio");
+        gtk_widget_set_tooltip_text (widget, "Disable more output messages");
     }
     else 
     {
         data -> passed_state = label_normal_off (GTK_LABEL (data -> passed_label));
-        gtk_widget_set_tooltip_text (widget, "Enable realtime audio");        
+        gtk_widget_set_tooltip_text (widget, "Enable more output messages");        
     }
 
     return FALSE;
@@ -79,7 +77,7 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
     {
         value = TRUE;
 
-        config_file_input ("gjackctl.server.realtime",
+        config_file_input ("gjackctl.server.verbose",
                            CONFIG_TYPE_BOOL,
                            (gpointer) &value);
     }
@@ -87,7 +85,7 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
     {	
         value = FALSE;
 
-		config_file_input ("gjackctl.server.realtime",
+		config_file_input ("gjackctl.server.verbose",
                            CONFIG_TYPE_BOOL,
                            (gpointer) &value);
     }
@@ -126,26 +124,26 @@ leave_event_box_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 }
 
 void
-toggle_rt (GtkWidget *box, GtkWidget *button)
+toggle_verbose (GtkWidget *box, GtkWidget *button)
 {   
     /* This gets called from `gjackctl_setings_cb` that's in the 
     `gjackctl_settings.c` module. */
 	
     GtkWidget *label;
     GtkWidget *event_box;
-    gboolean realtime;
+    gboolean verbose;
     gint state;
     GtkPassedData *data;
  
-    label = gtk_label_new ("Realtime");
+    label = gtk_label_new ("Verbose");
     event_box = gtk_event_box_new ();
     state = label_normal_off (GTK_LABEL (label));
 
     data = g_slice_new (GtkPassedData);
     data -> passed_label = label;
   
-    realtime = get_realtime ();
-    if (realtime == FALSE)
+    verbose = get_verbose ();
+    if (verbose == FALSE)
     {
         state = label_normal_off (GTK_LABEL (label));
         data -> passed_state = state;
@@ -160,11 +158,11 @@ toggle_rt (GtkWidget *box, GtkWidget *button)
     show when app first starts if we don't. */
     if (state == GTK_LABEL_NORMAL_ON)
     {
-        gtk_widget_set_tooltip_text (event_box, "Disable realtime audio");	
+        gtk_widget_set_tooltip_text (event_box, "Disable more output messages");	
     }
     else
     {	
-        gtk_widget_set_tooltip_text (event_box, "Enable realtime audio");
+        gtk_widget_set_tooltip_text (event_box, "Enable more output messages");
     }
 
     gtk_event_box_set_visible_window (GTK_EVENT_BOX (event_box), TRUE);
@@ -175,7 +173,7 @@ toggle_rt (GtkWidget *box, GtkWidget *button)
     gtk_box_pack_start (GTK_BOX (box), event_box, FALSE, FALSE, 2);
 
     gtk_widget_set_halign (event_box, GTK_ALIGN_CENTER);
-    gtk_widget_set_margin_top (event_box, 20);
+    gtk_widget_set_margin_start (event_box, 90);
       
     gtk_widget_add_events (event_box, GDK_BUTTON_PRESS_MASK);
     gtk_widget_add_events (event_box, GDK_BUTTON_RELEASE_MASK);

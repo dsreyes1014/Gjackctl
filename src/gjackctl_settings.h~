@@ -16,7 +16,6 @@
 #include "toggle_unlock_libs.h"
 #include "period.h"
 #include "frames.h"
-#include "toggle_verbose.h"
 
 void
 gjackctl_settings (GtkWidget *window,
