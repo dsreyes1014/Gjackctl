@@ -85,12 +85,12 @@ config_file_init ()
             config_setting_set_string (setting, "System");
 		}
 	
-		setting = config_setting_get_member (group_setting, "realtime");
+		/*setting = config_setting_get_member (group_setting, "realtime");
 
 		if (setting == NULL)
 		{
 			setting = config_setting_add (group_setting, "realtime", CONFIG_TYPE_BOOL);
-		}
+		}*/
     
         setting = config_setting_get_member (group_setting, "unlock_libs");
 

@@ -160,7 +160,7 @@ timeout (GtkWidget *box, GtkWidget *button)
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     gtk_widget_set_size_request (pdata -> pbutton, 80, 10);
     gtk_widget_set_tooltip_text (pdata -> pbutton, "Set JACK client timeout in milliseconds");
-    label_underline (label);
+    //label_underline (label);
 
     gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
 
@@ -171,6 +171,7 @@ timeout (GtkWidget *box, GtkWidget *button)
 
     gtk_widget_set_margin_start (label, 10);
     gtk_widget_set_margin_start (pdata -> pbutton, 10);
+    gtk_widget_set_name (pdata -> pbutton, "timeout-button");
 
     g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), pdata);
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);

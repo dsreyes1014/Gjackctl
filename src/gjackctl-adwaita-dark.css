@@ -1,0 +1,39 @@
+@define-color label_title #888888;
+
+GtkLayout {
+    background-color: #282828
+}
+
+/* 
+Settings for buttons in the
+server setting popup window 
+*/
+GtkLabel#clocksource-label-title {
+    color: @label_title;
+}
+
+/*
+GtkButton#clocksource-button > GtkLabel {
+    color: @label_normal;
+}
+*/
+
+GtkButton#clocksource-button:hover > GtkLabel {
+    color: #ffffff;
+}
+
+GtkButton#port-max-button > GtkLabel {
+    color: #888888;
+}
+
+GtkButton#port-max-button:hover > GtkLabel {
+    color: #ffffff;
+}
+
+GtkButton#timeout-button > GtkLabel {
+    color: #888888;
+}
+
+GtkButton#timeout-button:hover > GtkLabel {
+    color: #ffffff;
+}

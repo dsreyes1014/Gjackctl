@@ -21,16 +21,63 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
 }
 
 static void
+apply_theme ()
+{
+    GtkCssProvider *provider1;
+    GtkCssProvider *provider2;
+    GFile *file;
+    GdkScreen *screen;
+    const gchar *path;
+    const gchar *theme_sheet;
+    gint theme;
+    gchar *string;        
+
+    screen = gdk_screen_get_default ();    
+    provider1 = gtk_css_provider_get_named ("adwaita", NULL);   
+    provider2 = gtk_css_provider_get_named ("adwaita", "dark");
+    
+    if (provider1)
+    {
+        theme_sheet = g_strdup ("gjackctl-adwaita.css");
+        path = g_strconcat (g_getenv ("HOME"), "/.config/gjackctl/", theme_sheet, NULL);
+        file = g_file_new_for_path (path);
+        
+        gtk_style_context_add_provider_for_screen (screen,
+                                                   GTK_STYLE_PROVIDER (provider1),
+                                                   GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+        gtk_css_provider_load_from_file (provider1, file, NULL);
+
+        g_object_unref (file);
+    }
+
+    if (provider2)
+    {
+        theme_sheet = g_strdup ("gjackctl-adwaita-dark.css");
+        path = g_strconcat (g_getenv ("HOME"), "/.config/gjackctl/", theme_sheet, NULL);
+        file = g_file_new_for_path (path);
+        
+        gtk_style_context_add_provider_for_screen (screen,
+                                                   GTK_STYLE_PROVIDER (provider2),
+                                                   GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+        gtk_css_provider_load_from_file (provider2, file, NULL);
+
+        g_object_unref (file);
+    }
+}
+
+static void
 run_app_cb (GApplication *app, gpointer data)
 {
-	GtkWidget *window;	
+	GtkWidget *main_window;	
 	GtkWidget *header_bar;
 	GtkWidget *stack;
     GtkWidget *text;
     GtkWidget *sswitcher;	
     GtkWidget *sw;
 
-	window = gtk_application_window_new (GTK_APPLICATION (app));
+	main_window = gtk_application_window_new (GTK_APPLICATION (app));
 	stack = gtk_stack_new ();
 	header_bar = gtk_header_bar_new ();
     sw = gtk_switch_new ();    
@@ -41,7 +88,7 @@ run_app_cb (GApplication *app, gpointer data)
 
 	config_file_init ();
     
-	server_switch (window, 
+	server_switch (main_window, 
                    text,
                    GTK_APPLICATION (app),
                    header_bar,
@@ -49,6 +96,8 @@ run_app_cb (GApplication *app, gpointer data)
 
     display (stack, sw);
     jack_log (stack, text);
+    apply_theme ();
+    
 
 	//gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "GJackCtl");
 	gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);
@@ -60,17 +109,17 @@ run_app_cb (GApplication *app, gpointer data)
 	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);
 	
 	/* Set `GtkHeaderBar *head_bar` as titlebar. */
-	gtk_window_set_titlebar (GTK_WINDOW (window), header_bar);
-	gtk_window_set_default_size (GTK_WINDOW (window), 600, 220);
+	gtk_window_set_titlebar (GTK_WINDOW (main_window), header_bar);
+	gtk_window_set_default_size (GTK_WINDOW (main_window), 600, 220);
 
-	gtk_container_add (GTK_CONTAINER (window), stack);	
+	gtk_container_add (GTK_CONTAINER (main_window), stack);	
 
 	/* Position `window` to show wherever current mouse position is located. */	
-	gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_MOUSE);
+	gtk_window_set_position (GTK_WINDOW (main_window), GTK_WIN_POS_MOUSE);
 
-    g_signal_connect (stack, "notify::visible-child-name", G_CALLBACK (visible_child_cb), window);
+    g_signal_connect (stack, "notify::visible-child-name", G_CALLBACK (visible_child_cb), main_window);
 
-	gtk_widget_show_all (window);
+	gtk_widget_show_all (main_window);
 }
 
 int 

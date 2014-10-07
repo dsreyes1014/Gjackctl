@@ -158,6 +158,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     gtk_window_set_default_size (GTK_WINDOW (popup), 600, 220);    
     gtk_widget_set_size_request (button1, 80, 30);
     gtk_widget_set_margin_start (sbox5, 60);
+    gtk_widget_set_name (popup, "settings-window");
     
 	/* Pack `header_bar`. */
 	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);
@@ -209,7 +210,7 @@ gjackctl_settings (GtkWidget *window,
 	data_to_pass -> data1 = window;
 	data_to_pass -> data2 = app;
 	settings_button = gtk_button_new ();
-	gear = gtk_image_new_from_file ("/usr/share/icons/gnome/scalable/emblems/emblem-system-symbolic.svg");
+	gear = gtk_image_new_from_file ("/usr/share/icons/Adwaita/scalable/actions/open-menu-symbolic.svg");
 
 	gtk_widget_set_size_request (settings_button, 30, 34);
 	gtk_widget_set_tooltip_text (settings_button, "Settings");

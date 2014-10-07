@@ -109,7 +109,7 @@ drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button)
     child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
 
-    tt = g_strconcat ("Current device is ", 
+    tt = g_strconcat ("Current interface is ", 
                       "\"",
                       get_driver_device (config),
                       "\"", 
