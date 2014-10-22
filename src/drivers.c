@@ -103,7 +103,7 @@ drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button)
 	
     pdata = g_malloc (sizeof (GtkPassedDriverData));	
 
-    label = gtk_label_new ("Driver/Interface");	
+    label = gtk_label_new ("Driver");	
 	pdata -> pbutton = gtk_button_new_with_label (get_driver_type (config));
     pdata -> label = gtk_label_new (get_driver_device (config));	
     child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);

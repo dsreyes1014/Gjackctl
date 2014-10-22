@@ -57,9 +57,11 @@ target_link_libraries (gjackctl ${GTK3_LIBRARIES}
 
 # Compiler flags
 if (CMAKE_COMPILER_IS_GNUCXX)
-    set (CMAKE_CXX_FLAGS "-O2")        # Optimize
-    set (CMAKE_CXX_FLAGS "-Wall")       # Show Warnings
-    set (CMAKE_EXE_LINKER_FLAGS "-s")  # Strip binary
+    set (CMAKE_CXX_FLAGS "-O2" "-Wall" "-s")        # Optimize
+    #set (CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall")       # Show Warnings
+    #set (CMAKE_EXE_LINKER_FLAGS ${CMAKE_CXX_FLAGS} "-s")  # Strip binary
 endif ()
+
+#set (CMAKE_BUILD_TYPE Release)
 
 
