@@ -85,8 +85,10 @@ run_app_cb (GApplication *app, gpointer data)
     apply_theme ();
 
     
-    g_object_set (gtk_settings_get_default (), "gtk-application-prefer-dark-theme", TRUE, NULL);
-    
+    g_object_set (gtk_settings_get_default (),
+                  "gtk-application-prefer-dark-theme",
+                  TRUE,
+                  NULL);    
 
 	//gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "GJackCtl");
 	gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);

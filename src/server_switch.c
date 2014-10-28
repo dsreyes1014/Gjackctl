@@ -32,14 +32,17 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 
 	/* Check if `GPid pid` exists. */
 	if (gtk_switch_get_active (sw) == TRUE)
-	{						
+	{						 
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw) , "Shutdown Server");
-	    jack_server_init (GTK_WIDGET (sw), rdata -> text);
+	    if (jack_server_init (GTK_WIDGET (sw), rdata -> text, rdata -> window) != 0)
+        {
+            //gtk_switch_set_active (sw, FALSE);
+        }
 	}
 	else
 	{	        
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw), "Start Server");
-		kill (get_jack_gpid (), SIGTERM);	
+		kill (get_jack_gpid (), SIGKILL);	
         clear_log_view (rdata -> text);     
 	}
 }   
@@ -59,6 +62,7 @@ server_switch (GtkWidget *window,
     
     pdata = g_slice_new (GtkPassedServerSwitchData);    
     pdata -> text = text;
+    pdata -> window = window;
 
     gtk_text_view_set_editable (GTK_TEXT_VIEW (text), FALSE);
 

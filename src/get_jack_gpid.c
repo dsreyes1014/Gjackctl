@@ -21,7 +21,7 @@ get_jack_gpid ()
 
     //g_print ("From `get_jack_gpid.c`: %d\n", pid);
 
-    if (kill (pid, 0) == -1)
+    if (kill (pid, 0) < 0)
     {
         g_print ("jackd process id doesn't exist\n");
     }

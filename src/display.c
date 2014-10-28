@@ -23,7 +23,7 @@ get_config_setting_string (const gchar *path)
     return string;
 }
 
-static void
+static gboolean
 layout_on (GtkWidget *sw, GtkWidget *layout)
 {
     GtkWidget *label;
@@ -44,7 +44,11 @@ layout_on (GtkWidget *sw, GtkWidget *layout)
     label4 = gtk_label_new ("Device");
     label4a = gtk_label_new (get_config_setting_string ("gjackctl.driver.device"));
 
-    jack_client_init (sw, labela, label2a);
+    if (jack_client_init (sw, labela, label2a) != 0)
+    {
+        //gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
+        return FALSE;
+    }
     
     gtk_widget_override_font (labela, pango_font_description_from_string ("Cantarell Bold 32"));
     gtk_widget_override_font (label2, pango_font_description_from_string ("Cantarell Bold 12"));
@@ -60,6 +64,8 @@ layout_on (GtkWidget *sw, GtkWidget *layout)
     gtk_layout_put (GTK_LAYOUT (layout), label3a, 60, 16);
     gtk_layout_put (GTK_LAYOUT (layout), label4, 110, 16);
     gtk_layout_put (GTK_LAYOUT (layout), label4a, 164, 16);
+    
+    return TRUE;
 }
 
 static void
@@ -67,7 +73,7 @@ layout_off (GtkWidget *layout)
 {
     GtkWidget *label;
 
-    label = gtk_label_new ("jackd not running");
+    label = gtk_label_new ("");
 
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold Italic 14"));
 
@@ -87,7 +93,11 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 
     if (gtk_switch_get_active (sw) == TRUE)
     {
-        layout_on (GTK_WIDGET (sw), layout);
+        if (layout_on (GTK_WIDGET (sw), layout) == FALSE)
+        {
+            layout_off (layout);
+        }
+
         rdata -> layout = layout;
     }
     else
@@ -127,12 +137,10 @@ display (GtkWidget *stack, GtkWidget *sw)
     }
 
     gtk_container_add (GTK_CONTAINER (pdata -> scwindow), pdata -> layout);
+
 	gtk_stack_add_titled (GTK_STACK (stack), pdata -> scwindow,
                           "display", 
                           "Display");
 
-    g_signal_connect_after (sw,
-                            "notify::active", 
-                   	        G_CALLBACK (switch_pos_cb),
-                            pdata);
+    g_signal_connect (sw, "notify::active", G_CALLBACK (switch_pos_cb), pdata);
 }

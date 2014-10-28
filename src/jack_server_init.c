@@ -190,11 +190,11 @@ jackdrc_init_input ()
 }
 
 static void
-err_msg_box ()
+err_msg_box (GtkWidget *window)
 {
 	GtkWidget *msg_dialog;
 
-	msg_dialog = gtk_message_dialog_new (NULL, 
+	msg_dialog = gtk_message_dialog_new (GTK_WINDOW (window), 
 										 GTK_DIALOG_MODAL, 
 										 GTK_MESSAGE_WARNING,
 										 GTK_BUTTONS_CLOSE,
@@ -296,7 +296,8 @@ child_watch_cb (GPid pid, gint status, gpointer user_data)
 
 gint 
 jack_server_init (GtkWidget *sw, 
-                  GtkWidget *text)
+                  GtkWidget *text,
+                  GtkWidget *window)
 {
 	/* Starts the JACK server using `g_spawn_async ()` with the
 	 `GPid pid` as an out. */
@@ -312,14 +313,16 @@ jack_server_init (GtkWidget *sw,
 	gboolean ret;
     GIOChannel *ch_out;
     GIOChannel *ch_err;
-    GtkPassedServerData *pdata;
+    GtkPassedServerData *pdata; 
+    GError *error;
 
     pdata = g_slice_new (GtkPassedServerData);
     pdata -> text = text;
+    error = NULL;
 
     jackdrc_init_input ();
 	argv = get_arg_vector ();
-  
+
 	ret = g_spawn_async_with_pipes (NULL, 
                                     argv, 
 						            NULL,
@@ -330,14 +333,19 @@ jack_server_init (GtkWidget *sw,
                                     NULL,
                                     &out,
                                     &err,
-                                    NULL);
+                                    &error);
+
+    
+    
 
 	/* Check for errors on server startup. */	
-	if (ret == FALSE)
+	if (&error != NULL)
 	{
-		gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
-		g_print ("Couldn't start JACK server.\n");
-        err_msg_box ();
+		//gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
+		g_print ("'jack_server_init.c': Couldn't start JACK server.\n");
+        err_msg_box (window);
+
+        //gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
 
         return -1;
 	}

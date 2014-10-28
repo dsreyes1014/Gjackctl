@@ -9,6 +9,6 @@
 #include "dsp_load.h"
 
 gint 
-jack_server_init (GtkWidget *sw, GtkWidget *text);
+jack_server_init (GtkWidget *sw, GtkWidget *text, GtkWidget *window);
 
 #endif
