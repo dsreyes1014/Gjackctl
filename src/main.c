@@ -35,7 +35,7 @@ apply_theme ()
 
     if (provider)
     {
-        theme_sheet = g_strdup ("src/gjackctl-adwaita-dark.css");
+        theme_sheet = g_strdup ("../src/gjackctl-adwaita-dark.css");
 
         path = g_strconcat (g_getenv ("HOME"),
                             "/.config/gjackctl/",

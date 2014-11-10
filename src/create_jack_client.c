@@ -73,18 +73,13 @@ jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2)
     
     if (client == NULL)
     {
-        kill (get_jack_gpid (), SIGKILL);
-        g_print ("Gjackctl client couldn't be created\n.");
-        jack_client_close (client);
-        jack_deactivate (client);
-        
-
+        g_print ("'create_jack_client.c': Gjackctl client couldn't be created\n");
         //gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
 
         return -1;
     }
 
-    g_print ("'create_jack_init.c'\n.");
+    g_print ("'create_jack_init.c': Gjackctl client created successfully\n.");
 
     //ports = g_slice_new (jack_port);
     //ports -> in_port = jack_port_register (client, "capture", JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
@@ -102,16 +97,16 @@ jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2)
         i++;
     }*/
 
-    //jack_set_process_callback (client, process_cb, NULL);
-    //jack_on_shutdown (client, jack_shutdown_cb, client);
-    //jack_set_sample_rate_callback (client, srate_cb, label2);
+    jack_set_process_callback (client, process_cb, NULL);
+    jack_on_shutdown (client, jack_shutdown_cb, client);
+    jack_set_sample_rate_callback (client, srate_cb, label2);
 
-    //jack_activate (client); 
+    jack_activate (client); 
 
-    //dsp_init (sw, label, client); /* function updates label to show cpu load. */
+    dsp_init (sw, label, client); /* function updates label to show cpu load. */
 
-    //g_sprintf (srate, "%d", jack_get_sample_rate (client));
-    //gtk_label_set_text (GTK_LABEL (label2), g_strdup (srate));        
+    g_sprintf (srate, "%d", jack_get_sample_rate (client));
+    gtk_label_set_text (GTK_LABEL (label2), g_strdup (srate));        
 
     return 0;
 }

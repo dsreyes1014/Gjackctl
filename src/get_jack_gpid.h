@@ -7,6 +7,6 @@
 #include <sys/types.h>
 
 GPid 
-get_jack_gpid ();
+get_jack_gpid (const gchar *string_arg);
 
 #endif

@@ -30,7 +30,7 @@ get_arg_vector ()
 
 	/* reallocate argvp to provide enough room for adding arguments to the 
 	vector. */
-	argvp = g_realloc (argvp, (argcp + 8) * sizeof *argvp);
+	//argvp = g_realloc (argvp, (argcp + 8) * sizeof *argvp);
 
 	return argvp;
 }

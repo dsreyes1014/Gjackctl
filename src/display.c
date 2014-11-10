@@ -95,6 +95,7 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
     {
         if (layout_on (GTK_WIDGET (sw), layout) == FALSE)
         {
+            //gtk_switch_set_active (sw, FALSE);
             layout_off (layout);
         }
 
@@ -142,5 +143,5 @@ display (GtkWidget *stack, GtkWidget *sw)
                           "display", 
                           "Display");
 
-    g_signal_connect (sw, "notify::active", G_CALLBACK (switch_pos_cb), pdata);
+    g_signal_connect_after (sw, "notify::active", G_CALLBACK (switch_pos_cb), pdata);
 }

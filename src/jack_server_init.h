@@ -7,6 +7,7 @@
 
 #include "server_switch.h"
 #include "dsp_load.h"
+#include "get_jack_gpid.h"
 
 gint 
 jack_server_init (GtkWidget *sw, GtkWidget *text, GtkWidget *window);

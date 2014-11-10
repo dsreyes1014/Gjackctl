@@ -1,10 +1,20 @@
 #include "jack_server_init.h"
 
 typedef struct _GtkPassedServerData {
-    GtkWidget *text;
-    //GtkWidget *progress;
-    //gint timeout_id;
+    GtkWidget *ptext_view;
+    gchar pbuffer[4096];    
 } GtkPassedServerData;
+
+/*
+    This struct is used to pass data 
+    through to the 'GSubprocess *subprocess2'
+    read input async function.
+*/
+typedef struct _GtkPassedServerData2 {
+    gchar pbuffer2[2048];
+    GtkWidget *psw;
+    GtkWidget *pwindow;
+} GtkPassedServerData2;
 
 static gchar **
 get_arg_vector ()
@@ -189,109 +199,111 @@ jackdrc_init_input ()
     return TRUE;
 }
 
+/*static void
+dialog_response (GtkDialog *dialog, gint response_id, gpointer user_data)
+{
+    if (response_id == GTK_RESPONSE_CLOSE)
+    {
+        g_print ("'jack_server_init.c': Can't switch off the GtkSwitch\n");
+
+        //gtk_switch_set_active (GTK_SWITCH (user_data), FALSE);
+    }
+}*/
+
 static void
 err_msg_box (GtkWidget *window)
 {
 	GtkWidget *msg_dialog;
 
 	msg_dialog = gtk_message_dialog_new (GTK_WINDOW (window), 
-										 GTK_DIALOG_MODAL, 
+				                    	 GTK_DIALOG_MODAL, 
 										 GTK_MESSAGE_WARNING,
 										 GTK_BUTTONS_CLOSE,
-										 "JACK Server Error");
+										 "JACK Server Error");                                                      
 	
 	gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (msg_dialog),
-											  "Server could not be started!"); 
+						                      "Server could not be started!"); 
+
+    //g_signal_connect (msg_dialog, "response", G_CALLBACK (dialog_response), NULL);
 
 	gtk_dialog_run (GTK_DIALOG (msg_dialog));
 	gtk_widget_destroy (msg_dialog);
 }
 
-static gboolean
-out_watch_cb (GIOChannel *channel,
-              GIOCondition cond,
-              gpointer user_data)
+static void
+subprocess_pipe_callback (GObject *source, GAsyncResult *res, gpointer data)
 {
-    gchar *log;
-    gchar *string;
-    gsize  size;
-    GtkPassedServerData *rdata;
     GtkTextBuffer *buffer;
+    GtkPassedServerData *rdata;
+    const gchar *string;
+    gssize bytes;
 
-    rdata = user_data;
-    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> text));
+    rdata = data;
+    bytes = g_input_stream_read_finish (G_INPUT_STREAM (source),
+                                        res,
+                                        NULL);
 
-    if (cond == G_IO_HUP)
-    {
-        g_io_channel_unref (channel);
-        return FALSE;
-    }
+    g_print ("'jack_server_init.c': number of bytes in log pipe %d\n", bytes);
 
-    g_io_channel_read_line (channel, &log, &size, NULL, NULL);
-    string = g_strdup (log);
+    string = g_strndup (rdata -> pbuffer, bytes - 1);
+    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> ptext_view));
 
     gtk_text_buffer_insert_at_cursor (buffer, string, -1);
-    g_free (string);
-    g_free (log);
-
-    return TRUE; 
 }
-
-static gboolean
-err_watch_cb (GIOChannel *channel,
-              GIOCondition cond,
-              gpointer user_data)
-{
-    gchar *log;
-    gchar *string;
-    gsize  size;
-    GtkPassedServerData *rdata;
-    GtkTextBuffer *buffer;
-    GtkTextTag *tag;
-    GtkTextIter start;
-    GtkTextIter end;
-
-    rdata = user_data;
-    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> text));
-    tag = gtk_text_buffer_create_tag (buffer, NULL, "foreground", "red", NULL);
-    
-    if (cond == G_IO_HUP)
-    {
-        g_io_channel_unref (channel);
-        return FALSE;
-    }
-
-    g_io_channel_read_line (channel, &log, &size, NULL, NULL);
-    string = g_strdup (log);    
-
-    gtk_text_buffer_insert_at_cursor (buffer, string, -1);
-
-    gtk_text_buffer_get_start_iter (buffer, &start);
-    gtk_text_buffer_get_end_iter (buffer, &end);
-    gtk_text_buffer_apply_tag (buffer, tag, &start, &end);
-    
-    g_free (string);
-    g_free (log);
-
-    return TRUE; 
-}
-
-/*static gboolean
-timeout_cb (gpointer user_data)
-{
-    GtkPassedServerData *rdata;
-
-    rdata = user_data;
-    
-    gtk_progress_bar_pulse (GTK_PROGRESS_BAR (rdata -> progress));
-
-    return( TRUE );
-}*/
 
 static void
-child_watch_cb (GPid pid, gint status, gpointer user_data)
+subprocess2_pipe_callback (GObject *source, GAsyncResult *res, gpointer data)
 {
-    g_spawn_close_pid (pid);
+    gssize bytes;
+    GInputStream *out2;
+    const gchar *string;
+    GtkPassedServerData2 *rdata2;
+
+    rdata2 = data;
+
+    bytes = g_input_stream_read_finish (G_INPUT_STREAM (source),
+                                        res,
+                                        NULL);
+
+    string = g_strndup (rdata2 -> pbuffer2, bytes - 1);
+
+    g_print ("'jack_server_init.c': number of bytes %d\n", bytes);
+
+    g_print ("%s\n", string);
+
+    if (g_strcmp0 (string, "running") == 0)
+    {
+        g_print ("success\n");
+    }
+    else if (g_strcmp0 (string, "not running") == 0)
+    {
+        g_print ("failure\n");
+
+        err_msg_box (rdata2 -> pwindow);
+
+        gtk_switch_set_active (GTK_SWITCH (rdata2 -> psw), FALSE);
+    }
+}
+
+static void
+subprocess_wait_callback (GObject *source, GAsyncResult *res, gpointer data)
+{
+    gboolean status;
+    gboolean check;
+    GError *error;
+
+    check = g_subprocess_get_if_exited (G_SUBPROCESS (source));
+
+    //g_print ("'jack_server_init.c': jackd terminated\n");
+
+    status = g_subprocess_wait_finish (G_SUBPROCESS (source), res, &error);
+
+    if (check == TRUE)
+    {
+        g_print ("'jack_server_init.c': %d\n", g_subprocess_get_exit_status (G_SUBPROCESS (source)));
+        //g_subprocess_get_exit_status (G_SUBPROCESS (source));
+        g_print ("'jack_server_init.c': jackd terminated\n");
+    }
 }
 
 gint 
@@ -301,93 +313,75 @@ jack_server_init (GtkWidget *sw,
 {
 	/* Starts the JACK server using `g_spawn_async ()` with the
 	 `GPid pid` as an out. */
-    //GtkWidget *progress;
     GPid pid;
-	jack_client_t *client;
-	jack_status_t status;
 	gint check_pid;
-    gint in;
-    gint out;
-    gint err;
 	gchar **argv;
-	gboolean ret;
-    GIOChannel *ch_out;
-    GIOChannel *ch_err;
-    GtkPassedServerData *pdata; 
-    GError *error;
+    GtkPassedServerData *pdata;
+    GtkPassedServerData2 *pdata2; 
+    GSubprocess *subprocess;
+    GSubprocess *subprocess2;
+    const gchar *pid_string;
+    GInputStream *out;
+    GInputStream *out2;
 
     pdata = g_slice_new (GtkPassedServerData);
-    pdata -> text = text;
-    error = NULL;
+    pdata -> ptext_view = text;
+    pdata2 = g_slice_new (GtkPassedServerData2);
+    pdata2 -> psw = sw;
+    pdata2 -> pwindow = window;
 
     jackdrc_init_input ();
 	argv = get_arg_vector ();
 
-	ret = g_spawn_async_with_pipes (NULL, 
-                                    argv, 
-						            NULL,
-                                    G_SPAWN_DO_NOT_REAP_CHILD, 
-						            NULL,
-                                    NULL, 
-						            &pid,
+    subprocess = g_subprocess_newv ((const gchar *const *) argv,
+                                    G_SUBPROCESS_FLAGS_STDOUT_PIPE |
+                                    G_SUBPROCESS_FLAGS_STDERR_PIPE,
+                                    NULL);
+
+    g_subprocess_wait_async (subprocess,
+                             NULL,
+                             subprocess_wait_callback,
+                             NULL);
+
+    out = g_subprocess_get_stdout_pipe (subprocess);
+
+    g_input_stream_read_async (out,
+                               pdata -> pbuffer,
+                               4096,
+                               G_PRIORITY_DEFAULT,
+                               NULL,
+                               subprocess_pipe_callback,
+                               pdata);    
+
+    sleep (5);
+
+    /* 
+    Check here to see if 'jackd' didn't 
+    stop after starting it with 'GSubprocess *subprocess' 
+    using 'GSubprocess *subprocess2'.
+    */
+    subprocess2 = g_subprocess_new (G_SUBPROCESS_FLAGS_STDOUT_PIPE |
+                                    G_SUBPROCESS_FLAGS_STDERR_PIPE,
                                     NULL,
-                                    &out,
-                                    &err,
-                                    &error);
+                                    "/usr/bin/jack_wait",
+                                    "-c",
+                                    NULL);
 
-    
-    
+    out2 = g_subprocess_get_stdout_pipe (subprocess2);
 
-	/* Check for errors on server startup. */	
-	if (&error != NULL)
-	{
-		//gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
-		g_print ("'jack_server_init.c': Couldn't start JACK server.\n");
-        err_msg_box (window);
+    g_input_stream_read_async (out2,
+                               pdata2 -> pbuffer2,
+                               2048,
+                               G_PRIORITY_DEFAULT,
+                               NULL,
+                               subprocess2_pipe_callback,
+                               pdata2);
 
-        //gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
+    pid_string = g_subprocess_get_identifier (subprocess);
 
-        return -1;
-	}
+    pid = get_jack_gpid (pid_string);
 
-    //pdata -> timeout_id = g_timeout_add (1500, (GSourceFunc) timeout_cb, pdata);
-
-    g_child_watch_add (pid, (GChildWatchFunc) child_watch_cb, pdata);
-
-#ifdef G_OS_WIN32
-    ch_out = g_io_channel_win32_new_fd (out);
-    ch_err = g_io_channel_win32_new_fd (err);
-#else
-    ch_out = g_io_channel_unix_new (out);
-    ch_err = g_io_channel_unix_new (err);
-#endif
-
-    if (gtk_switch_get_active (GTK_SWITCH (sw)) == TRUE)
-    {
-        g_io_add_watch (ch_out,
-                        G_IO_IN | G_IO_ERR | 
-                        G_IO_OUT | G_IO_PRI | 
-                        G_IO_HUP | G_IO_NVAL, 
-                        (GIOFunc) out_watch_cb,
-                        pdata);
-
-        g_io_add_watch (ch_err,
-                        G_IO_ERR | G_IO_HUP,
-                        (GIOFunc) err_watch_cb,
-                        pdata);
-    }
-    else
-    {
-        g_io_add_watch (ch_out, 
-                        G_IO_IN | G_IO_HUP,
-                        (GIOFunc) out_watch_cb,
-                        pdata);
-
-        g_io_add_watch (ch_err,
-                        G_IO_ERR | G_IO_HUP,
-                        (GIOFunc) err_watch_cb,
-                        pdata);
-    }
+    g_print ("'jack_server_init.c': GPid %d\n", pid);
 
 	return 0;
 }
