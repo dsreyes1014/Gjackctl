@@ -5,9 +5,9 @@ GtkLayout {
 }
 
 /* 
- * Settings for labels in the
- * server setting popup window 
- */
+    Settings for labels in the
+    server setting popup window 
+*/
 
 GtkLabel#clocksource-label-title {
     color: @label_title;

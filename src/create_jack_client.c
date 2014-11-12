@@ -53,9 +53,9 @@ jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2)
         to provide some info of the jackd server. 
 
         Argument info:
-            --argument 1 "GtkWidget *sw" is declared in "main.c"
-            --argument 2 "GtkWidget *label" is declared in "display.c"
-            --argument 3 "GtkWidget *label2" is declared in "display.c"
+            --argument 1 'GtkWidget *sw' is declared in 'main.c'
+            --argument 2 'GtkWidget *label' is declared in 'display.c'
+            --argument 3 'GtkWidget *label2' is declared in 'display.c'
     */
 
     jack_client_t *client;
