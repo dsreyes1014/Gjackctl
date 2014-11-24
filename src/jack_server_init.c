@@ -356,7 +356,7 @@ jack_server_init (GtkWidget *sw,
                                subprocess_pipe_cb,
                                pdata);    
 
-    sleep (5);
+    sleep (1);
 
     /* 
         Check here to see if 'jackd' didn't stop 
