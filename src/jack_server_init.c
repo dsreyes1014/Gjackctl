@@ -2,7 +2,7 @@
 
 typedef struct _GtkPassedServerData {
     GtkWidget *ptext_view;
-    gchar pbuffer[8192];    
+    gchar pbuffer[8192];   
 } GtkPassedServerData;
 
 /*
@@ -218,7 +218,7 @@ err_msg_box (GtkWidget *window)
 }
 
 static void
-subprocess_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
+subprocess_out_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
 {
     GtkTextBuffer *buffer;
     GtkPassedServerData *rdata;
@@ -230,12 +230,37 @@ subprocess_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
                                         res,
                                         NULL);
 
-    g_print ("'jack_server_init.c': number of bytes in log pipe %d\n", bytes);
+    g_print ("'jack_server_init.c': number of bytes in log out pipe %d\n", bytes);
 
     string = g_strndup (rdata -> pbuffer, bytes - 1);
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> ptext_view));
 
     gtk_text_buffer_insert_at_cursor (buffer, string, -1);
+}
+
+static void
+subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
+{
+    GtkTextBuffer *buffer;
+    GtkPassedServerData *rdata;
+    const gchar *string1;
+    const gchar *string2;
+    gssize bytes;
+
+    rdata = data;
+    bytes = g_input_stream_read_finish (G_INPUT_STREAM (source),
+                                        res,
+                                        NULL);
+
+    g_print ("'jack_server_init.c': number of bytes in log err pipe %d\n", bytes);
+
+    string1 = g_strndup (rdata -> pbuffer, bytes - 1);
+    string2 = g_strdup ("\n\nERROR:\n");
+    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> ptext_view));
+
+    gtk_text_buffer_insert_at_cursor (buffer, string2, -1);
+    gtk_text_buffer_insert_at_cursor (buffer, string1, -1);
+
 }
 
 static void
@@ -325,6 +350,7 @@ jack_server_init (GtkWidget *sw,
     GSubprocess *subprocess2;
     const gchar *pid_string;
     GInputStream *out;
+    GInputStream *err;
     GInputStream *out2;
 
     pdata = g_slice_new (GtkPassedServerData);
@@ -347,14 +373,25 @@ jack_server_init (GtkWidget *sw,
                              NULL);
 
     out = g_subprocess_get_stdout_pipe (subprocess);
+    err = g_subprocess_get_stderr_pipe (subprocess);
 
     g_input_stream_read_async (out,
                                pdata -> pbuffer,
                                4096,
                                G_PRIORITY_DEFAULT,
                                NULL,
-                               subprocess_pipe_cb,
+                               subprocess_out_pipe_cb,
+                               pdata);
+
+    g_input_stream_read_async (err,
+                               pdata -> pbuffer,
+                               4096,
+                               G_PRIORITY_DEFAULT,
+                               NULL,
+                               subprocess_err_pipe_cb,
                                pdata);    
+
+    
 
     sleep (1);
 
