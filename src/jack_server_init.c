@@ -246,6 +246,7 @@ subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
     const gchar *string1;
     const gchar *string2;
     gssize bytes;
+    GtkTextIter iter;
 
     rdata = data;
     bytes = g_input_stream_read_finish (G_INPUT_STREAM (source),
@@ -258,9 +259,25 @@ subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
     string2 = g_strdup ("\n\nERROR:\n");
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> ptext_view));
 
-    gtk_text_buffer_insert_at_cursor (buffer, string2, -1);
-    gtk_text_buffer_insert_at_cursor (buffer, string1, -1);
+    gtk_text_buffer_create_tag (buffer,
+                                "red_fg",
+                                "foreground",
+                                "red",
+                                NULL);
 
+    gtk_text_buffer_get_end_iter (buffer, &iter);
+
+    gtk_text_buffer_insert (buffer, &iter, "\n\n", -1);
+
+    gtk_text_buffer_insert_with_tags_by_name (buffer,
+                                              &iter,
+                                              string1,
+                                              -1,
+                                              "red_fg",
+                                              NULL);
+
+    //gtk_text_buffer_insert_at_cursor (buffer, string2, -1);
+    //gtk_text_buffer_insert_at_cursor (buffer, string1, -1);
 }
 
 static void

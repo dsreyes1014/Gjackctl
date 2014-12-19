@@ -134,9 +134,9 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     gtk_box_pack_start (GTK_BOX (sbox4), sbox6, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (sbox1), sbox4, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (sbox3), sbox7, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (dbox0), dbox2, FALSE, FALSE, 2);
-    gtk_box_pack_end (GTK_BOX (dbox0), dbox1, FALSE, FALSE, 2);  
-    gtk_box_pack_end (GTK_BOX (dbox0), separator1, FALSE, FALSE, 2);   
+    gtk_box_pack_start (GTK_BOX (dbox0), dbox1, FALSE, FALSE, 2);  
+    gtk_box_pack_start (GTK_BOX (dbox0), separator1, FALSE, FALSE, 2);  
+    gtk_box_pack_start (GTK_BOX (dbox0), dbox2, FALSE, FALSE, 2); 
     /**************************************************************************/
 	server_name (sbox2, button1);		
 	toggle_rt (sbox5, button1);
