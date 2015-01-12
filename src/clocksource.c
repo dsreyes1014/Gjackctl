@@ -98,6 +98,8 @@ popover_button_clicked_cb (GtkButton *button, gpointer user_data)
     }
     
     list = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
+
+    gtk_popover_set_position (GTK_POPOVER (pdata -> popover), GTK_POS_RIGHT);
  
     g_signal_connect (radio1,
                       "notify::active",

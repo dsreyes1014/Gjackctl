@@ -35,11 +35,15 @@ get_realtime ()
 	{
 		config_destroy (&config);
 
+        g_free (file);
+
 		return FALSE;
 	}
 	else
     {
         config_destroy (&config);	
+
+        g_free (file);
 
         return TRUE;
    	}

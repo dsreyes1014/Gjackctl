@@ -8,6 +8,6 @@
 #include <string.h>
 
 gint
-jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2);
+jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2, GtkWidget *level_bar);
 
 #endif

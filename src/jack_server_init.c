@@ -41,6 +41,7 @@ get_arg_vector ()
 	g_shell_parse_argv (contents, &argcp, &argvp, NULL);
 
 	g_free (contents);
+    g_free (jackdrc);
 
 	return argvp;
 }
@@ -222,7 +223,7 @@ subprocess_out_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
 {
     GtkTextBuffer *buffer;
     GtkPassedServerData *rdata;
-    const gchar *string;
+    gchar *string;
     gssize bytes;
 
     rdata = data;
@@ -236,6 +237,10 @@ subprocess_out_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> ptext_view));
 
     gtk_text_buffer_insert_at_cursor (buffer, string, -1);
+
+    sleep (1);
+
+    g_free (string);
 }
 
 static void
@@ -243,10 +248,11 @@ subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
 {
     GtkTextBuffer *buffer;
     GtkPassedServerData *rdata;
-    const gchar *string1;
-    const gchar *string2;
+    gchar *string1;
+    //const gchar *string2;
     gssize bytes;
     GtkTextIter iter;
+    GtkTextTagTable *table;
 
     rdata = data;
     bytes = g_input_stream_read_finish (G_INPUT_STREAM (source),
@@ -256,14 +262,18 @@ subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
     g_print ("'jack_server_init.c': number of bytes in log err pipe %d\n", bytes);
 
     string1 = g_strndup (rdata -> pbuffer, bytes - 1);
-    string2 = g_strdup ("\n\nERROR:\n");
+    //string2 = g_strdup ("\n\nERROR:\n");
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> ptext_view));
-
-    gtk_text_buffer_create_tag (buffer,
-                                "red_fg",
-                                "foreground",
-                                "red",
-                                NULL);
+    table = gtk_text_buffer_get_tag_table (buffer);
+    
+    if (gtk_text_tag_table_lookup (table, "red_fg") == NULL)
+    {
+        gtk_text_buffer_create_tag (buffer,
+                                    "red_fg",
+                                    "foreground",
+                                    "red",
+                                    NULL);
+    }
 
     gtk_text_buffer_get_end_iter (buffer, &iter);
 
@@ -276,8 +286,7 @@ subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
                                               "red_fg",
                                               NULL);
 
-    //gtk_text_buffer_insert_at_cursor (buffer, string2, -1);
-    //gtk_text_buffer_insert_at_cursor (buffer, string1, -1);
+    g_free (string1);
 }
 
 static void

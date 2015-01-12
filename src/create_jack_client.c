@@ -46,7 +46,7 @@ srate_cb (jack_nframes_t nframes, gpointer user_data)
 }
 
 gint
-jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2)
+jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2, GtkWidget *level_bar)
 {
     /*  
         This function creates a client for the JACK server
@@ -103,7 +103,7 @@ jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2)
 
     jack_activate (client); 
 
-    dsp_init (sw, label, client); /* function updates label to show cpu load. */
+    dsp_init (sw, label, client, level_bar); /* function updates label to show cpu load. */
 
     g_sprintf (srate, "%d", jack_get_sample_rate (client));
     gtk_label_set_text (GTK_LABEL (label2), g_strdup (srate));        

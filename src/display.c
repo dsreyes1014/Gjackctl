@@ -3,8 +3,8 @@
 typedef struct _GtkPassedDisplayData GtkPassedDisplayData;
 
 struct _GtkPassedDisplayData {
-    GtkWidget *layout;
-    GtkWidget *scwindow;
+    GtkWidget *grid;
+    GtkWidget *stack;
 };
 
 static const gchar *
@@ -19,12 +19,14 @@ get_config_setting_string (const gchar *path)
 
     config_read_file (&config, file);
     config_lookup_string (&config, path, &string);
+    
+    g_free (file);
 
     return string;
 }
 
 static gboolean
-layout_on (GtkWidget *sw, GtkWidget *layout)
+grid_on (GtkWidget *sw, GtkWidget *grid)
 {
     GtkWidget *label;
     GtkWidget *labela;
@@ -34,6 +36,7 @@ layout_on (GtkWidget *sw, GtkWidget *layout)
     GtkWidget *label3a;
     GtkWidget *label4;
     GtkWidget *label4a;
+    GtkWidget *level_bar;
 
     label = gtk_label_new ("CPU Load");
     labela = gtk_label_new (NULL);
@@ -43,105 +46,140 @@ layout_on (GtkWidget *sw, GtkWidget *layout)
     label3a = gtk_label_new (get_config_setting_string ("gjackctl.driver.type"));
     label4 = gtk_label_new ("Device");
     label4a = gtk_label_new (get_config_setting_string ("gjackctl.driver.device"));
+    level_bar = gtk_level_bar_new ();    
+    
+    gtk_level_bar_set_min_value (GTK_LEVEL_BAR (level_bar), 0);
+    gtk_level_bar_set_max_value (GTK_LEVEL_BAR (level_bar), 100);
+    gtk_level_bar_set_mode (GTK_LEVEL_BAR (level_bar),
+                            GTK_LEVEL_BAR_MODE_CONTINUOUS);
 
-    if (jack_client_init (sw, labela, label2a) != 0)
+    if (jack_client_init (sw, labela, label2a, level_bar) != 0)
     {
-        //gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
         return FALSE;
     }
     
-    gtk_widget_override_font (labela, pango_font_description_from_string ("Cantarell Bold 32"));
-    gtk_widget_override_font (label2, pango_font_description_from_string ("Cantarell Bold 12"));
-    gtk_widget_override_font (label3, pango_font_description_from_string ("Cantarell Bold 12"));
-    gtk_widget_override_font (label4, pango_font_description_from_string ("Cantarell Bold 12"));
-    gtk_widget_set_tooltip_text (labela, "CPU Load");
+    gtk_widget_set_tooltip_text (level_bar, "CPU Load");
 
-    //gtk_layout_put (GTK_LAYOUT (layout), label, 310, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), labela, 220, 42);
-    gtk_layout_put (GTK_LAYOUT (layout), label2, 400, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), label2a, 496, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), label3, 10, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), label3a, 60, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), label4, 110, 16);
-    gtk_layout_put (GTK_LAYOUT (layout), label4a, 164, 16);
-    
+    gtk_grid_attach (GTK_GRID (grid), level_bar, 0, 0, 7, 1);
+    gtk_grid_attach_next_to (GTK_GRID (grid),
+                             labela,
+                             level_bar,
+                             GTK_POS_RIGHT,
+                             1,
+                             1); 
+
+    gtk_grid_attach (GTK_GRID (grid), label3, 0, 1, 1, 1); 
+    gtk_grid_attach_next_to (GTK_GRID (grid),
+                             label3a,
+                             label3,
+                             GTK_POS_RIGHT,
+                             1,
+                             1);
+
+    gtk_grid_attach (GTK_GRID (grid), label4, 3, 1, 1, 1);
+    gtk_grid_attach_next_to (GTK_GRID (grid),
+                             label4a,
+                             label4,
+                             GTK_POS_RIGHT,
+                             1,
+                             1);
+
+    gtk_grid_attach (GTK_GRID (grid), label2, 5, 1, 1, 1);
+    gtk_grid_attach_next_to (GTK_GRID (grid),
+                             label2a,
+                             label2,
+                             GTK_POS_RIGHT,
+                             1,
+                             1);
+
+    gtk_widget_set_margin_top (level_bar, 6);
+    gtk_widget_set_margin_start (level_bar, 34); 
+    gtk_widget_set_margin_bottom (level_bar, 4); 
+    gtk_widget_set_margin_start (label3, 34);
+    gtk_widget_set_margin_start (label3a, 4);
+    gtk_widget_set_margin_start (label4, 26);
+    gtk_widget_set_margin_start (label4a, 4);
+    gtk_widget_set_margin_start (label2, 26);
+    gtk_widget_set_margin_start (label2a, 4);
+    gtk_widget_set_margin_start (labela, 4);
+
+    gtk_widget_show_all (grid);
+
     return TRUE;
 }
 
 static void
-layout_off (GtkWidget *layout)
+grid_off (GtkWidget *stack, GtkWidget *grid)
 {
-    GtkWidget *label;
+    GList *children, *iter;
 
-    label = gtk_label_new ("");
+    children = gtk_container_get_children (GTK_CONTAINER (grid));
+    
+    for (iter = children; iter != NULL; iter = g_list_next (iter))
+    {
+        gtk_widget_destroy (iter -> data);
+    }
 
-    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold Italic 14"));
-
-    gtk_layout_put (GTK_LAYOUT (layout), label, 170, 40);
+    g_list_free (children);
 }
 
 static void
 switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 {
-    GtkWidget *layout;
+    /* 
+        Here we destroy the 'GtkWidget *grid' passed through by the struct
+        and create a new one for on/off functionality.
+    */
+     
     GtkPassedDisplayData *rdata;
     
     rdata = user_data;
-    layout = gtk_layout_new (NULL, NULL);
-
-    gtk_widget_destroy (rdata -> layout);
 
     if (gtk_switch_get_active (sw) == TRUE)
     {
-        if (layout_on (GTK_WIDGET (sw), layout) == FALSE)
+        if (grid_on (GTK_WIDGET (sw), rdata -> grid) == FALSE)
         {
-            //gtk_switch_set_active (sw, FALSE);
-            layout_off (layout);
+            grid_off (rdata -> stack, rdata -> grid);
         }
-
-        rdata -> layout = layout;
     }
     else
     {
-        layout_off (layout);
-        rdata -> layout = layout;
+        grid_off (rdata -> stack, rdata -> grid);
     }
-    
-    gtk_container_add (GTK_CONTAINER (rdata -> scwindow), layout);
-    gtk_widget_show_all (layout);
+
+    gtk_widget_show_all (rdata -> grid);
 }
 
 void
 display (GtkWidget *stack, GtkWidget *sw)
 {
-	GtkWidget *layout;
 	GtkWidget *scwindow;
+    GtkWidget *grid;
     GtkPassedDisplayData *pdata;
 
     pdata = g_slice_new (GtkPassedDisplayData);
-    pdata -> scwindow = gtk_scrolled_window_new (NULL, NULL);
-    layout = gtk_layout_new (NULL, NULL);
-
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (pdata -> scwindow), 
-									GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    grid = gtk_grid_new ();
+    pdata -> stack = stack;
 
 	/* Pack `header_bar` & `sc_window`. */
     if (gtk_switch_get_active (GTK_SWITCH (sw)) == TRUE)
     {
-        layout_on (sw, layout);
-        pdata -> layout = layout;
+        grid_on (sw, grid);
+        pdata -> grid = grid;
     }
 	else
     {
-        layout_off (layout);
-        pdata -> layout = layout;
+        grid_off (pdata -> stack, grid);
+        pdata -> grid = grid;
     }
 
-    gtk_container_add (GTK_CONTAINER (pdata -> scwindow), pdata -> layout);
-
-	gtk_stack_add_titled (GTK_STACK (stack), pdata -> scwindow,
+	gtk_stack_add_titled (GTK_STACK (stack),
+                          grid,
                           "display", 
                           "Display");
 
-    g_signal_connect_after (sw, "notify::active", G_CALLBACK (switch_pos_cb), pdata);
+    g_signal_connect_after (sw,
+                            "notify::active",
+                            G_CALLBACK (switch_pos_cb),
+                            pdata);
 }

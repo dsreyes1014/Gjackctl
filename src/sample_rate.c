@@ -33,6 +33,8 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
     config_file_input ("gjackctl.driver.sample_rate",
                        CONFIG_TYPE_STRING,
                        (gpointer) gtk_button_get_label (GTK_BUTTON (rdata -> pbutton)));
+
+    g_slice_free (GtkPassedSampleRateData, rdata);
 }
 
 static void
