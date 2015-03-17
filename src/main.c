@@ -11,12 +11,17 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
 {
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "display") == 0)
     {
-        gtk_window_resize (GTK_WINDOW (user_data), 600, 220);
+        gtk_window_resize (GTK_WINDOW (user_data), 650, 220);
     }
    
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "log") == 0)
     {
-        gtk_window_resize (GTK_WINDOW (user_data), 870, 500);
+        gtk_window_resize (GTK_WINDOW (user_data), 750, 500);
+    }
+    
+    if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "ports") == 0)
+    {
+        gtk_window_resize (GTK_WINDOW (user_data), 750, 500);
     }
 }
 
@@ -29,13 +34,14 @@ apply_theme ()
     const gchar *path;
     const gchar *theme_sheet;      
 
+    theme_sheet = g_strdup ("./src/gjackctl-adwaita-dark.css");
     screen = gdk_screen_get_default ();    
     provider = gtk_css_provider_get_named ("adwaita", "dark");
     
 
     if (provider)
     {
-        theme_sheet = g_strdup ("./src/gjackctl-adwaita-dark.css");
+        
 
         path = g_strconcat (g_getenv ("HOME"),
                             "/.config/gjackctl/",

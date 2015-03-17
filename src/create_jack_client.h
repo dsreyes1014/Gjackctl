@@ -7,7 +7,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "jack_ports.h"
+
 gint
-jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2, GtkWidget *level_bar);
+jack_client_init (GtkWidget *sw,
+                  GtkWidget *stack,
+                  GtkWidget *label,
+                  GtkWidget *label2,
+                  GtkWidget *level_bar);
 
 #endif

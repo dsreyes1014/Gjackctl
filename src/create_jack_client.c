@@ -46,7 +46,11 @@ srate_cb (jack_nframes_t nframes, gpointer user_data)
 }
 
 gint
-jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2, GtkWidget *level_bar)
+jack_client_init (GtkWidget *sw,
+                  GtkWidget *stack,
+                  GtkWidget *label,
+                  GtkWidget *label2,
+                  GtkWidget *level_bar)
 {
     /*  
         This function creates a client for the JACK server
@@ -56,6 +60,7 @@ jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2, GtkWidget 
             --argument 1 'GtkWidget *sw' is declared in 'main.c'
             --argument 2 'GtkWidget *label' is declared in 'display.c'
             --argument 3 'GtkWidget *label2' is declared in 'display.c'
+            --argument 4 'GtkWidget *level_bar' is declared in 'display.c'
     */
 
     jack_client_t *client;
@@ -64,22 +69,24 @@ jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2, GtkWidget 
     //const gchar **playback;
     gint i;
 
-    //sleep (2);
+    //g_print ("create_jack_client.c: line 72\n");
+
+    sleep (1);
+    client = NULL;
     i = 0;
     client = jack_client_open ("gjackctl", 
-                               JackNoStartServer,
+                               JackNoStartServer |
+                               JackUseExactName,
                                &status);
-    
-    
+
     if (client == NULL)
     {
         g_print ("'create_jack_client.c': Gjackctl client couldn't be created\n");
-        //gtk_switch_set_active (GTK_SWITCH (sw), FALSE);
 
         return -1;
     }
 
-    g_print ("'create_jack_init.c': Gjackctl client created successfully\n.");
+    //g_print ("'create_jack_init.c': Gjackctl client created successfully\n.");
 
     //ports = g_slice_new (jack_port);
     //ports -> in_port = jack_port_register (client, "capture", JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
@@ -102,6 +109,8 @@ jack_client_init (GtkWidget *sw, GtkWidget *label, GtkWidget *label2, GtkWidget 
     jack_set_sample_rate_callback (client, srate_cb, label2);
 
     jack_activate (client); 
+
+    jack_ports (stack, client);
 
     dsp_init (sw, label, client, level_bar); /* function updates label to show cpu load. */
 

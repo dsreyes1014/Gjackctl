@@ -26,7 +26,7 @@ get_config_setting_string (const gchar *path)
 }
 
 static gboolean
-grid_on (GtkWidget *sw, GtkWidget *grid)
+grid_on (GtkWidget *sw, GtkWidget *grid, gpointer user_data)
 {
     GtkWidget *label;
     GtkWidget *labela;
@@ -37,6 +37,7 @@ grid_on (GtkWidget *sw, GtkWidget *grid)
     GtkWidget *label4;
     GtkWidget *label4a;
     GtkWidget *level_bar;
+    GtkPassedDisplayData *rdata;
 
     label = gtk_label_new ("CPU Load");
     labela = gtk_label_new (NULL);
@@ -47,17 +48,26 @@ grid_on (GtkWidget *sw, GtkWidget *grid)
     label4 = gtk_label_new ("Device");
     label4a = gtk_label_new (get_config_setting_string ("gjackctl.driver.device"));
     level_bar = gtk_level_bar_new ();    
+    rdata = user_data;
     
     gtk_level_bar_set_min_value (GTK_LEVEL_BAR (level_bar), 0);
     gtk_level_bar_set_max_value (GTK_LEVEL_BAR (level_bar), 100);
     gtk_level_bar_set_mode (GTK_LEVEL_BAR (level_bar),
                             GTK_LEVEL_BAR_MODE_CONTINUOUS);
 
-    if (jack_client_init (sw, labela, label2a, level_bar) != 0)
+    if (jack_client_init (sw,
+                          rdata -> stack,
+                          labela,
+                          label2a,
+                          level_bar) != 0)
     {
         return FALSE;
     }
+
     
+    
+    g_print ("display.c: line 66\n");
+
     gtk_widget_set_tooltip_text (level_bar, "CPU Load");
 
     gtk_grid_attach (GTK_GRID (grid), level_bar, 0, 0, 7, 1);
@@ -109,11 +119,16 @@ grid_on (GtkWidget *sw, GtkWidget *grid)
 }
 
 static void
-grid_off (GtkWidget *stack, GtkWidget *grid)
+grid_off (GtkWidget *stack, GtkWidget *grid, gpointer user_data)
 {
     GList *children, *iter;
+    GtkPassedDisplayData *rdata;
+    GtkWidget *stack_child;
 
     children = gtk_container_get_children (GTK_CONTAINER (grid));
+    rdata = user_data;
+
+    stack_child = gtk_stack_get_child_by_name (GTK_STACK (rdata -> stack), "ports");    
     
     for (iter = children; iter != NULL; iter = g_list_next (iter))
     {
@@ -121,6 +136,11 @@ grid_off (GtkWidget *stack, GtkWidget *grid)
     }
 
     g_list_free (children);
+    
+    if (stack_child != NULL)
+    {
+        gtk_widget_destroy (stack_child);
+    }
 }
 
 static void
@@ -131,20 +151,32 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
         and create a new one for on/off functionality.
     */
      
+    GtkWidget *stack_child;
     GtkPassedDisplayData *rdata;
     
     rdata = user_data;
+    stack_child = gtk_stack_get_child_by_name (GTK_STACK (rdata -> stack), "log");
 
     if (gtk_switch_get_active (sw) == TRUE)
     {
-        if (grid_on (GTK_WIDGET (sw), rdata -> grid) == FALSE)
+        g_object_ref (stack_child);
+        gtk_container_remove (GTK_CONTAINER (rdata -> stack), stack_child);
+
+        if (grid_on (GTK_WIDGET (sw), rdata -> grid, rdata) == FALSE)
         {
-            grid_off (rdata -> stack, rdata -> grid);
+            grid_off (rdata -> stack, rdata -> grid, rdata);
         }
+
+        gtk_stack_add_titled (GTK_STACK (rdata -> stack),
+                              stack_child,
+                              "log",
+                              "Log");
+
+        g_object_unref (stack_child);
     }
     else
     {
-        grid_off (rdata -> stack, rdata -> grid);
+        grid_off (rdata -> stack, rdata -> grid, rdata);
     }
 
     gtk_widget_show_all (rdata -> grid);
@@ -156,20 +188,28 @@ display (GtkWidget *stack, GtkWidget *sw)
 	GtkWidget *scwindow;
     GtkWidget *grid;
     GtkPassedDisplayData *pdata;
+    GtkWidget *stack_child;
+    GtkWidget *stack_child2;
 
     pdata = g_slice_new (GtkPassedDisplayData);
     grid = gtk_grid_new ();
     pdata -> stack = stack;
+    stack_child = NULL;
 
-	/* Pack `header_bar` & `sc_window`. */
     if (gtk_switch_get_active (GTK_SWITCH (sw)) == TRUE)
     {
-        grid_on (sw, grid);
+        grid_on (sw, grid, pdata);
         pdata -> grid = grid;
+
+        /* Here we remove the 'Ports' tab of our stack so that the 'Display'
+        tab our stack shows first. */ 
+        stack_child = gtk_stack_get_child_by_name (GTK_STACK (stack), "ports");
+        g_object_ref (stack_child);
+        gtk_container_remove (GTK_CONTAINER (stack), stack_child); 
     }
 	else
     {
-        grid_off (pdata -> stack, grid);
+        grid_off (pdata -> stack, grid, pdata);
         pdata -> grid = grid;
     }
 
@@ -178,8 +218,16 @@ display (GtkWidget *stack, GtkWidget *sw)
                           "display", 
                           "Display");
 
-    g_signal_connect_after (sw,
-                            "notify::active",
-                            G_CALLBACK (switch_pos_cb),
-                            pdata);
+    g_signal_connect (sw,
+                      "notify::active",
+                      G_CALLBACK (switch_pos_cb),
+                      pdata);
+
+    if (stack_child != NULL)
+    {
+        /* Here we add the 'Ports' tab of our stack back into the stack 
+        and 'unref' it so it will be released when our app is destroyed. */
+        gtk_stack_add_titled (GTK_STACK (stack), stack_child, "ports", "Ports");
+        g_object_unref (stack_child);
+    }
 }
