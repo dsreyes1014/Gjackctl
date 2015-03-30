@@ -1,10 +1,12 @@
 #!/usr/bin/env xdg-open
+
 [Desktop Entry]
 Type=Application
 Encoding=UTF-8
 Name=GJackctl
-Exec=/home/drew/Projects/gjackctl/0.1.84/build/gjackctl
+Exec=gjackctl
 Terminal=false
 Icon=/home/drew/Pictures/Jack_3.5-512.png
 Comment=Gnome frontend for the JACK server jackd
 Categories=GTK;GNOME;
+

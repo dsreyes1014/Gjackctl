@@ -2,7 +2,7 @@
 
 typedef struct _GtkPassedRtData GtkPassedRtData;
 
-static gboolean
+gboolean
 get_realtime ()
 {
 	gboolean realtime;

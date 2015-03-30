@@ -14,4 +14,7 @@
 void
 toggle_rt (GtkWidget *box, GtkWidget *button);
 
+gboolean
+get_realtime ();
+
 #endif

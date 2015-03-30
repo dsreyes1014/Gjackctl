@@ -57,9 +57,75 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
 }
 
 static void
+rt_state_cb (GSimpleAction *simple,
+             GVariant *parameter,
+             gpointer user_data)
+{
+    g_simple_action_set_state (simple, parameter);
+
+    gboolean value;
+
+    value =  g_variant_get_boolean (parameter);
+
+    config_file_input ("gjackctl.server.realtime",
+                       CONFIG_TYPE_BOOL,
+                       (gpointer) &value);
+}
+
+static void
 gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 {	
-	GtkWidget *popup;
+    GtkWidget *popover;
+    GMenu *main_menu;
+    GMenu *server_menu;
+    GMenu *driver_menu;
+    GMenuItem *rt_item;
+    GSimpleActionGroup *group;
+    GSimpleAction *rt_action;
+    GVariant *variant;
+
+    main_menu = g_menu_new ();
+    server_menu = g_menu_new ();
+    driver_menu = g_menu_new ();
+    group = g_simple_action_group_new ();
+    variant = g_variant_new_boolean (get_realtime ());
+    rt_action = g_simple_action_new_stateful ("realtime",
+                                              NULL,
+                                              variant);
+
+    g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (rt_action));  
+
+    gtk_widget_insert_action_group (GTK_WIDGET (button),
+                                    "settings",
+                                    G_ACTION_GROUP (group)); 
+
+    rt_item = g_menu_item_new ("Realtime", "settings.realtime");   
+
+    g_menu_insert_item (main_menu,
+                        0,
+                        rt_item);                                        
+
+    g_menu_insert_submenu (main_menu,
+                           1,
+                           "Server Options",
+                           G_MENU_MODEL (server_menu));
+    g_menu_insert_submenu (main_menu,
+                           2,
+                           "Driver Options",
+                           G_MENU_MODEL (driver_menu));
+
+    popover = gtk_popover_new_from_model (GTK_WIDGET (button),
+                                          G_MENU_MODEL (main_menu));
+
+    gtk_widget_insert_action_group (popover,
+                                    "settings",
+                                    G_ACTION_GROUP (group));
+
+    g_signal_connect (rt_action, "change-state", G_CALLBACK (rt_state_cb), NULL);
+
+    gtk_widget_show_all (popover);
+
+	/*GtkWidget *popup;
 	GtkWidget *header_bar;
 	GtkWidget *button1;
 	GtkWidget *button2;
@@ -79,11 +145,11 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     GtkWidget *dbox1;
     GtkWidget *dbox2;
     GtkWidget *separator;
-    GtkWidget *separator1;
+    GtkWidget *separator1; */
 
 	/* This is a `struct` that holds variables passed by 
 	the `g_signal_connect ()` function through `gpointer user_data`. */ 
-	pass_data *data_received;
+	/*pass_data *data_received;
 	pass_data_2 *data_to_pass;	
 
     sbox0 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);    
@@ -123,10 +189,10 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     
 	gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER (sswitcher),
                                   GTK_STACK (stack)); 
-	gtk_stack_set_transition_type (GTK_STACK (stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);
+	gtk_stack_set_transition_type (GTK_STACK (stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);*/
 
 	/* Pack `box` into `stack` named `server`. */
-    gtk_box_pack_start (GTK_BOX (sbox0), sbox3, FALSE, FALSE, 2);
+    /*gtk_box_pack_start (GTK_BOX (sbox0), sbox3, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (sbox0), separator, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (sbox0), sbox1, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (sbox1), sbox2, FALSE, FALSE, 2);
@@ -136,9 +202,9 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     gtk_box_pack_start (GTK_BOX (sbox3), sbox7, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (dbox0), dbox1, FALSE, FALSE, 2);  
     gtk_box_pack_start (GTK_BOX (dbox0), separator1, FALSE, FALSE, 2);  
-    gtk_box_pack_start (GTK_BOX (dbox0), dbox2, FALSE, FALSE, 2); 
+    gtk_box_pack_start (GTK_BOX (dbox0), dbox2, FALSE, FALSE, 2); */
     /**************************************************************************/
-	server_name (sbox2, button1);		
+	/*server_name (sbox2, button1);		
 	toggle_rt (sbox5, button1);
 	toggle_no_memlock (sbox5, button1);
     toggle_midi (sbox5, button1);
@@ -148,9 +214,9 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 	rt_priority (sbox2, button1);
     clocksource (sbox7, button1);
     port_max (sbox7, button1);
-    timeout (sbox7, button1);
+    timeout (sbox7, button1);*/
     /**************************************************************************/    
-	drivers (dbox1, app, button1);
+	/*drivers (dbox1, app, button1);
 	sample_rate (dbox1, button1);
     frames (dbox1, button1);    
     period (dbox2, button1);
@@ -158,10 +224,10 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     gtk_window_set_default_size (GTK_WINDOW (popup), 600, 220);    
     gtk_widget_set_size_request (button1, 80, 30);
     gtk_widget_set_margin_start (sbox5, 60);
-    gtk_widget_set_name (popup, "settings-window");
+    gtk_widget_set_name (popup, "settings-window");*/
     
 	/* Pack `header_bar`. */
-	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);
+	/*gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);
 	gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "Settings");
 	gtk_window_set_titlebar (GTK_WINDOW (popup), header_bar);
 	gtk_header_bar_pack_start (GTK_HEADER_BAR (header_bar), button2);
@@ -187,13 +253,13 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     g_signal_connect (stack,
                       "notify::visible-child-name",
                       G_CALLBACK (visible_child_cb),
-                      popup);
+                      popup);*/
 
 	/* Position `popup` to show wherever current mouse position is located. */
-	gtk_window_set_position (GTK_WINDOW (popup), GTK_WIN_POS_MOUSE);
+	/*gtk_window_set_position (GTK_WINDOW (popup), GTK_WIN_POS_MOUSE);
 	
 	gtk_widget_show_all (popup);
-	gtk_widget_hide (window);
+	gtk_widget_hide (window);*/
 }
 
 void
