@@ -10,4 +10,7 @@
 void
 toggle_unlock_libs (GtkWidget *box, GtkWidget *button);
 
+gboolean
+get_unlock_libs ();
+
 #endif

@@ -11,4 +11,7 @@
 void
 toggle_no_memlock (GtkWidget *box, GtkWidget *button);
 
+gboolean
+get_no_memlock ();
+
 #endif

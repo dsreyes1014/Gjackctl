@@ -1,6 +1,6 @@
 #include "toggle_verbose.h"
 
-static gboolean
+gboolean
 get_verbose ()
 {
 	gboolean verbose;

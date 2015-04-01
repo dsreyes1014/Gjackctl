@@ -12,4 +12,7 @@
 void
 rt_priority (GtkWidget *box, GtkWidget *button);
 
+const gchar *
+get_priority ();
+
 #endif

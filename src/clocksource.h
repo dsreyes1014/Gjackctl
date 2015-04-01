@@ -10,4 +10,7 @@
 void
 clocksource (GtkWidget *box, GtkWidget *button);
 
+const gchar *
+get_clocksource ();
+
 #endif

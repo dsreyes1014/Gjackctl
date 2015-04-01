@@ -1,10 +1,11 @@
 #include "toggle_no_memlock.h"
 
-static gboolean
-get_no_memlock (config_t config)
+gboolean
+get_no_memlock ()
 {
 	gboolean realtime;
 	gchar config_file[128];
+    config_t config;
 
 	g_sprintf (config_file, "%s/.config/gjackctl/gjackctl.conf", g_getenv ("HOME"));
 
@@ -122,7 +123,7 @@ toggle_no_memlock (GtkWidget *box, GtkWidget *button)
     label = gtk_label_new ("No Memlock");
     event_box = gtk_event_box_new ();
     config_init (&config);
-    memlock = get_no_memlock (config);
+    memlock = get_no_memlock ();
     data -> passed_label = label;
     
     if (memlock == FALSE)

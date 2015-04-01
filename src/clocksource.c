@@ -17,11 +17,12 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
                        (gpointer) gtk_button_get_label (GTK_BUTTON (rdata -> pbutton))); 
 }
 
-static const gchar *
-get_clocksource (config_t config)
+const gchar *
+get_clocksource ()
 {
     const gchar *string;
     gchar *file;
+    config_t config;
 
     file = g_strconcat (g_getenv ("HOME"),
                         "/.config/gjackctl/gjackctl.conf",
@@ -134,7 +135,7 @@ clocksource (GtkWidget *box, GtkWidget *button)
     separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
 
     pdata = g_slice_new (GtkPassedClockSourceData);
-    pdata -> pbutton = gtk_button_new_with_label (get_clocksource (config));
+    pdata -> pbutton = gtk_button_new_with_label (get_clocksource ());
     pdata -> popover = NULL;
 
     gtk_widget_set_tooltip_text (pdata -> pbutton, "Choose a specific wall clock.");

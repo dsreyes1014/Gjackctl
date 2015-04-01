@@ -13,4 +13,7 @@
 void
 toggle_verbose (GtkWidget *box, GtkWidget *button);
 
+gboolean
+get_verbose ();
+
 #endif

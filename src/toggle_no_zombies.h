@@ -14,4 +14,7 @@
 void
 toggle_no_zombies (GtkWidget *box, GtkWidget *button);
 
+gboolean
+get_no_zombies ();
+
 #endif

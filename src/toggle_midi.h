@@ -10,4 +10,7 @@
 void
 toggle_midi (GtkWidget *box, GtkWidget *button);
 
+gboolean
+get_midi ();
+
 #endif

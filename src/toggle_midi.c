@@ -1,10 +1,11 @@
 #include "toggle_midi.h"
 
-static gboolean
-get_midi (config_t config)
+gboolean
+get_midi ()
 {
 	gboolean realtime;
 	gchar config_file[128];
+    config_t config;
 
 	g_sprintf (config_file, "%s/.config/gjackctl/gjackctl.conf", g_getenv ("HOME"));
 
@@ -127,7 +128,7 @@ toggle_midi (GtkWidget *box, GtkWidget *button)
     data = g_slice_new (GtkPassedData);
     data -> passed_label = label;
   
-    midi = get_midi (config);
+    midi = get_midi ();
     if (midi == FALSE)
     {
         state = label_normal_off (GTK_LABEL (label));

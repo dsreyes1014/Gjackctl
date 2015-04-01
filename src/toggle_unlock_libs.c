@@ -1,10 +1,11 @@
 #include "toggle_no_zombies.h"
 
-static gboolean
-get_unlock_libs (config_t config)
+gboolean
+get_unlock_libs ()
 {
 	gboolean no_zombies;
 	gchar *file;
+    config_t config;
 
     file = g_strconcat (g_getenv ("HOME"),
                         "/.config/gjackctl/gjackctl.conf",
@@ -129,7 +130,7 @@ toggle_unlock_libs (GtkWidget *box, GtkWidget *button)
     data = g_slice_new (GtkPassedData);
     data -> passed_label = label;
   
-    realtime = get_unlock_libs (config);
+    realtime = get_unlock_libs ();
     if (realtime == FALSE)
     {
         state = label_normal_off (GTK_LABEL (label));

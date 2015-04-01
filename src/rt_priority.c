@@ -7,11 +7,12 @@ struct _GtkPassedRtData {
     config_t config;
 };
 
-static const gchar *
-get_priority (config_t config)
+const gchar *
+get_priority ()
 {
     const gchar *priority;
     gchar *file;
+    config_t config;
 
     config_init (&config);
     file = g_strconcat (g_getenv ("HOME"),
@@ -62,7 +63,7 @@ rt_priority (GtkWidget *box, GtkWidget *button)
     label = gtk_label_new ("Priority");
 	adjustment = gtk_adjustment_new (75, 0, 99, 1, 0, 0);
 	pdata -> spin_button = gtk_spin_button_new (adjustment, 1, 0);
-    priority = g_ascii_strtoll (get_priority (pdata -> config), NULL, 0);
+    priority = g_ascii_strtoll (get_priority (), NULL, 0);
     child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
 
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
