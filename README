@@ -6,8 +6,7 @@ Gtk3 based frontend for JACK.
 To Build
 ========
 
-mkdir -v build && cd build
-cmake ../src/
+./configure
 make
 
 To Install
