@@ -9,9 +9,11 @@ typedef struct
 static void
 close_window_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
+    GtkWidget *toplevel;
     gint priority;
     gchar string[10];
 
+    toplevel = gtk_widget_get_toplevel (widget);
     priority = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (user_data));        
     g_sprintf (string, "%d", priority);
 
@@ -20,6 +22,8 @@ close_window_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
                        (gpointer) string);
 
     gtk_widget_destroy (widget);
+    
+    gtk_widget_grab_focus (toplevel);
 }
 
 static void
@@ -56,6 +60,34 @@ activate_priority_cb (GSimpleAction *simple,
                       spin_button);
     
     gtk_widget_show_all (window);
+}
+
+static void
+port_max_state_cb (GSimpleAction *simple,
+                   GVariant *parameter,
+                   gpointer user_data)
+{
+    g_simple_action_set_state (simple, parameter);
+
+    gsize length;
+
+    config_file_input ("gjackctl.server.port_max",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) g_variant_get_string (parameter, &length));
+}
+
+static void
+timeout_state_cb (GSimpleAction *simple,
+                  GVariant *parameter,
+                  gpointer user_data)
+{
+    g_simple_action_set_state (simple, parameter);
+
+    gsize length;
+
+    config_file_input ("gjackctl.server.timeout",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) g_variant_get_string (parameter, &length));
 }
 
 static void
@@ -178,12 +210,14 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     GtkWidget *popover;
 
     GMenu *main_menu;
-    GMenu *server_menu;
+    GMenu *options1_submenu;
     GMenu *driver_menu;
     GMenu *server_section;
     GMenu *driver_section;
     GMenu *clocksource_submenu;
     GMenu *priority_submenu;
+    GMenu *timeout_submenu;
+    GMenu *port_max_submenu;
 
     GMenuItem *rt_item;
     GMenuItem *midi_item;
@@ -195,6 +229,16 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     GMenuItem *clocksource_item2;
     GMenuItem *clocksource_item3;
     GMenuItem *priority_item;
+    GMenuItem *timeout_item1;
+    GMenuItem *timeout_item2;
+    GMenuItem *timeout_item3;
+    GMenuItem *timeout_item4;
+    GMenuItem *timeout_item5;
+    GMenuItem *timeout_item6;
+    GMenuItem *port_max_item1;
+    GMenuItem *port_max_item2;
+    GMenuItem *port_max_item3;
+    GMenuItem *port_max_item4;
 
     GSimpleActionGroup *group;
     GSimpleAction *rt_action;
@@ -205,6 +249,8 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     GSimpleAction *unlock_libs_action;
     GSimpleAction *clocksource_action;
     GSimpleAction *priority_action;
+    GSimpleAction *timeout_action;
+    GSimpleAction *port_max_action;
 
     GVariant *rt_variant;
     GVariant *midi_variant;
@@ -213,14 +259,18 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     GVariant *no_zombies_variant;
     GVariant *unlock_libs_variant;
     GVariant *clocksource_variant;
+    GVariant *timeout_variant;
+    GVariant *port_max_variant;
 
     main_menu = g_menu_new ();
-    server_menu = g_menu_new ();
+    options1_submenu = g_menu_new ();
     driver_menu = g_menu_new ();
     server_section = g_menu_new ();
     driver_section = g_menu_new ();
     clocksource_submenu = g_menu_new ();
     priority_submenu = g_menu_new ();
+    timeout_submenu = g_menu_new ();
+    port_max_submenu = g_menu_new ();
     group = g_simple_action_group_new ();
 
     rt_variant = g_variant_new_boolean (get_realtime ());
@@ -230,6 +280,8 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     no_zombies_variant = g_variant_new_boolean (get_no_zombies ());
     unlock_libs_variant = g_variant_new_boolean (get_unlock_libs ());
     clocksource_variant = g_variant_new_string (get_clocksource ());
+    timeout_variant = g_variant_new_string (get_timeout ());
+    port_max_variant = g_variant_new_string (get_port_max ());
 
     /* Our actions. */
     rt_action = g_simple_action_new_stateful ("realtime",
@@ -263,6 +315,14 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     priority_action = g_simple_action_new ("priority",
                                            NULL);
 
+    timeout_action = g_simple_action_new_stateful ("timeout",
+                                                   G_VARIANT_TYPE_STRING,
+                                                   timeout_variant);
+
+    port_max_action = g_simple_action_new_stateful ("port-max",
+                                                    G_VARIANT_TYPE_STRING,
+                                                    port_max_variant);
+
     /* Add our actions to the action group. */
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (rt_action));
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (midi_action));
@@ -271,15 +331,16 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (no_zombies_action));
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (unlock_libs_action));
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (clocksource_action));
-    g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (priority_action)); 
-
-    
+    g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (priority_action));
+    g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (timeout_action));
+    g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (port_max_action));     
 
     /* Attach the action group to a widget, in this case our GtkButton. */
     gtk_widget_insert_action_group (GTK_WIDGET (button),
                                     "settings",
                                     G_ACTION_GROUP (group)); 
 
+    /* Initialize our menu items. */
     rt_item = g_menu_item_new ("Realtime", "settings.realtime");
     midi_item = g_menu_item_new ("MIDI", "settings.midi");
     no_memlock_item = g_menu_item_new ("No Memlock", "settings.no-memlock");
@@ -290,8 +351,18 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     clocksource_item2 = g_menu_item_new ("Hpet", NULL);  
     clocksource_item3 = g_menu_item_new ("System", NULL);
     priority_item = g_menu_item_new (get_priority (), "settings.priority");
+    timeout_item1 = g_menu_item_new ("200", NULL);
+    timeout_item2 = g_menu_item_new ("500", NULL);
+    timeout_item3 = g_menu_item_new ("1000", NULL);
+    timeout_item4 = g_menu_item_new ("2000", NULL);
+    timeout_item5 = g_menu_item_new ("5000", NULL);
+    timeout_item6 = g_menu_item_new ("10000", NULL);
+    port_max_item1 = g_menu_item_new ("128", NULL);
+    port_max_item2 = g_menu_item_new ("256", NULL);
+    port_max_item3 = g_menu_item_new ("512", NULL);
+    port_max_item4 = g_menu_item_new ("1024", NULL);
 
-    /* Here we create radio buttons for the clocksource submenu. */
+    /* Here we create radio buttons for the 'clocksource_submenu'. */
     g_menu_item_set_action_and_target_value (clocksource_item1,
                                              "settings.clocksource",
                                              g_variant_new_string ("Cycle"));
@@ -301,6 +372,41 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     g_menu_item_set_action_and_target_value (clocksource_item3,
                                              "settings.clocksource",
                                              g_variant_new_string ("System"));
+
+    /* Here we create radio buttons for the 'timeout_submenu'. */
+    g_menu_item_set_action_and_target_value (timeout_item1,
+                                             "settings.timeout",
+                                             g_variant_new_string ("200"));
+    g_menu_item_set_action_and_target_value (timeout_item2,
+                                             "settings.timeout",
+                                             g_variant_new_string ("500"));
+    g_menu_item_set_action_and_target_value (timeout_item3,
+                                             "settings.timeout",
+                                             g_variant_new_string ("1000"));
+    g_menu_item_set_action_and_target_value (timeout_item4,
+                                             "settings.timeout",
+                                             g_variant_new_string ("2000"));
+    g_menu_item_set_action_and_target_value (timeout_item5,
+                                             "settings.timeout",
+                                             g_variant_new_string ("5000"));
+    g_menu_item_set_action_and_target_value (timeout_item6,
+                                             "settings.timeout",
+                                             g_variant_new_string ("10000"));
+
+    /* Here we create radio buttons for the 'port_max_ submenu'. */
+    g_menu_item_set_action_and_target_value (port_max_item1,
+                                             "settings.port-max",
+                                             g_variant_new_string ("128"));
+    g_menu_item_set_action_and_target_value (port_max_item2,
+                                             "settings.port-max",
+                                             g_variant_new_string ("256"));
+    g_menu_item_set_action_and_target_value (port_max_item3,
+                                             "settings.port-max",
+                                             g_variant_new_string ("512"));
+    g_menu_item_set_action_and_target_value (port_max_item4,
+                                             "settings.port-max",
+                                             g_variant_new_string ("1024"));
+    
 
     /* 'server_section' is a GMenu that contains the server options for JACK. */
     g_menu_insert_section (main_menu,
@@ -331,6 +437,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                            "RT Priority",
                            G_MENU_MODEL (priority_submenu));
 
+    /* Pack clocksource_submenu. */
     g_menu_insert_item (clocksource_submenu,
                         0,
                         clocksource_item1);
@@ -346,26 +453,81 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     g_menu_insert_submenu (server_section,
                            3,
                            "Clocksource",
-                           G_MENU_MODEL (clocksource_submenu));                                    
+                           G_MENU_MODEL (clocksource_submenu));
+    
+    /* Pack 'timeout_submenu'. */
+    g_menu_insert_item (timeout_submenu,
+                        0,
+                        timeout_item1);
+    
+    g_menu_insert_item (timeout_submenu,
+                        1,
+                        timeout_item2);
+
+    g_menu_insert_item (timeout_submenu,
+                        2,
+                        timeout_item3);
+
+    g_menu_insert_item (timeout_submenu,
+                        3,
+                        timeout_item4);
+
+    g_menu_insert_item (timeout_submenu,
+                        4,
+                        timeout_item5);
+
+    g_menu_insert_item (timeout_submenu,
+                        5,
+                        timeout_item6);
+
+    /* Add 'timeout_submenu' to 'options1_submenu'. */
+    g_menu_insert_submenu (options1_submenu,
+                           4,
+                           "Timeout",
+                           G_MENU_MODEL (timeout_submenu));   
+
+    /* Pack 'port_max_submenu'. */ 
+    g_menu_insert_item (port_max_submenu,
+                        0,
+                        port_max_item1);  
+
+    g_menu_insert_item (port_max_submenu,
+                        1,
+                        port_max_item2);
+
+    g_menu_insert_item (port_max_submenu,
+                        2,
+                        port_max_item3);
+
+    g_menu_insert_item (port_max_submenu,
+                        3,
+                        port_max_item4);
+
+    /* Add 'port_max_submenu' to 'options1_submenu'. */
+    g_menu_insert_submenu (options1_submenu,
+                           5,
+                           "Port Max",
+                           G_MENU_MODEL (port_max_submenu)); 
+
 
     g_menu_insert_submenu (server_section,
                            4,
                            "Other Options",
-                           G_MENU_MODEL (server_menu));
+                           G_MENU_MODEL (options1_submenu));
 
-    g_menu_insert_item (server_menu,
+    g_menu_insert_item (options1_submenu,
                         0,
                         no_memlock_item);
 
-    g_menu_insert_item (server_menu,
+    g_menu_insert_item (options1_submenu,
                         1,
                         verbose_item);
 
-    g_menu_insert_item (server_menu,
+    g_menu_insert_item (options1_submenu,
                         2,
                         no_zombies_item);
 
-    g_menu_insert_item (server_menu,
+    g_menu_insert_item (options1_submenu,
                         3,
                         unlock_libs_item);
 
@@ -414,6 +576,16 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     g_signal_connect (clocksource_action,
                       "change-state",
                       G_CALLBACK (clocksource_state_cb),
+                      NULL);
+
+    g_signal_connect (timeout_action,
+                      "change-state",
+                      G_CALLBACK (timeout_state_cb),
+                      NULL);
+
+    g_signal_connect (port_max_action,
+                      "change-state",
+                      G_CALLBACK (port_max_state_cb),
                       NULL);
 
     g_signal_connect (priority_action,

@@ -10,4 +10,7 @@
 void
 timeout (GtkWidget *box, GtkWidget *button);
 
+const gchar *
+get_timeout ();
+
 #endif

@@ -35,11 +35,12 @@ notify_button_toggled_cb (GtkToggleButton *tb, GParamSpec *pspec, gpointer user_
     gtk_widget_hide (rdata -> popover);
 }
 
-static const gchar *
-get_timeout (config_t config)
+const gchar *
+get_timeout ()
 {
     const gchar *string;
     gchar *file;
+    config_t config;
 
     file = g_strconcat (g_getenv ("HOME"),
                                "/.config/gjackctl/gjackctl.conf",
@@ -156,7 +157,7 @@ timeout (GtkWidget *box, GtkWidget *button)
     child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
 
     pdata = g_slice_new (GtkPassedTimeoutData);
-    pdata -> pbutton = gtk_button_new_with_label (get_timeout (config));
+    pdata -> pbutton = gtk_button_new_with_label (get_timeout ());
     pdata -> popover = NULL;
     
     gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));

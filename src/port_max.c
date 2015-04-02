@@ -35,11 +35,12 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
     g_slice_free (GtkPassedPortMaxData, rdata);
 }
 
-static const gchar *
-get_port_max (config_t config)
+const gchar *
+get_port_max ()
 {
     const gchar *string;
     gchar *file;
+    config_t config;
 
     file = g_strconcat (g_getenv ("HOME"),
                                "/.config/gjackctl/gjackctl.conf",
@@ -143,7 +144,7 @@ port_max (GtkWidget *box, GtkWidget *button)
     separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
 
     pdata = g_slice_new (GtkPassedPortMaxData);
-    pdata -> pbutton = gtk_button_new_with_label (get_port_max (config));
+    pdata -> pbutton = gtk_button_new_with_label (get_port_max ());
     pdata -> popover = NULL;
 
     gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);

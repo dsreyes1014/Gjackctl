@@ -87,4 +87,3 @@ gjackctl_LDADD = \
 
 desktopdir = $(datadir)/applications
 desktop_DATA = src/gjackctl.desktop
-
