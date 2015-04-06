@@ -1,0 +1,15 @@
+Gjackctl
+========
+
+Gtk3 based frontend for JACK. 
+
+To Build
+========
+
+./configure
+make
+
+To Install
+==========
+
+sudo make install
