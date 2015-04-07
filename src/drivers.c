@@ -1,9 +1,9 @@
 #include "drivers.h"
 
-const GActionEntry entries[] =
+/*const GActionEntry entries[] =
 	{
 		{"print_alsa_driver", print_alsa_driver_activate_cb, "s"}
-	};
+	};*/
 
 static void
 button_clicked_cb (GtkButton *button, gpointer user_data)
@@ -39,7 +39,7 @@ popover_button_clicked_cb (GtkWidget *button, GdkEvent *event, gpointer user_dat
 	submenu = g_menu_new ();
 	item1 = g_menu_item_new ("Dummy", NULL);
 	
-	alsa_device_names (submenu);	
+	//alsa_device_names (submenu);	
 		
 	/* Creates a submenu from an item in `section`. `GMenu submenu` 
 	is declared in `alsa_device_names.h` */
@@ -74,11 +74,12 @@ get_driver_type (config_t config)
     return string;
 }
 
-static const gchar *
-get_driver_device (config_t config)
+const gchar *
+get_driver_device ()
 {
     const gchar *string;
     gchar *file;
+    config_t config;
 
     file = g_strconcat (g_getenv ("HOME"),
                         "/.config/gjackctl/gjackctl.conf",
@@ -105,7 +106,7 @@ drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button)
 
     label = gtk_label_new ("Driver");	
 	pdata -> pbutton = gtk_button_new_with_label (get_driver_type (config));
-    pdata -> label = gtk_label_new (get_driver_device (config));	
+    pdata -> label = gtk_label_new (get_driver_device ());	
     child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
 
@@ -117,10 +118,10 @@ drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button)
                       "Click to choose driver/device",
                       NULL);
 
-	g_action_map_add_action_entries (G_ACTION_MAP (app),
+	/*g_action_map_add_action_entries (G_ACTION_MAP (app),
 									 entries, 
 									 G_N_ELEMENTS (entries), 
-									 pdata);
+									 pdata);*/
 	
     gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
 

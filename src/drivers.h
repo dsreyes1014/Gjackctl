@@ -16,4 +16,7 @@ typedef struct _GtkPassedDriverData {
 void
 drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button);
 
+const gchar *
+get_driver_device ();
+
 #endif

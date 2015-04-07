@@ -52,11 +52,12 @@ button_toggled_cb (GtkToggleButton *tb, gpointer user_data)
     gtk_widget_hide (rdata -> popover);
 }
 
-static const gchar *
-get_sample_rate (config_t config)
+const gchar *
+get_sample_rate ()
 {
     const gchar *string;
     gchar *file;
+    config_t config;
 
     file = g_strconcat (g_getenv ("HOME"),
                                "/.config/gjackctl/gjackctl.conf",
@@ -107,7 +108,7 @@ popover_button_clicked_cb (GtkWidget *button, gpointer user_data)
     {
         tb = list -> data;
 
-        if (g_strcmp0 (gtk_button_get_label (GTK_BUTTON (tb)), get_sample_rate (config)) == 0)
+        if (g_strcmp0 (gtk_button_get_label (GTK_BUTTON (tb)), get_sample_rate ()) == 0)
         {
             gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (tb), TRUE);
         }
@@ -152,7 +153,7 @@ sample_rate (GtkWidget *box, GtkWidget *button)
     separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
 
     pdata = g_slice_new (GtkPassedSampleRateData);
-    pdata -> pbutton = gtk_button_new_with_label (get_sample_rate (config));
+    pdata -> pbutton = gtk_button_new_with_label (get_sample_rate ());
 
     gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
 

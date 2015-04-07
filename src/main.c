@@ -12,7 +12,7 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
 {
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "display") == 0)
     {
-        gtk_window_resize (GTK_WINDOW (user_data), 650, 220);
+        gtk_window_resize (GTK_WINDOW (user_data), 650, 400);
     }
    
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "log") == 0)
@@ -129,7 +129,7 @@ main (int argc, char *argv[])
 	GtkApplication *app;
 	int status;
 
-	app = gtk_application_new ("org.gnome.gjackctl", G_APPLICATION_FLAGS_NONE);
+	app = gtk_application_new ("org.dsr.gjackctl", G_APPLICATION_FLAGS_NONE);
 
 	g_signal_connect (app, "activate", G_CALLBACK (run_app_cb), NULL);
 
