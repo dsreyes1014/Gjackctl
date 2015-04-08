@@ -32,11 +32,12 @@ button_toggled_cb (GtkToggleButton *tb, gpointer user_data)
     gtk_widget_hide (rdata -> popover);
 }
 
-static const gchar *
-get_frames (config_t config)
+const gchar *
+get_frames ()
 {
     const gchar *string;
     gchar *file;
+    config_t config;
 
     file = g_strconcat (g_getenv ("HOME"),
                                "/.config/gjackctl/gjackctl.conf",
@@ -87,7 +88,7 @@ popover_button_clicked_cb (GtkButton *button, gpointer user_data)
     {
         tb = list -> data;
 
-        if (g_strcmp0 (gtk_button_get_label (GTK_BUTTON (tb)), get_frames (config)) == 0)
+        if (g_strcmp0 (gtk_button_get_label (GTK_BUTTON (tb)), get_frames ()) == 0)
         {
             gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (tb), TRUE);
         }
@@ -130,7 +131,7 @@ frames (GtkWidget *box, GtkWidget *button)
     gchar *string;
     config_t config;
     
-    pbutton = gtk_button_new_with_label (get_frames (config));
+    pbutton = gtk_button_new_with_label (get_frames ());
     label = gtk_label_new ("Frames"); 
     child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     

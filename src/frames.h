@@ -9,4 +9,7 @@
 void
 frames (GtkWidget *box, GtkWidget *button);
 
+const gchar *
+get_frames ();
+
 #endif

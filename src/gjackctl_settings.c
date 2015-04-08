@@ -27,6 +27,19 @@ close_window_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 }
 
 void
+frames_state_cb (GSimpleAction *action,
+                 GVariant *parameter,
+                 gpointer user_data)
+{
+    g_simple_action_set_state (action, parameter);
+
+    gsize length;
+
+    config_file_input ("gjackctl.driver.frames",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) g_variant_get_string (parameter, &length));
+}
+void
 sample_rate_state_cb (GSimpleAction *action,
                       GVariant *parameter,
                       gpointer user_data)
@@ -255,6 +268,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     GMenu *port_max_submenu;
     GMenu *driver_submenu;
     GMenu *sample_rate_submenu;
+    GMenu *frames_submenu;
 
     GMenuItem *rt_item;
     GMenuItem *midi_item;
@@ -283,6 +297,15 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     GMenuItem *sample_rate_item5;
     GMenuItem *sample_rate_item6;
     GMenuItem *sample_rate_item7;
+    GMenuItem *frames_item1;
+    GMenuItem *frames_item2;
+    GMenuItem *frames_item3;
+    GMenuItem *frames_item4;
+    GMenuItem *frames_item5;
+    GMenuItem *frames_item6;
+    GMenuItem *frames_item7;
+    GMenuItem *frames_item8;
+    GMenuItem *frames_item9;
 
     GSimpleActionGroup *group;
     GSimpleAction *rt_action;
@@ -297,6 +320,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     GSimpleAction *port_max_action;
     GSimpleAction *alsa_action;
     GSimpleAction *sample_rate_action;
+    GSimpleAction *frames_action;
 
     GVariant *rt_variant;
     GVariant *midi_variant;
@@ -309,6 +333,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     GVariant *port_max_variant;
     GVariant *alsa_variant;
     GVariant *sample_rate_variant;
+    GVariant *frames_variant;
 
     main_menu = g_menu_new ();
     options1_submenu = g_menu_new ();
@@ -321,6 +346,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     port_max_submenu = g_menu_new ();
     driver_submenu = g_menu_new ();
     sample_rate_submenu = g_menu_new ();
+    frames_submenu = g_menu_new ();
     group = g_simple_action_group_new ();
 
     rt_variant = g_variant_new_boolean (get_realtime ());
@@ -334,6 +360,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     port_max_variant = g_variant_new_string (get_port_max ());
     alsa_variant = g_variant_new_string (get_driver_device ());
     sample_rate_variant = g_variant_new_string (get_sample_rate ());
+    frames_variant = g_variant_new_string (get_frames ());
 
     /* Our actions. */
     rt_action = g_simple_action_new_stateful ("realtime",
@@ -383,6 +410,10 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                                                        G_VARIANT_TYPE_STRING,
                                                        sample_rate_variant);
 
+    frames_action = g_simple_action_new_stateful ("frames",
+                                                  G_VARIANT_TYPE_STRING,
+                                                  frames_variant);
+
     /* Add our actions to the action group. */
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (rt_action));
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (midi_action));
@@ -395,12 +426,8 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (timeout_action));
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (port_max_action));
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (alsa_action));
-    g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (sample_rate_action));        
-
-    /* Attach the action group to a widget, in this case our GtkButton. 
-    gtk_widget_insert_action_group (GTK_WIDGET (button),
-                                    "settings",
-                                    G_ACTION_GROUP (group)); */
+    g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (sample_rate_action));
+    g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (frames_action));        
 
     alsa_device_names (driver_submenu);
 
@@ -432,6 +459,15 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     sample_rate_item5 = g_menu_item_new ("88200", NULL);
     sample_rate_item6 = g_menu_item_new ("96000", NULL);
     sample_rate_item7 = g_menu_item_new ("192000", NULL);
+    frames_item1 = g_menu_item_new ("16", NULL);
+    frames_item2 = g_menu_item_new ("32", NULL);
+    frames_item3 = g_menu_item_new ("64", NULL);
+    frames_item4 = g_menu_item_new ("128", NULL);
+    frames_item5 = g_menu_item_new ("256", NULL);
+    frames_item6 = g_menu_item_new ("512", NULL);
+    frames_item7 = g_menu_item_new ("1024", NULL);
+    frames_item8 = g_menu_item_new ("2048", NULL);
+    frames_item9 = g_menu_item_new ("4096", NULL);
 
     /* Here we create radio buttons for the 'clocksource_submenu'. */
     g_menu_item_set_action_and_target_value (clocksource_item1,
@@ -501,7 +537,35 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                                              g_variant_new_string ("96000")); 
     g_menu_item_set_action_and_target_value (sample_rate_item7,
                                              "settings.sample-rate",
-                                             g_variant_new_string ("192000"));                                      
+                                             g_variant_new_string ("192000"));
+
+    g_menu_item_set_action_and_target_value (frames_item1,
+                                             "settings.frames",
+                                             g_variant_new_string ("16"));
+    g_menu_item_set_action_and_target_value (frames_item2,
+                                             "settings.frames",
+                                             g_variant_new_string ("32"));
+    g_menu_item_set_action_and_target_value (frames_item3,
+                                             "settings.frames",
+                                             g_variant_new_string ("64"));
+    g_menu_item_set_action_and_target_value (frames_item4,
+                                             "settings.frames",
+                                             g_variant_new_string ("128"));
+    g_menu_item_set_action_and_target_value (frames_item5,
+                                             "settings.frames",
+                                             g_variant_new_string ("256"));
+    g_menu_item_set_action_and_target_value (frames_item6,
+                                             "settings.frames",
+                                             g_variant_new_string ("512"));
+    g_menu_item_set_action_and_target_value (frames_item7,
+                                             "settings.frames",
+                                             g_variant_new_string ("1024"));
+    g_menu_item_set_action_and_target_value (frames_item8,
+                                             "settings.frames",
+                                             g_variant_new_string ("2048"));
+    g_menu_item_set_action_and_target_value (frames_item9,
+                                             "settings.frames",
+                                             g_variant_new_string ("4096"));                                      
 
     /* 'server_section' is a GMenu that contains the server options for JACK. */
     g_menu_insert_section (main_menu,
@@ -630,11 +694,6 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                            0,
                            "Driver",
                            G_MENU_MODEL (driver_submenu));
-
-    g_menu_insert_submenu (driver_section,
-                           2,
-                           "Options",
-                           G_MENU_MODEL (driver_menu));
     
     g_menu_insert_item (sample_rate_submenu,
                         0,
@@ -668,6 +727,52 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                            1,
                            "Sample Rate",
                            G_MENU_MODEL (sample_rate_submenu));
+
+    g_menu_insert_item (frames_submenu,
+                        0,
+                        frames_item1);
+
+    g_menu_insert_item (frames_submenu,
+                        1,
+                        frames_item2);
+    
+    g_menu_insert_item (frames_submenu,
+                        2,
+                        frames_item3);
+
+    g_menu_insert_item (frames_submenu,
+                        3,
+                        frames_item4);
+
+    g_menu_insert_item (frames_submenu,
+                        4,
+                        frames_item5);
+
+    g_menu_insert_item (frames_submenu,
+                        5,
+                        frames_item6);
+
+    g_menu_insert_item (frames_submenu,
+                        6,
+                        frames_item7);
+
+    g_menu_insert_item (frames_submenu,
+                        7,
+                        frames_item8);
+
+    g_menu_insert_item (frames_submenu,
+                        8,
+                        frames_item9);
+
+    g_menu_insert_submenu (driver_section,
+                           2,
+                           "Frames",
+                           G_MENU_MODEL (frames_submenu));
+
+    g_menu_insert_submenu (driver_section,
+                           3,
+                           "Other Driver Options",
+                           G_MENU_MODEL (driver_menu));
 
     popover = gtk_popover_new_from_model (GTK_WIDGET (button),
                                           G_MENU_MODEL (main_menu));
@@ -734,6 +839,11 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     g_signal_connect (sample_rate_action,
                       "change-state",
                       G_CALLBACK (sample_rate_state_cb),
+                      NULL);
+
+    g_signal_connect (frames_action,
+                      "change-state",
+                      G_CALLBACK (frames_state_cb),
                       NULL);
     
 
