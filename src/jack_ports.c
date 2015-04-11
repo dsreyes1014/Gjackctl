@@ -26,7 +26,7 @@ from_button_clicked_cb (GtkButton *button, gpointer user_data)
 
     while (rdata -> string[i++]);
 
-    for (j = 0; j < i; j++)
+    for (j; j < i; j++)
     {
         if (rdata -> string[j] == NULL)
         {
@@ -44,7 +44,7 @@ from_button_clicked_cb (GtkButton *button, gpointer user_data)
         port_string = NULL;
         k = 0;
         port_string = g_strdup (rdata -> string[j]);
-        port = jack_port_by_name (rdata -> client, rdata -> string[j]);
+        port = jack_port_by_name (rdata -> client, port_string);
         
         if ((copy == NULL) && (jack_port_flags (port) == JackPortIsOutput))
         { 
@@ -95,6 +95,8 @@ from_button_clicked_cb (GtkButton *button, gpointer user_data)
     
     popover = gtk_popover_new_from_model (GTK_WIDGET (button),
                                           G_MENU_MODEL (menu));
+
+    gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_BOTTOM);
 
     g_free (copy);
     

@@ -12,7 +12,7 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
 {
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "display") == 0)
     {
-        gtk_window_resize (GTK_WINDOW (user_data), 650, 400);
+        gtk_window_resize (GTK_WINDOW (user_data), 650, 250);
     }
    
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "log") == 0)

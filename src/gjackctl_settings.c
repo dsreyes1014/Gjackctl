@@ -777,6 +777,8 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     popover = gtk_popover_new_from_model (GTK_WIDGET (button),
                                           G_MENU_MODEL (main_menu));
 
+    gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_BOTTOM);
+
     gtk_widget_insert_action_group (popover,
                                     "settings",
                                     G_ACTION_GROUP (group));
