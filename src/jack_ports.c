@@ -7,25 +7,69 @@ struct _GtkPassedJackPortsData {
     jack_client_t *client;
 };
 
+typedef enum {
+    AUDIO,
+    MIDI
+}GtkJackPortType;
+
+typedef enum {
+    GTK_JACK_PORT_IS_INPUT,
+    GTK_JACK_PORT_IS_OUTPUT,
+    GTK_JACK_PORT_IS_PHYSICAL,
+    GTK_JACK_PORT_CAN_MONITOR,
+    GTK_JACK_PORT_IS_TERMINAL
+}GtkJackPortFlags;
+
 static const GSList *
-get_from_audio (jack_client_t *client)
+get_midi_ports_list (jack_client_t *client)
 {
     GSList *list;
     const gchar **ports_array;
-    gchar *dup_copy;
+    gint i, j;
+    gchar *dup;
+
+    i = 0;
+    j = 0;
+    list = NULL;
+    dup = NULL;
+    ports_array = jack_get_ports (client, NULL, NULL, 0);
+
+    while (ports_array[i++])
+    {
+        dup = g_strdup (ports_array[i]);
+
+
+
+    }
+
+
+
+
+    return list;
+}
+
+static const GSList *
+get_ports_list (jack_client_t *client,
+                enum JackPortFlags flags,
+                GtkJackPortType type)
+{
+    GSList *list;
+    const gchar **ports_array;
+    gchar *dup_copy_audio;
+    gchar *dup_copy_midi;
     gint i;
     gint j;
 
-    dup_copy = NULL;
+    dup_copy_audio = NULL;
+    dup_copy_midi = NULL;
     list = NULL;
     i = 0;
     j = 0;
+    flags = flags + 20;
 
     ports_array = jack_get_ports (client, NULL, NULL, 0);
 
     while (ports_array[++i]);
-
-    g_print ("jack_ports.c: %s\n", ports_array[i]);
 
     for (j = 0; j < i; j++)
     {
@@ -35,69 +79,117 @@ get_from_audio (jack_client_t *client)
         }
 
         gchar *dup;
-        gchar *modded_dup;
+        gchar *modded_dup_audio;
+        gchar *modded_dup_midi;
         jack_port_t *port;
         gint k;
 
-        modded_dup = NULL;
+        modded_dup_audio = NULL;
+        modded_dup_midi = NULL;
         dup = NULL;
         dup = g_strdup (ports_array[j]);
         port = jack_port_by_name (client, dup);
         k = 0;
 
-        if ((dup_copy == NULL) && (jack_port_flags (port) == JackPortIsOutput))
+        /*if (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_AUDIO_TYPE) == 0)
+        {
+            g_print ("audio\n");
+        }
+        else
+        {
+            g_print ("midi\n");
+        }*/
+
+        if ((dup_copy_audio == NULL) &&
+            (jack_port_flags (port) == flags) &&
+            (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_AUDIO_TYPE) == 0))
         {
             while (dup[k++])
             {
                 if (dup[k] == ':')
                 {
-                    dup_copy = g_strndup (dup, k);
+                    dup_copy_audio = g_strndup (dup, k);
 
                     /*
                      * We don't want any jack MIDI ports here so if we find
                      * any then we skip to the next array element.
                      */
-                    if (g_strcmp0 (dup_copy, "alsa_midi:") == 0)
+                    if (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_MIDI_TYPE) == 0)
                     {
+                        g_print ("test fail: %s\n", dup_copy_audio);
                         g_free (dup);
-
                         break;
                     }
                     else
                     {
-                        list = g_slist_prepend (list, dup_copy);
-
+                        g_print ("test success: %s\n", dup_copy_audio);
+                        list = g_slist_prepend (list, dup_copy_audio);
                         g_free (dup);
+                        break;
                     }
                 }
             }
         }
-        else
+        else if ((dup_copy_midi == NULL) &&
+                 (jack_port_flags (port) == flags) &&
+                 (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_MIDI_TYPE) == 0))
         {
             while (dup[k++])
             {
                 if (dup[k] == ':')
                 {
+                    dup_copy_midi = g_strndup (dup, k);
+
+                    /*
+                     * We don't want any jack AUDIO ports here so if we find
+                     * any then we skip to the next array element.
+                     */
+                    if (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_AUDIO_TYPE) == 0)
+                    {
+                        g_print ("test fail: %s\n", dup_copy_midi);
+                        g_free (dup);
+                        break;
+                    }
+                    else
+                    {
+                        g_print ("test success: %s\n", dup_copy_midi);
+
+                        list = g_slist_prepend (list, dup_copy_midi);
+                        g_free (dup);
+                        break;
+                    }
+                }
+            }
+        }
+        else if ((dup_copy_audio != NULL) &&
+                 (jack_port_flags (port) == flags) &&
+                 (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_AUDIO_TYPE) == 0))
+        {
+            while (dup[k++])
+            {
+                if (dup[k] == ':')
+                {
+                    modded_dup_audio = g_strndup (dup, k);
 
                     /*
                      * We don't want any jack MIDI ports here so if we find
                      * any then we skip to the next array element.
-                     */
-                    if (g_strcmp0 (dup_copy, "alsa_midi:") == 0)
+                     *
+                    if (g_strcmp0 (modded_dup_audio, "alsa_midi:") == 0)
                     {
                         g_free (dup);
                         break;
-                    }
-
-                    modded_dup = g_strndup (dup, k);
+                    }*/
 
                     /*
                      * If 'modded_dup' and 'dup_copy' are the same skip to the
                      * next array element in 'ports_array'.
                      */
-                    if (g_strcmp0 (dup_copy, modded_dup) == 0)
+                    if (g_strcmp0 (dup_copy_audio, modded_dup_audio) == 0)
                     {
-                        g_free (modded_dup);
+                        g_print ("test fail: %s\n", dup_copy_audio);
+
+                        g_free (modded_dup_audio);
                         g_free (dup);
                         break;
                     }
@@ -105,14 +197,67 @@ get_from_audio (jack_client_t *client)
                     {
                         /*
                          * Clear 'dup_copy' by re-initializing with 'NULL'
-                         * and add new string to it.
+                         * I think and add new string to it.
                          */
-                        dup_copy = NULL;
-                        dup_copy = g_strndup (dup, k);
+                        dup_copy_audio = NULL;
+                        dup_copy_audio = g_strndup (dup, k);
 
-                        list = g_slist_prepend (list, dup_copy);
+                        g_print ("test success: %s\n", dup_copy_audio);
 
-                        g_free (modded_dup);
+                        list = g_slist_prepend (list, dup_copy_audio);
+
+                        g_free (modded_dup_audio);
+                        g_free (dup);
+                    }
+                }
+            }
+        }
+        else if ((dup_copy_midi != NULL) &&
+                 (jack_port_flags (port) == flags) &&
+                 (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_MIDI_TYPE) == 0))
+        {
+            while (dup[k++])
+            {
+                if (dup[k] == ':')
+                {
+                    modded_dup_midi = g_strndup (dup, k);
+
+                    /*
+                     * We don't want any jack AUDIO ports here so if we find
+                     * any then we skip to the next array element.
+
+                    if (g_strcmp0 (modded_dup, "alsa_midi:") != 0)
+                    {
+                        g_free (dup);
+                        break;
+                    }*/
+
+                    /*
+                     * If 'modded_dup' and 'dup_copy' are the same skip to the
+                     * next array element in 'ports_array'.
+                     */
+                    if (g_strcmp0 (dup_copy_midi, modded_dup_midi) == 0)
+                    {
+                        g_print ("test fail: %s\n", dup_copy_midi);
+
+                        g_free (modded_dup_midi);
+                        g_free (dup);
+                        break;
+                    }
+                    else
+                    {
+                        /*
+                         * Clear 'dup_copy' by re-initializing with 'NULL'
+                         * I think and add new string to it.
+                         */
+                        dup_copy_midi = NULL;
+                        dup_copy_midi = g_strndup (dup, k);
+
+                        g_print ("test success: %s\n", dup_copy_midi);
+
+                        list = g_slist_prepend (list, dup_copy_midi);
+
+                        g_free (modded_dup_midi);
                         g_free (dup);
                     }
                 }
@@ -121,44 +266,258 @@ get_from_audio (jack_client_t *client)
     }
 
     jack_free (ports_array);
-    g_free (dup_copy);
+    g_print ("right before returning: %s\n", dup_copy_midi);
+
+    //g_free (dup_copy_audio);
+    //g_free (dup_copy_midi);
     return list;
 }
 
-static void
-from_button_clicked_cb (GtkButton *button, gpointer user_data)
+static gchar **
+modified_ports_array (const gchar **ports_array)
 {
-    GSList *list;
+    gchar **array;
+    gchar *dup;
+    gchar *modded_dup;
+    gchar *modded_dup_copy;
+    gint i;
+    gint j;
+    gint k;
 
-    list = NULL;
-    list = (GSList *) get_from_audio (user_data);
-    list = g_slist_reverse (list);
-    list = g_slist_nth (list, 0);
+    i = 0;
+    j = 0;
+    k = 0;
+    dup = NULL;
+    modded_dup = NULL;
+    modded_dup_copy = NULL;
+    array = (gchar **) g_malloc (16 * sizeof (gchar *));
 
+    while (ports_array[i])
+    {
+        dup = g_strdup (ports_array[i]);
+        j = 0;
+
+        while (dup[j])
+        {
+            if (dup[j] == ':')
+            {
+                modded_dup = g_strndup (dup, j);
+                break;
+            }
+
+            j++;
+        }
+
+        g_free (dup);
+
+        if (g_strcmp0 (modded_dup_copy, modded_dup) != 0)
+        {
+            g_free (modded_dup_copy);
+
+            modded_dup_copy = g_strdup (modded_dup);
+            array[k] = g_strdup (modded_dup_copy);
+            k++;
+        }
+
+        g_free (modded_dup);
+        i++;
+    }
+
+    array[k] = NULL;
+
+    g_free (modded_dup_copy);
+
+    return array;
+}
+
+
+static void
+audio_from_button_clicked_cb (GtkButton *button, gpointer user_data)
+{
     GtkWidget *popover;
     GMenu *menu;
     GMenu *from_section;
+    jack_client_t *client;
+    jack_port_t *jack_port;
+    const gchar **ports_array;
+    gchar **modified_array;
+    gint i;
 
+    i = 0;
     menu = g_menu_new ();
     from_section = g_menu_new ();
+    client = user_data;
+    ports_array = jack_get_ports (client,
+                                  NULL,
+                                  JACK_DEFAULT_AUDIO_TYPE,
+                                  JackPortIsOutput);
 
-    while (list != NULL)
+    modified_array = modified_ports_array (ports_array);
+
+    while (modified_array[i])
     {
         GMenuItem *item;
 
-        item = g_menu_item_new (list -> data, NULL);
+        item = g_menu_item_new (modified_array[i], NULL);
         g_menu_append_item (G_MENU (from_section), item);
-        g_slist_free_1 (list);
 
-        list = g_slist_next (list);
+        i++;
     }
 
-    g_slist_free (list);
+    jack_free (ports_array);
+    g_strfreev (modified_array);
 
     g_menu_insert_section (menu,
                            0,
                            "Source",
                            G_MENU_MODEL (from_section));
+
+    popover = gtk_popover_new_from_model (GTK_WIDGET (button),
+                                          G_MENU_MODEL (menu));
+
+    gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_BOTTOM);
+
+    gtk_widget_show_all (popover);
+}
+
+static void
+audio_to_button_clicked_cb (GtkButton *button, gpointer user_data)
+{
+    GtkWidget *popover;
+    GMenu *menu;
+    GMenu *to_section;
+    jack_client_t *client;
+    jack_port_t *jack_port;
+    const gchar **ports_array;
+    gchar **modified_array;
+    gint i;
+
+    i = 0;
+    menu = g_menu_new ();
+    to_section = g_menu_new ();
+    client = user_data;
+    ports_array = jack_get_ports (client,
+                                  NULL,
+                                  JACK_DEFAULT_AUDIO_TYPE,
+                                  JackPortIsInput);
+
+    modified_array = modified_ports_array (ports_array);
+
+    while (modified_array[i])
+    {
+        GMenuItem *item;
+
+        item = g_menu_item_new (modified_array[i], NULL);
+        g_menu_append_item (G_MENU (to_section), item);
+
+        i++;
+    }
+
+    jack_free (ports_array);
+    g_strfreev (modified_array);
+
+    g_menu_insert_section (menu,
+                           0,
+                           "Destination",
+                           G_MENU_MODEL (to_section));
+
+    popover = gtk_popover_new_from_model (GTK_WIDGET (button),
+                                          G_MENU_MODEL (menu));
+
+    gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_BOTTOM);
+
+    gtk_widget_show_all (popover);
+}
+
+static void
+midi_from_button_clicked_cb (GtkButton *button, gpointer user_data)
+{
+    GtkWidget *popover;
+    GMenu *menu;
+    GMenu *from_section;
+    jack_client_t *client;
+    jack_port_t *jack_port;
+    const gchar **ports_array;
+    gchar **modified_array;
+    gint i;
+
+    i = 0;
+    menu = g_menu_new ();
+    from_section = g_menu_new ();
+    client = user_data;
+    ports_array = jack_get_ports (client,
+                                  NULL,
+                                  JACK_DEFAULT_MIDI_TYPE,
+                                  JackPortIsOutput);
+
+    modified_array = modified_ports_array (ports_array);
+
+    while (modified_array[i])
+    {
+        GMenuItem *item;
+
+        item = g_menu_item_new (modified_array[i], NULL);
+        g_menu_append_item (G_MENU (from_section), item);
+
+        i++;
+    }
+
+    jack_free (ports_array);
+    g_strfreev (modified_array);
+
+    g_menu_insert_section (menu,
+                           0,
+                           "Source",
+                           G_MENU_MODEL (from_section));
+
+    popover = gtk_popover_new_from_model (GTK_WIDGET (button),
+                                          G_MENU_MODEL (menu));
+
+    gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_BOTTOM);
+
+    gtk_widget_show_all (popover);
+}
+
+static void
+midi_to_button_clicked_cb (GtkButton *button, gpointer user_data)
+{
+    GtkWidget *popover;
+    GMenu *menu;
+    GMenu *to_section;
+    jack_client_t *client;
+    jack_port_t *jack_port;
+    const gchar **ports_array;
+    gchar **modified_array;
+    gint i;
+
+    i = 0;
+    menu = g_menu_new ();
+    to_section = g_menu_new ();
+    client = user_data;
+    ports_array = jack_get_ports (client,
+                                  NULL,
+                                  JACK_DEFAULT_MIDI_TYPE,
+                                  JackPortIsInput);
+
+    modified_array = modified_ports_array (ports_array);
+
+    while (modified_array[i])
+    {
+        GMenuItem *item;
+
+        item = g_menu_item_new (modified_array[i], NULL);
+        g_menu_append_item (G_MENU (to_section), item);
+
+        i++;
+    }
+
+    jack_free (ports_array);
+    g_strfreev (modified_array);
+
+    g_menu_insert_section (menu,
+                           0,
+                           "Destination",
+                           G_MENU_MODEL (to_section));
 
     popover = gtk_popover_new_from_model (GTK_WIDGET (button),
                                           G_MENU_MODEL (menu));
@@ -243,12 +602,16 @@ jack_ports (GtkWidget *stack, jack_client_t *client)
     GtkWidget *notebook;
     GtkWidget *audio_grid;
     GtkWidget *midi_grid;
-    GtkWidget *from_button;
+    GtkWidget *audio_from_button;
+    GtkWidget *audio_to_button;
+    GtkWidget *midi_from_button;
+    GtkWidget *midi_to_button;
     GtkWidget *to_button;
     GtkWidget *audio_label;
     GtkWidget *midi_label;
     gint i, j;
     GtkPassedJackPortsData *pdata;
+    jack_port_t *port;
 
     pdata = g_slice_new (GtkPassedJackPortsData);
 
@@ -259,7 +622,10 @@ jack_ports (GtkWidget *stack, jack_client_t *client)
     midi_grid = gtk_grid_new ();
     audio_label = gtk_label_new ("Audio");
     midi_label = gtk_label_new ("MIDI");
-    from_button = gtk_button_new_with_label ("From");
+    audio_from_button = gtk_button_new_with_label ("From");
+    audio_to_button = gtk_button_new_with_label ("To");
+    midi_from_button = gtk_button_new_with_label ("From");
+    midi_to_button = gtk_button_new_with_label ("To");
     to_button = gtk_button_new_with_label ("To");
 
     pdata -> string = jack_get_ports (client,
@@ -267,16 +633,12 @@ jack_ports (GtkWidget *stack, jack_client_t *client)
                                       NULL,
                                       0);
 
-    gtk_button_set_relief (GTK_BUTTON (from_button), GTK_RELIEF_NONE);
-
+    gtk_button_set_relief (GTK_BUTTON (audio_from_button), GTK_RELIEF_NONE);
+    gtk_button_set_relief (GTK_BUTTON (audio_to_button), GTK_RELIEF_NONE);
+    gtk_button_set_relief (GTK_BUTTON (midi_from_button), GTK_RELIEF_NONE);
+    gtk_button_set_relief (GTK_BUTTON (midi_to_button), GTK_RELIEF_NONE);
 
     pdata -> client = client;
-
-    /*if (client != NULL)
-    {
-        g_print ("jack_ports.c: %s\n", jack_get_client_name (client));
-    }*/;
-
 
     while (pdata -> string[i++]);
 
@@ -285,20 +647,51 @@ jack_ports (GtkWidget *stack, jack_client_t *client)
         //create_port (pdata -> string[j], j, pdata);
 
         g_print ("jack_ports.c: %s\n", pdata -> string[j]);
+
+        port = jack_port_by_name (client, pdata -> string[j]);
+
+        //g_print ("port: %d\n", jack_port_flags (port));
     }
 
-    g_signal_connect (from_button,
+    g_signal_connect (audio_from_button,
                       "clicked",
-                      G_CALLBACK (from_button_clicked_cb),
+                      G_CALLBACK (audio_from_button_clicked_cb),
+                      client);
+
+    g_signal_connect (audio_to_button,
+                      "clicked",
+                      G_CALLBACK (audio_to_button_clicked_cb),
+                      client);
+
+    g_signal_connect (midi_from_button,
+                      "clicked",
+                      G_CALLBACK (midi_from_button_clicked_cb),
+                      client);
+
+    g_signal_connect (midi_to_button,
+                      "clicked",
+                      G_CALLBACK (midi_to_button_clicked_cb),
                       client);
 
     //g_signal_connect (refresh_button, "clicked", G_CALLBACK (refresh_ports), pdata);
 
-    gtk_widget_set_margin_start (from_button, 30);
+    gtk_widget_set_margin_start (audio_from_button, 30);
 
     gtk_grid_attach (GTK_GRID (audio_grid),
-                     from_button,
+                     audio_from_button,
                      0, 0, 1, 1);
+
+    gtk_grid_attach (GTK_GRID (audio_grid),
+                     audio_to_button,
+                     1, 0, 1, 1);
+
+    gtk_grid_attach (GTK_GRID (midi_grid),
+                     midi_from_button,
+                     0, 0, 1, 1);
+
+    gtk_grid_attach (GTK_GRID (midi_grid),
+                     midi_to_button,
+                     1, 0, 1, 1);
 
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
                               audio_grid,
