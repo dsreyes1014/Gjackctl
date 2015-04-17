@@ -1,278 +1,5 @@
 #include "jack_ports.h"
 
-typedef struct _GtkPassedJackPortsData GtkPassedJackPortsData;
-
-struct _GtkPassedJackPortsData {
-    const gchar **string;
-    jack_client_t *client;
-};
-
-typedef enum {
-    AUDIO,
-    MIDI
-}GtkJackPortType;
-
-typedef enum {
-    GTK_JACK_PORT_IS_INPUT,
-    GTK_JACK_PORT_IS_OUTPUT,
-    GTK_JACK_PORT_IS_PHYSICAL,
-    GTK_JACK_PORT_CAN_MONITOR,
-    GTK_JACK_PORT_IS_TERMINAL
-}GtkJackPortFlags;
-
-static const GSList *
-get_midi_ports_list (jack_client_t *client)
-{
-    GSList *list;
-    const gchar **ports_array;
-    gint i, j;
-    gchar *dup;
-
-    i = 0;
-    j = 0;
-    list = NULL;
-    dup = NULL;
-    ports_array = jack_get_ports (client, NULL, NULL, 0);
-
-    while (ports_array[i++])
-    {
-        dup = g_strdup (ports_array[i]);
-
-
-
-    }
-
-
-
-
-    return list;
-}
-
-static const GSList *
-get_ports_list (jack_client_t *client,
-                enum JackPortFlags flags,
-                GtkJackPortType type)
-{
-    GSList *list;
-    const gchar **ports_array;
-    gchar *dup_copy_audio;
-    gchar *dup_copy_midi;
-    gint i;
-    gint j;
-
-    dup_copy_audio = NULL;
-    dup_copy_midi = NULL;
-    list = NULL;
-    i = 0;
-    j = 0;
-    flags = flags + 20;
-
-    ports_array = jack_get_ports (client, NULL, NULL, 0);
-
-    while (ports_array[++i]);
-
-    for (j = 0; j < i; j++)
-    {
-        if (ports_array[j] == NULL)
-        {
-            break;
-        }
-
-        gchar *dup;
-        gchar *modded_dup_audio;
-        gchar *modded_dup_midi;
-        jack_port_t *port;
-        gint k;
-
-        modded_dup_audio = NULL;
-        modded_dup_midi = NULL;
-        dup = NULL;
-        dup = g_strdup (ports_array[j]);
-        port = jack_port_by_name (client, dup);
-        k = 0;
-
-        /*if (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_AUDIO_TYPE) == 0)
-        {
-            g_print ("audio\n");
-        }
-        else
-        {
-            g_print ("midi\n");
-        }*/
-
-        if ((dup_copy_audio == NULL) &&
-            (jack_port_flags (port) == flags) &&
-            (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_AUDIO_TYPE) == 0))
-        {
-            while (dup[k++])
-            {
-                if (dup[k] == ':')
-                {
-                    dup_copy_audio = g_strndup (dup, k);
-
-                    /*
-                     * We don't want any jack MIDI ports here so if we find
-                     * any then we skip to the next array element.
-                     */
-                    if (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_MIDI_TYPE) == 0)
-                    {
-                        g_print ("test fail: %s\n", dup_copy_audio);
-                        g_free (dup);
-                        break;
-                    }
-                    else
-                    {
-                        g_print ("test success: %s\n", dup_copy_audio);
-                        list = g_slist_prepend (list, dup_copy_audio);
-                        g_free (dup);
-                        break;
-                    }
-                }
-            }
-        }
-        else if ((dup_copy_midi == NULL) &&
-                 (jack_port_flags (port) == flags) &&
-                 (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_MIDI_TYPE) == 0))
-        {
-            while (dup[k++])
-            {
-                if (dup[k] == ':')
-                {
-                    dup_copy_midi = g_strndup (dup, k);
-
-                    /*
-                     * We don't want any jack AUDIO ports here so if we find
-                     * any then we skip to the next array element.
-                     */
-                    if (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_AUDIO_TYPE) == 0)
-                    {
-                        g_print ("test fail: %s\n", dup_copy_midi);
-                        g_free (dup);
-                        break;
-                    }
-                    else
-                    {
-                        g_print ("test success: %s\n", dup_copy_midi);
-
-                        list = g_slist_prepend (list, dup_copy_midi);
-                        g_free (dup);
-                        break;
-                    }
-                }
-            }
-        }
-        else if ((dup_copy_audio != NULL) &&
-                 (jack_port_flags (port) == flags) &&
-                 (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_AUDIO_TYPE) == 0))
-        {
-            while (dup[k++])
-            {
-                if (dup[k] == ':')
-                {
-                    modded_dup_audio = g_strndup (dup, k);
-
-                    /*
-                     * We don't want any jack MIDI ports here so if we find
-                     * any then we skip to the next array element.
-                     *
-                    if (g_strcmp0 (modded_dup_audio, "alsa_midi:") == 0)
-                    {
-                        g_free (dup);
-                        break;
-                    }*/
-
-                    /*
-                     * If 'modded_dup' and 'dup_copy' are the same skip to the
-                     * next array element in 'ports_array'.
-                     */
-                    if (g_strcmp0 (dup_copy_audio, modded_dup_audio) == 0)
-                    {
-                        g_print ("test fail: %s\n", dup_copy_audio);
-
-                        g_free (modded_dup_audio);
-                        g_free (dup);
-                        break;
-                    }
-                    else
-                    {
-                        /*
-                         * Clear 'dup_copy' by re-initializing with 'NULL'
-                         * I think and add new string to it.
-                         */
-                        dup_copy_audio = NULL;
-                        dup_copy_audio = g_strndup (dup, k);
-
-                        g_print ("test success: %s\n", dup_copy_audio);
-
-                        list = g_slist_prepend (list, dup_copy_audio);
-
-                        g_free (modded_dup_audio);
-                        g_free (dup);
-                    }
-                }
-            }
-        }
-        else if ((dup_copy_midi != NULL) &&
-                 (jack_port_flags (port) == flags) &&
-                 (g_strcmp0 (jack_port_type (port), JACK_DEFAULT_MIDI_TYPE) == 0))
-        {
-            while (dup[k++])
-            {
-                if (dup[k] == ':')
-                {
-                    modded_dup_midi = g_strndup (dup, k);
-
-                    /*
-                     * We don't want any jack AUDIO ports here so if we find
-                     * any then we skip to the next array element.
-
-                    if (g_strcmp0 (modded_dup, "alsa_midi:") != 0)
-                    {
-                        g_free (dup);
-                        break;
-                    }*/
-
-                    /*
-                     * If 'modded_dup' and 'dup_copy' are the same skip to the
-                     * next array element in 'ports_array'.
-                     */
-                    if (g_strcmp0 (dup_copy_midi, modded_dup_midi) == 0)
-                    {
-                        g_print ("test fail: %s\n", dup_copy_midi);
-
-                        g_free (modded_dup_midi);
-                        g_free (dup);
-                        break;
-                    }
-                    else
-                    {
-                        /*
-                         * Clear 'dup_copy' by re-initializing with 'NULL'
-                         * I think and add new string to it.
-                         */
-                        dup_copy_midi = NULL;
-                        dup_copy_midi = g_strndup (dup, k);
-
-                        g_print ("test success: %s\n", dup_copy_midi);
-
-                        list = g_slist_prepend (list, dup_copy_midi);
-
-                        g_free (modded_dup_midi);
-                        g_free (dup);
-                    }
-                }
-            }
-        }
-    }
-
-    jack_free (ports_array);
-    g_print ("right before returning: %s\n", dup_copy_midi);
-
-    //g_free (dup_copy_audio);
-    //g_free (dup_copy_midi);
-    return list;
-}
-
 static gchar **
 modified_ports_array (const gchar **ports_array)
 {
@@ -516,7 +243,7 @@ midi_to_button_clicked_cb (GtkButton *button, gpointer user_data)
 
     g_menu_insert_section (menu,
                            0,
-                           "Destination",
+                           "Destination1",
                            G_MENU_MODEL (to_section));
 
     popover = gtk_popover_new_from_model (GTK_WIDGET (button),
@@ -610,10 +337,7 @@ jack_ports (GtkWidget *stack, jack_client_t *client)
     GtkWidget *audio_label;
     GtkWidget *midi_label;
     gint i, j;
-    GtkPassedJackPortsData *pdata;
     jack_port_t *port;
-
-    pdata = g_slice_new (GtkPassedJackPortsData);
 
     i = 0;
     j = 0;
@@ -628,30 +352,10 @@ jack_ports (GtkWidget *stack, jack_client_t *client)
     midi_to_button = gtk_button_new_with_label ("To");
     to_button = gtk_button_new_with_label ("To");
 
-    pdata -> string = jack_get_ports (client,
-                                      NULL,
-                                      NULL,
-                                      0);
-
     gtk_button_set_relief (GTK_BUTTON (audio_from_button), GTK_RELIEF_NONE);
     gtk_button_set_relief (GTK_BUTTON (audio_to_button), GTK_RELIEF_NONE);
     gtk_button_set_relief (GTK_BUTTON (midi_from_button), GTK_RELIEF_NONE);
     gtk_button_set_relief (GTK_BUTTON (midi_to_button), GTK_RELIEF_NONE);
-
-    pdata -> client = client;
-
-    while (pdata -> string[i++]);
-
-    for (j = 0; j < i - 1; j++)
-    {
-        //create_port (pdata -> string[j], j, pdata);
-
-        g_print ("jack_ports.c: %s\n", pdata -> string[j]);
-
-        port = jack_port_by_name (client, pdata -> string[j]);
-
-        //g_print ("port: %d\n", jack_port_flags (port));
-    }
 
     g_signal_connect (audio_from_button,
                       "clicked",
