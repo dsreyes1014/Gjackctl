@@ -30,7 +30,9 @@ config_file_init ()
 		/* Initialize `config`. */
 		config_init (&config);
 
-		/* Check to see if `config` has root setting. */
+		/*
+         * Check to see if `config` has root setting.
+         */
 		root = config_root_setting (&config);
 		root_setting = config_setting_get_member (root, "gjackctl");
 

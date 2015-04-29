@@ -26,7 +26,7 @@ close_window_cb (GtkWidget *widget, GdkEvent *event, gpointer user_data)
     gtk_widget_grab_focus (toplevel);
 }
 
-void
+static void
 frames_state_cb (GSimpleAction *action,
                  GVariant *parameter,
                  gpointer user_data)
@@ -39,7 +39,8 @@ frames_state_cb (GSimpleAction *action,
                        CONFIG_TYPE_STRING,
                        (gpointer) g_variant_get_string (parameter, &length));
 }
-void
+
+static void
 sample_rate_state_cb (GSimpleAction *action,
                       GVariant *parameter,
                       gpointer user_data)
@@ -53,7 +54,7 @@ sample_rate_state_cb (GSimpleAction *action,
                        (gpointer) g_variant_get_string (parameter, &length));
 }
 
-void
+static void
 alsa_state_cb (GSimpleAction *action,
                GVariant *parameter,
                gpointer user_data)
@@ -242,7 +243,6 @@ rt_state_cb (GSimpleAction *simple,
     gboolean value;
 
     value =  g_variant_get_boolean (parameter);
-
     config_file_input ("gjackctl.server.realtime",
                        CONFIG_TYPE_BOOL,
                        (gpointer) &value);
