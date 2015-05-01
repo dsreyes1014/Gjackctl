@@ -150,7 +150,7 @@ port_max (GtkWidget *box, GtkWidget *button)
     gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
 
     gtk_widget_set_tooltip_text (pdata -> pbutton, "Choose maximum number of ports \n for the JACK server to manage.");
-    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
+    //gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     gtk_widget_set_size_request (pdata -> pbutton, 80, 10);
     //label_underline (label);
 

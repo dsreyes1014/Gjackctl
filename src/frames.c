@@ -135,7 +135,7 @@ frames (GtkWidget *box, GtkWidget *button)
     label = gtk_label_new ("Frames"); 
     child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     
-    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
+    //gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     gtk_widget_set_size_request (pbutton, 80, 10);
     gtk_widget_set_tooltip_text (pbutton, "Set number of frames between JACK process calls");
 

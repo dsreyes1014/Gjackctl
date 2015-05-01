@@ -61,7 +61,7 @@ server_name (GtkWidget *box, GtkWidget *button)
     gtk_entry_set_placeholder_text (GTK_ENTRY (entry), "default");
 
 	gtk_widget_set_tooltip_text (entry, "Enter the name of the JACK server");	
-	gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));    
+	//gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
 
     gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
     gtk_box_pack_start (GTK_BOX (child_box), entry, FALSE, FALSE, 2);

@@ -1,10 +1,11 @@
 #include "period.h"
 
-static const gchar *
-get_period (config_t config)
+const gchar *
+get_period ()
 {
     const gchar *period;
     gchar *file;
+    config_t config;
 
     config_init (&config);
     file = g_strconcat (g_getenv ("HOME"),
@@ -49,10 +50,10 @@ period (GtkWidget *box, GtkWidget *button)
     label = gtk_label_new ("Period");
 	adjustment = gtk_adjustment_new (2, 0, 6, 1, 0, 0);
 	spin_button = gtk_spin_button_new (adjustment, 1, 0);
-    period = g_ascii_strtoll (get_period (config), NULL, 0);
+    period = g_ascii_strtoll (get_period (), NULL, 0);
     child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
 
-    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
+    //gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     gtk_widget_set_tooltip_text (spin_button, "Number of periods of latency");
 
     gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin_button), period);

@@ -164,7 +164,7 @@ sample_rate (GtkWidget *box, GtkWidget *button)
 
     gtk_widget_set_tooltip_text (pdata -> pbutton, "Choose sample rate (hz)");
 	gtk_widget_set_size_request (pdata -> pbutton, 80, 10);	
-    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
+    //gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     //gtk_widget_set_margin_start (label, 20);
     //gtk_widget_set_margin_start (pdata -> pbutton, 20);
 	

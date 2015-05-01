@@ -18,7 +18,7 @@
 #include "frames.h"
 #include "toggle_verbose.h"
 #include "alsa_device_names.h"
-    
+#include "period.h"
 
 void
 gjackctl_settings (GtkWidget *window,

@@ -66,7 +66,7 @@ rt_priority (GtkWidget *box, GtkWidget *button)
     priority = g_ascii_strtoll (get_priority (), NULL, 0);
     child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
 
-    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
+    //gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     gtk_spin_button_set_value (GTK_SPIN_BUTTON (pdata -> spin_button), priority);
 
 	/* Pack `box` which is declared in `gjackctl_settings.c`

@@ -12,4 +12,7 @@
 void
 period (GtkWidget *box, GtkWidget *button);
 
+const gchar *
+get_period ();
+
 #endif

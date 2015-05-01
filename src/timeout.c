@@ -160,7 +160,7 @@ timeout (GtkWidget *box, GtkWidget *button)
     pdata -> pbutton = gtk_button_new_with_label (get_timeout ());
     pdata -> popover = NULL;
     
-    gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
+    //gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
     gtk_widget_set_size_request (pdata -> pbutton, 80, 10);
     gtk_widget_set_tooltip_text (pdata -> pbutton, "Set JACK client timeout in milliseconds");
     //label_underline (label);
