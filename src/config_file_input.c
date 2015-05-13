@@ -73,6 +73,7 @@ config_file_input (const gchar *config_path,
 	config_set_tab_width (&config, 4);
 	config_write_file (&config, config_file);
 	config_destroy (&config);
+    //g_free (config_path);
 
 	return 0;
 }

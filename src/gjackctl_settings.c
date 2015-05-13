@@ -158,7 +158,7 @@ activate_priority_cb (GSimpleAction *simple,
     gtk_container_add (GTK_CONTAINER (window), grid);
 
     gtk_window_set_transient_for (GTK_WINDOW (window), GTK_WINDOW (rdata -> window));
-    gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER_ON_PARENT);    
+    gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
     gtk_window_set_modal (GTK_WINDOW (window), TRUE);
     gtk_window_set_decorated (GTK_WINDOW (window), FALSE);
     gtk_widget_set_events (window, GDK_FOCUS_CHANGE_MASK);
@@ -306,6 +306,16 @@ rt_state_cb (GSimpleAction *simple,
     config_file_input ("gjackctl.server.realtime",
                        CONFIG_TYPE_BOOL,
                        (gpointer) &value);
+}
+
+static gboolean
+popover_destroy_cb (GtkWidget *popover,
+                    GdkEvent  *event,
+                    gpointer   user_data)
+{
+    gtk_widget_destroy (popover);
+
+    return TRUE;
 }
 
 static void
@@ -496,6 +506,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (period_action));
 
     alsa_device_names (driver_submenu);
+    //g_menu_item_set_attribute (G_MENU_ITEM ())
 
     /* Initialize our menu items. */
     rt_item = g_menu_item_new ("Realtime", "settings.realtime");
@@ -850,6 +861,9 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                            "Other Driver Options",
                            G_MENU_MODEL (driver_menu));
 
+
+
+
     popover = gtk_popover_new_from_model (GTK_WIDGET (button),
                                           G_MENU_MODEL (main_menu));
 
@@ -858,6 +872,19 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     gtk_widget_insert_action_group (popover,
                                     "settings",
                                     G_ACTION_GROUP (group));
+
+    g_object_unref (driver_section);
+    g_object_unref (server_section);
+    g_object_unref (period_submenu);
+    g_object_unref (frames_submenu);
+    g_object_unref (sample_rate_submenu);
+    g_object_unref (driver_submenu);
+    g_object_unref (options1_submenu);
+    g_object_unref (port_max_submenu);
+    g_object_unref (timeout_submenu);
+    g_object_unref (clocksource_submenu);
+    g_object_unref (priority_submenu);
+    g_object_unref (main_menu);
 
     g_signal_connect (rt_action,
                       "change-state",
@@ -928,7 +955,11 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                       "activate",
                       G_CALLBACK (period_size_cb),
                       rdata);
-    
+
+    g_signal_connect (popover,
+                      "focus-out-event",
+                      G_CALLBACK (popover_destroy_cb),
+                      NULL);
 
     gtk_widget_show_all (popover);
 }
