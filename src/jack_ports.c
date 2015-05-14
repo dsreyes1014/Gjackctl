@@ -1,8 +1,6 @@
 #include "jack_ports.h"
 
 typedef struct _GtkPassedJackPortsData GtkPassedJackPortsData;
-typedef struct _GtkGcharElements GtkGcharElements;
-typedef struct _GtkGbooleanElements GtkGbooleanElements;
 
 enum GtkJackPortType {
     GTK_JACK_PORT_AUDIO_FROM,
@@ -23,16 +21,6 @@ struct _GtkPassedJackPortsData {
     enum GtkJackPortType port_type;
     GSimpleAction *audio_action;
     GSimpleActionGroup *group;
-};
-
-struct _GtkGcharElements {
-    gint col_num;
-    const gchar *jack_port;
-};
-
-struct _GtkGbooleanElements {
-    gint col_num;
-    gboolean value;
 };
 
 static gchar **
@@ -94,14 +82,15 @@ modified_ports_array (const gchar **ports_array)
 }
 
 static const gchar *
-get_matched_gtk_jack_port (const gchar   *string,
-                           const gchar   *port_clicked,
-                           jack_client_t *client)
+get_matched_gtk_jack_port_prefix (const gchar   *string,
+                                  const gchar   *port_clicked,
+                                  jack_client_t *client)
 {
     gchar *modded_string;
     gchar *dup;
     const gchar *string_return;
     gint i;
+    jack_port_t *jack_port;
 
     string_return = NULL;
     modded_string = NULL;
@@ -111,8 +100,6 @@ get_matched_gtk_jack_port (const gchar   *string,
 
     while (dup[i])
     {
-        jack_port_t *jack_port;
-
         if (dup[i] == ':')
         {
             modded_string = g_strndup (dup, i);
@@ -168,6 +155,118 @@ clear_tree_view (GtkWidget *view)
     return col;
 }
 
+static gint
+disconnect_jack_port (const gchar *path_str,
+                      gint         col_num,
+                      gpointer     user_data)
+{
+    GtkTreePath *path;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreeViewColumn *column;
+    GtkPassedJackPortsData *rdata;
+    gchar *from_port_str;
+    gchar *from_port_prefix;
+    gchar *full_from_port_str;
+    gchar *to_port_str;
+    gchar *to_port_prefix;
+    gchar *full_to_port_str;
+
+    gint status;
+
+    rdata = user_data;
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view));
+    path = gtk_tree_path_new_from_string (path_str);
+    from_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> from_audio)));
+    column = gtk_tree_view_get_column (GTK_TREE_VIEW (rdata -> view), col_num);
+    to_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> to_audio)));
+
+    gtk_tree_model_get_iter (model, &iter, path);
+    gtk_tree_model_get (model, &iter, 0, &from_port_str, -1);
+
+    full_from_port_str = g_strconcat (from_port_prefix,
+                                      ":",
+                                      from_port_str,
+                                      NULL);
+
+    to_port_str = g_strdup (gtk_tree_view_column_get_title (column));
+
+    full_to_port_str = g_strconcat (to_port_prefix,
+                                    ":",
+                                    to_port_str,
+                                    NULL);
+
+    status = jack_disconnect (rdata -> client,
+                              full_from_port_str,
+                              full_to_port_str);
+
+    g_free (full_from_port_str);
+    g_free (full_to_port_str);
+    g_free (to_port_str);
+    g_free (to_port_prefix);
+    g_free (from_port_prefix);
+    g_free (from_port_str);
+    gtk_tree_path_free (path);
+
+    return status;
+}
+
+static gint
+connect_jack_port (const gchar *path_str,
+                   gint         col_num,
+                   gpointer     user_data)
+{
+    GtkTreePath *path;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreeViewColumn *column;
+    GtkPassedJackPortsData *rdata;
+    gchar *from_port_str;
+    gchar *from_port_prefix;
+    gchar *full_from_port_str;
+    gchar *to_port_str;
+    gchar *to_port_prefix;
+    gchar *full_to_port_str;
+
+    gint status;
+
+    rdata = user_data;
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view));
+    path = gtk_tree_path_new_from_string (path_str);
+    from_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> from_audio)));
+    column = gtk_tree_view_get_column (GTK_TREE_VIEW (rdata -> view), col_num);
+    to_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> to_audio)));
+
+    gtk_tree_model_get_iter (model, &iter, path);
+    gtk_tree_model_get (model, &iter, 0, &from_port_str, -1);
+
+    full_from_port_str = g_strconcat (from_port_prefix,
+                                      ":",
+                                      from_port_str,
+                                      NULL);
+
+    to_port_str = g_strdup (gtk_tree_view_column_get_title (column));
+
+    full_to_port_str = g_strconcat (to_port_prefix,
+                                    ":",
+                                    to_port_str,
+                                    NULL);
+
+    status = jack_connect (rdata -> client,
+                           full_from_port_str,
+                           full_to_port_str);
+
+    g_free (full_from_port_str);
+    g_free (full_to_port_str);
+    g_free (to_port_str);
+    g_free (to_port_prefix);
+    g_free (from_port_prefix);
+    g_free (from_port_str);
+    gtk_tree_path_free (path);
+
+    return status;
+}
+
 static void
 toggled_cb (GtkCellRendererToggle *cell,
             gchar                 *path,
@@ -187,11 +286,6 @@ toggled_cb (GtkCellRendererToggle *cell,
     model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view));
     type = gtk_tree_model_get_column_type (model, column);
 
-    if (type == G_TYPE_BOOLEAN)
-    {
-        g_print ("It's of type gboolean: %d\n", column);
-    }
-
     gtk_tree_model_get_iter (model,
                              &iter,
                              gtk_tree_path_new_from_string (path));
@@ -201,16 +295,16 @@ toggled_cb (GtkCellRendererToggle *cell,
     if (toggled == FALSE)
     {
         toggled = TRUE;
-        g_print ("TRUE\n");
-        //gtk_cell_renderer_toggle_set_active (GTK_CELL_RENDERER_TOGGLE (cell),
-                                             //toggled);
+        connect_jack_port (path,
+                           column,
+                           rdata);
     }
     else
     {
         toggled = FALSE;
-        g_print ("FALSE\n");
-        //gtk_cell_renderer_toggle_set_active (GTK_CELL_RENDERER_TOGGLE (cell),
-                                             //toggled);
+        disconnect_jack_port (path,
+                              column,
+                              rdata);
     }
 
     gtk_list_store_set (GTK_LIST_STORE (model),
@@ -218,8 +312,6 @@ toggled_cb (GtkCellRendererToggle *cell,
                         column,
                         toggled,
                         -1);
-
-    g_print ("%s\n", path);
 }
 
 static gint
@@ -247,7 +339,7 @@ create_from_jack_port_filtered_model (const gchar **array,
 {
     /*
      * This will build the from ports part of the 'gtk_tree_model'
-     * or 'gtk_list_store'.
+     * or 'gtk_list_store' which will always be the first column.
      */
 
     GtkPassedJackPortsData *rdata;
@@ -265,9 +357,9 @@ create_from_jack_port_filtered_model (const gchar **array,
     {
         const gchar *jack_port_string;
 
-        jack_port_string = get_matched_gtk_jack_port (array[i],
-                                                      from_port_clicked,
-                                                      rdata -> client);
+        jack_port_string = get_matched_gtk_jack_port_prefix (array[i],
+                                                             from_port_clicked,
+                                                             rdata -> client);
 
         if (jack_port_string != NULL)
         {
@@ -286,6 +378,86 @@ create_from_jack_port_filtered_model (const gchar **array,
     jack_free (array);
 
     return 0;
+}
+
+static gboolean
+check_connections (const gchar *port_str,
+                   gpointer     user_data)
+{
+    GtkPassedJackPortsData *rdata;
+    GtkTreeModel *model;
+    gchar *from_port_prefix;
+    gchar *to_port_prefix;
+    gchar *short_port;
+    gchar *full_from_port;
+    gchar *full_to_port;
+    const gchar **connections;
+    GtkTreeIter iter;
+    gboolean check;
+    jack_port_t *port;
+    gint i;
+    gint j;
+    gint num_rows;
+
+    i = 0;
+    j = 0;
+    rdata = user_data;
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view));
+    from_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> from_audio)));
+    to_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> to_audio)));
+    full_to_port = g_strconcat (to_port_prefix, ":", port_str, NULL);
+    port = jack_port_by_name (rdata -> client , full_to_port);
+    connections = jack_port_get_all_connections (rdata -> client, port);
+    num_rows = gtk_tree_model_iter_n_children (model, NULL);
+
+    gtk_tree_model_get_iter_first (model, &iter);
+
+    for (i = 0; i < num_rows; i++)
+    {
+        gtk_tree_model_get (model, &iter, 0, &short_port, -1);
+        full_from_port = g_strconcat (from_port_prefix, ":", short_port, NULL);
+
+        if (connections == NULL)
+        {
+            g_free (full_from_port);
+            g_free (short_port);
+            g_free (full_to_port);
+            g_free (to_port_prefix);
+            g_free (from_port_prefix);
+
+            return FALSE;
+        }
+
+        /* Reinitialize 'j' to 0 so we won't exit function prematurely. */
+        j = 0;
+        while (connections[j])
+        {
+            if (g_strcmp0 (connections[j], full_from_port) == 0)
+            {
+                gtk_list_store_set (GTK_LIST_STORE (model),
+                                    &iter,
+                                    rdata -> col_num,
+                                    TRUE,
+                                    -1);
+
+                g_print ("Connected port: %s\n", connections[j]);
+            }
+
+            j++;
+        }
+
+        g_free (short_port);
+        g_free (full_from_port);
+
+        gtk_tree_model_iter_next (model, &iter);
+    }
+
+    g_free (full_to_port);
+    g_free (to_port_prefix);
+    g_free (from_port_prefix);
+    jack_free (connections);
+
+    return TRUE;
 }
 
 static gint
@@ -312,22 +484,23 @@ create_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
     rdata -> col_num = 1;
     to_port_clicked = gtk_label_get_text (GTK_LABEL (rdata -> to_audio));
 
-
-
     while (array[i])
     {
         const gchar *jack_port_string;
 
-        jack_port_string = get_matched_gtk_jack_port (array[i],
-                                                      to_port_clicked,
-                                                      rdata -> client);
+        jack_port_string = get_matched_gtk_jack_port_prefix (array[i],
+                                                             to_port_clicked,
+                                                             rdata -> client);
 
         if (jack_port_string != NULL)
         {
+            gboolean check;
+
             cell = gtk_cell_renderer_toggle_new ();
 
             gtk_cell_renderer_toggle_set_radio (GTK_CELL_RENDERER_TOGGLE (cell),
                                                 TRUE);
+
             gtk_cell_renderer_toggle_set_activatable (GTK_CELL_RENDERER_TOGGLE (cell),
                                                       TRUE);
 
@@ -336,6 +509,7 @@ create_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
                                                                "active",
                                                                rdata -> col_num,
                                                                NULL);
+
             /*
              * Setup 'cell' to be able to later confirm the column number
              * it's associated with.
@@ -343,7 +517,6 @@ create_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
             g_object_set_data (G_OBJECT (cell),
                                "column",
                                GUINT_TO_POINTER (rdata -> col_num));
-
 
             gtk_tree_model_get_iter_first (model, &iter);
 
@@ -355,6 +528,9 @@ create_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
 
             gtk_tree_view_append_column (GTK_TREE_VIEW (rdata -> view), column);
 
+            check_connections (jack_port_string,
+                               rdata);
+
             g_signal_connect (cell,
                               "toggled",
                               G_CALLBACK (toggled_cb),
@@ -365,6 +541,9 @@ create_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
 
         i++;
     }
+
+    /* Clean up. */
+    jack_free (array);
 
     return 0;
 }
@@ -474,9 +653,6 @@ create_audio_jack_ports_view (const gchar  *from_port_clicked,
                                         model,
                                         to_ports_array,
                                         rdata);
-
-    /* Clean up. */
-    jack_free (to_ports_array);
 
     g_print ("From audio action success\n");
 
@@ -783,7 +959,7 @@ jack_ports (GtkWidget *stack, jack_client_t *client)
     gtk_button_set_relief (GTK_BUTTON (midi_from_button), GTK_RELIEF_NONE);
     gtk_button_set_relief (GTK_BUTTON (midi_to_button), GTK_RELIEF_NONE);
 
-    gtk_label_set_angle (GTK_LABEL (pdata -> from_audio), 90);
+    //gtk_label_set_angle (GTK_LABEL (pdata -> from_audio), 90);
     gtk_label_set_single_line_mode (GTK_LABEL (pdata -> from_audio), TRUE);
 
     gtk_tree_view_set_grid_lines (GTK_TREE_VIEW (pdata -> view),
@@ -831,11 +1007,11 @@ jack_ports (GtkWidget *stack, jack_client_t *client)
 
     gtk_grid_attach (GTK_GRID (audio_grid),
                      pdata -> view,
-                     2, 2, 1, 1);
+                     1, 2, 1, 1);
 
     gtk_grid_attach (GTK_GRID (audio_grid),
                      pdata -> from_audio,
-                     0, 2, 1, 1);
+                     0, 1, 1, 1);
 
     gtk_grid_attach (GTK_GRID (audio_grid),
                      pdata -> to_audio,
