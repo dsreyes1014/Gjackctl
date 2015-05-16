@@ -26,3 +26,6 @@ GtkButton#clocksource-button > GtkLabel {
 }
 */
 
+GtkTreeViewColumn:hover {
+	color: blue;
+}

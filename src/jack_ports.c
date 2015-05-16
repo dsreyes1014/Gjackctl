@@ -26,6 +26,12 @@ struct _GtkPassedJackPortsData {
 static gchar **
 modified_ports_array (const gchar **ports_array)
 {
+    /*
+     * This function takes each jack port in the array and returns
+     * the prefix of the port only.  For example "system:capture_1",
+     * "system" will be sent back in the modified array.
+     */
+
     gchar **array;
     gchar *dup;
     gchar *modded_dup;
@@ -460,6 +466,20 @@ check_connections (const gchar *port_str,
     return TRUE;
 }
 
+static GtkWidget *
+create_label (const gchar *string)
+{
+    GtkWidget *label;
+
+    label = gtk_label_new (string);
+
+    gtk_label_set_angle (GTK_LABEL (label), 270);
+
+    gtk_widget_show_all (label);
+
+    return label;
+}
+
 static gint
 create_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
                                     GtkCellRenderer    *cell,
@@ -494,7 +514,9 @@ create_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
 
         if (jack_port_string != NULL)
         {
-            gboolean check;
+            GtkWidget *label;
+
+            label = create_label (jack_port_string);
 
             cell = gtk_cell_renderer_toggle_new ();
 
@@ -509,6 +531,11 @@ create_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
                                                                "active",
                                                                rdata -> col_num,
                                                                NULL);
+
+            gtk_tree_view_column_set_widget (column, label);
+            gtk_tree_view_column_set_fixed_width (column, 40);
+            gtk_tree_view_column_set_clickable (column, TRUE);
+            gtk_tree_view_column_set_alignment (column, 0.0);
 
             /*
              * Setup 'cell' to be able to later confirm the column number
@@ -914,6 +941,7 @@ midi_to_button_clicked_cb (GtkButton *button, gpointer user_data)
 gint
 jack_ports (GtkWidget *stack, jack_client_t *client)
 {
+    GtkWidget *sc_window;
     GtkWidget *notebook;
     GtkWidget *audio_grid;
     GtkWidget *midi_grid;
@@ -930,6 +958,7 @@ jack_ports (GtkWidget *stack, jack_client_t *client)
 
     pdata = g_slice_new (GtkPassedJackPortsData);
 
+    sc_window = gtk_scrolled_window_new (NULL, NULL);
     i = 0;
     j = 0;
     notebook = gtk_notebook_new ();
@@ -987,6 +1016,12 @@ jack_ports (GtkWidget *stack, jack_client_t *client)
                       G_CALLBACK (midi_to_button_clicked_cb),
                       pdata);
 
+    create_audio_jack_ports_view (gtk_label_get_text (GTK_LABEL (pdata -> from_audio)),
+                                  gtk_label_get_text (GTK_LABEL (pdata -> to_audio)),
+                                  pdata);
+
+    gtk_container_add (GTK_CONTAINER (sc_window), audio_grid);
+
     gtk_widget_set_margin_start (audio_from_button, 30);
 
     gtk_grid_attach (GTK_GRID (audio_grid),
@@ -1018,7 +1053,7 @@ jack_ports (GtkWidget *stack, jack_client_t *client)
                      1, 1, 1, 1);
 
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-                              audio_grid,
+                              sc_window,
                               audio_label);
 
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
