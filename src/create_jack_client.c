@@ -22,13 +22,11 @@ process_cb (jack_nframes_t nframes, gpointer user_data)
 static void
 jack_shutdown_cb (gpointer user_data)
 {
-    //exit (1);
-    //jack_client_t *client;
+    GtkPassedJackPortsData *rdata;
 
-    //client = user_data;
+    rdata = user_data;
 
-    //jack_deactivate (client);
-    //jack_client_close (client);   
+    g_slice_free (GtkPassedJackPortsData, rdata);
 }
 
 static gint
@@ -63,59 +61,40 @@ jack_client_init (GtkWidget *sw,
             --argument 4 'GtkWidget *level_bar' is declared in 'display.c'
     */
 
-    jack_client_t *client;
     jack_status_t status;
     gchar srate[10];
-    //const gchar **playback;
-    gint i;
+    GtkPassedJackPortsData *pdata;
 
-    //g_print ("create_jack_client.c: line 72\n");
-
+    pdata = g_slice_new (GtkPassedJackPortsData);
     sleep (1);
-    client = NULL;
-    i = 0;
-    client = jack_client_open ("gjackctl", 
-                               JackNoStartServer |
-                               JackUseExactName,
-                               &status);
+    pdata -> client = NULL;
+    pdata -> client = jack_client_open ("gjackctl",
+                                        JackNoStartServer |
+                                        JackUseExactName,
+                                        &status);
 
-    if (client == NULL)
+
+
+    if (pdata -> client == NULL)
     {
-        g_print ("'create_jack_client.c': Gjackctl client couldn't be created\n");
+        //g_print ("'create_jack_client.c': Gjackctl client couldn't be created\n");
 
         return -1;
     }
 
-    //g_print ("'create_jack_init.c': Gjackctl client created successfully\n.");
+    jack_set_process_callback (pdata -> client, process_cb, NULL);
+    jack_on_shutdown (pdata -> client, jack_shutdown_cb, pdata);
+    jack_set_sample_rate_callback (pdata -> client, srate_cb, label2);
 
-    //ports = g_slice_new (jack_port);
-    //ports -> in_port = jack_port_register (client, "capture", JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
-    //ports -> out_port = jack_port_register (client, "playback", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);      
+    jack_activate (pdata -> client);
 
-    //playback = jack_get_ports (client, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+    jack_ports (stack, pdata);
 
-    //ports = set_playback_ports (playback);
+    /* Function updates label to show cpu load. */
+    dsp_load (sw, label, pdata -> client, level_bar);
 
-    /*while (playback[i])
-    {
-        g_print ("create_jack_client.c: %s\n", playback[i]);
-
-        //alloc_port (playback[i]);
-        i++;
-    }*/
-
-    jack_set_process_callback (client, process_cb, NULL);
-    jack_on_shutdown (client, jack_shutdown_cb, client);
-    jack_set_sample_rate_callback (client, srate_cb, label2);
-
-    jack_activate (client); 
-
-    jack_ports (stack, client);
-
-    dsp_init (sw, label, client, level_bar); /* function updates label to show cpu load. */
-
-    g_sprintf (srate, "%d", jack_get_sample_rate (client));
-    gtk_label_set_text (GTK_LABEL (label2), g_strdup (srate));        
+    g_sprintf (srate, "%d", jack_get_sample_rate (pdata -> client));
+    gtk_label_set_text (GTK_LABEL (label2), g_strdup (srate));
 
     return 0;
 }

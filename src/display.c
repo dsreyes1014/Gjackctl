@@ -1,10 +1,16 @@
 #include "display.h"
 
 typedef struct _GtkPassedDisplayData GtkPassedDisplayData;
+typedef struct _GtkPassedPulseUpdate GtkPassedPulseUpdate;
 
 struct _GtkPassedDisplayData {
     GtkWidget *grid;
     GtkWidget *stack;
+};
+
+struct _GtkPassedPulseUpdate {
+    GtkWidget *sw;
+    GtkWidget *pbar;
 };
 
 static const gchar *
@@ -13,16 +19,38 @@ get_config_setting_string (const gchar *path)
     const gchar *string;
     config_t config;
     gchar *file;
+    const gchar *string_copy;
 
     file = g_strconcat (g_getenv ("HOME"), "/.config/gjackctl/gjackctl.conf", NULL);
     config_init (&config);
 
     config_read_file (&config, file);
     config_lookup_string (&config, path, &string);
+    string_copy = g_strdup (string);
     
+    /* Clean up after ourselves. */
     g_free (file);
+    config_destroy (&config);
 
-    return string;
+    return string_copy;
+}
+
+static gint
+clear_container (GtkWidget *container)
+{
+    GList *children, *iter;
+
+    children = gtk_container_get_children (GTK_CONTAINER (container));
+
+    for (iter = children; iter != NULL; iter = g_list_next (iter))
+    {
+        gtk_widget_destroy (iter -> data);
+    }
+
+    g_list_free (children);
+    g_list_free (iter);
+
+    return 0;
 }
 
 static gboolean
@@ -49,6 +77,8 @@ grid_on (GtkWidget *sw, GtkWidget *grid, gpointer user_data)
     label4a = gtk_label_new (get_config_setting_string ("gjackctl.driver.device"));
     level_bar = gtk_level_bar_new ();    
     rdata = user_data;
+
+    clear_container (grid);
     
     gtk_level_bar_set_min_value (GTK_LEVEL_BAR (level_bar), 0);
     gtk_level_bar_set_max_value (GTK_LEVEL_BAR (level_bar), 100);
@@ -63,10 +93,6 @@ grid_on (GtkWidget *sw, GtkWidget *grid, gpointer user_data)
     {
         return FALSE;
     }
-
-    
-    
-    g_print ("display.c: line 66\n");
 
     gtk_widget_set_tooltip_text (level_bar, "CPU Load");
 
@@ -113,43 +139,90 @@ grid_on (GtkWidget *sw, GtkWidget *grid, gpointer user_data)
     gtk_widget_set_margin_start (label2a, 4);
     gtk_widget_set_margin_start (labela, 4);
 
+    gtk_widget_set_vexpand (level_bar, TRUE);
+    gtk_widget_set_halign (level_bar, GTK_ALIGN_FILL);
+
     gtk_widget_show_all (grid);
 
     return TRUE;
 }
 
-static void
-grid_off (GtkWidget *stack, GtkWidget *grid, gpointer user_data)
+static gboolean
+pulse_timeout_cb (gpointer user_data)
 {
-    GList *children, *iter;
+    gboolean value;
+    GtkPassedPulseUpdate *rdata;
+
+    rdata = user_data;
+    value = gtk_switch_get_active (GTK_SWITCH (rdata -> sw));
+
+    if (value == TRUE)
+    {
+        g_slice_free (GtkPassedPulseUpdate, rdata);
+        return FALSE;
+    }
+    else
+    {
+        gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR (rdata -> pbar),
+                                         0.3);
+
+        gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR (rdata -> pbar), TRUE);
+        gtk_progress_bar_set_text (GTK_PROGRESS_BAR (rdata -> pbar),
+                                   "jackd not running");
+
+        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (rdata -> pbar));
+        return TRUE;
+    }
+}
+
+static void
+grid_off (GtkWidget *stack,
+          GtkWidget *grid,
+          GtkWidget *sw,
+          gpointer   user_data)
+{
     GtkPassedDisplayData *rdata;
     GtkWidget *stack_child;
+    GtkWidget *pbar;
+    GtkPassedPulseUpdate *pdata;
 
-    children = gtk_container_get_children (GTK_CONTAINER (grid));
+    pdata = g_slice_new (GtkPassedPulseUpdate);
     rdata = user_data;
+    pdata -> pbar = gtk_progress_bar_new ();
+    pdata -> sw = sw;
 
-    stack_child = gtk_stack_get_child_by_name (GTK_STACK (rdata -> stack), "ports");    
-    
-    for (iter = children; iter != NULL; iter = g_list_next (iter))
-    {
-        gtk_widget_destroy (iter -> data);
-    }
+    clear_container (grid);
 
-    g_list_free (children);
+    stack_child = gtk_stack_get_child_by_name (GTK_STACK (rdata -> stack),
+                                               "ports");
     
     if (stack_child != NULL)
     {
         gtk_widget_destroy (stack_child);
     }
+
+    gtk_grid_attach (GTK_GRID (grid),
+                     pdata -> pbar,
+                     0, 0, 1, 1);
+
+    /* Setting 'GtkProgressBar' attributes inside of 'GtkGrid'. */
+    gtk_widget_set_halign (pdata -> pbar, GTK_ALIGN_FILL);
+    gtk_widget_set_valign (pdata -> pbar, GTK_ALIGN_CENTER);
+    gtk_widget_set_hexpand (pdata -> pbar, TRUE);
+    gtk_widget_set_margin_start (pdata -> pbar, 80);
+    gtk_widget_set_margin_end (pdata -> pbar, 80);
+    gtk_widget_set_margin_top (pdata -> pbar, 40);
+
+    g_timeout_add (500, (GSourceFunc) pulse_timeout_cb, pdata);
 }
 
 static void
 switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 {
-    /* 
-        Here we destroy the 'GtkWidget *grid' passed through by the struct
-        and create a new one for on/off functionality.
-    */
+    /*
+     * Here we destroy the 'GtkWidget *grid' passed through by the struct
+     * and create a new one for on/off functionality.
+     */
      
     GtkWidget *stack_child;
     GtkPassedDisplayData *rdata;
@@ -164,7 +237,10 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 
         if (grid_on (GTK_WIDGET (sw), rdata -> grid, rdata) == FALSE)
         {
-            grid_off (rdata -> stack, rdata -> grid, rdata);
+            grid_off (rdata -> stack,
+                      rdata -> grid,
+                      GTK_WIDGET (sw),
+                      rdata);
         }
 
         gtk_stack_add_titled (GTK_STACK (rdata -> stack),
@@ -176,7 +252,10 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
     }
     else
     {
-        grid_off (rdata -> stack, rdata -> grid, rdata);
+        grid_off (rdata -> stack,
+                  rdata -> grid,
+                  GTK_WIDGET (sw),
+                  rdata);
     }
 
     gtk_widget_show_all (rdata -> grid);
@@ -201,15 +280,21 @@ display (GtkWidget *stack, GtkWidget *sw)
         grid_on (sw, grid, pdata);
         pdata -> grid = grid;
 
-        /* Here we remove the 'Ports' tab of our stack so that the 'Display'
-        tab our stack shows first. */ 
+        /*
+         * Here we remove the 'Ports' tab of our stack so that the 'Display'
+         * tab our stack shows first.
+         */
         stack_child = gtk_stack_get_child_by_name (GTK_STACK (stack), "ports");
         g_object_ref (stack_child);
         gtk_container_remove (GTK_CONTAINER (stack), stack_child); 
     }
 	else
     {
-        grid_off (pdata -> stack, grid, pdata);
+        grid_off (pdata -> stack,
+                  grid,
+                  sw,
+                  pdata);
+
         pdata -> grid = grid;
     }
 
@@ -225,8 +310,10 @@ display (GtkWidget *stack, GtkWidget *sw)
 
     if (stack_child != NULL)
     {
-        /* Here we add the 'Ports' tab of our stack back into the stack 
-        and 'unref' it so it will be released when our app is destroyed. */
+        /*
+         * Here we add the 'Ports' tab of our stack back into the stack
+         * and 'unref' it so it will be released when our app is destroyed.
+         */
         gtk_stack_add_titled (GTK_STACK (stack), stack_child, "ports", "Ports");
         g_object_unref (stack_child);
     }

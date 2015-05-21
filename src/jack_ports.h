@@ -4,11 +4,11 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include <jack/jack.h>
-#include <clutter/clutter.h>
-#include <clutter-gtk/clutter-gtk.h>
 
-gint 
-jack_ports (GtkWidget *stack, jack_client_t *client);
+#include "create_jack_client.h"
+
+gint
+jack_ports (GtkWidget *stack, gpointer user_data);
 
 #endif
 

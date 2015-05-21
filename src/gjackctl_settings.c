@@ -530,13 +530,13 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     port_max_item2 = g_menu_item_new ("256", NULL);
     port_max_item3 = g_menu_item_new ("512", NULL);
     port_max_item4 = g_menu_item_new ("1024", NULL);
-    sample_rate_item1 = g_menu_item_new ("22050", NULL);
-    sample_rate_item2 = g_menu_item_new ("32000", NULL);
-    sample_rate_item3 = g_menu_item_new ("44100", NULL);
-    sample_rate_item4 = g_menu_item_new ("48000", NULL);
-    sample_rate_item5 = g_menu_item_new ("88200", NULL);
-    sample_rate_item6 = g_menu_item_new ("96000", NULL);
-    sample_rate_item7 = g_menu_item_new ("192000", NULL);
+    sample_rate_item1 = g_menu_item_new ("22.1kHz", NULL);
+    sample_rate_item2 = g_menu_item_new ("32kHz", NULL);
+    sample_rate_item3 = g_menu_item_new ("44.1kHz", NULL);
+    sample_rate_item4 = g_menu_item_new ("48kHz", NULL);
+    sample_rate_item5 = g_menu_item_new ("88.2kHz", NULL);
+    sample_rate_item6 = g_menu_item_new ("96kHz", NULL);
+    sample_rate_item7 = g_menu_item_new ("192kHz", NULL);
     frames_item1 = g_menu_item_new ("16", NULL);
     frames_item2 = g_menu_item_new ("32", NULL);
     frames_item3 = g_menu_item_new ("64", NULL);
@@ -606,13 +606,13 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                                              g_variant_new_string ("44100"));
     g_menu_item_set_action_and_target_value (sample_rate_item4,
                                              "settings.sample-rate",
-                                             g_variant_new_string ("48000")); 
+                                             g_variant_new_string ("48000"));
     g_menu_item_set_action_and_target_value (sample_rate_item5,
                                              "settings.sample-rate",
-                                             g_variant_new_string ("88200")); 
+                                             g_variant_new_string ("88200"));
     g_menu_item_set_action_and_target_value (sample_rate_item6,
                                              "settings.sample-rate",
-                                             g_variant_new_string ("96000")); 
+                                             g_variant_new_string ("96000"));
     g_menu_item_set_action_and_target_value (sample_rate_item7,
                                              "settings.sample-rate",
                                              g_variant_new_string ("192000"));

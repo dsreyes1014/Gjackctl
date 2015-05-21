@@ -12,7 +12,7 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
 {
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "display") == 0)
     {
-        gtk_window_resize (GTK_WINDOW (user_data), 650, 250);
+        gtk_window_resize (GTK_WINDOW (user_data), 650, 200);
     }
    
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "log") == 0)
@@ -22,7 +22,7 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
     
     if (g_strcmp0 (gtk_stack_get_visible_child_name (GTK_STACK (stack)), "ports") == 0)
     {
-        gtk_window_resize (GTK_WINDOW (user_data), 750, 500);
+        gtk_window_resize (GTK_WINDOW (user_data), 650, 400);
     }
 }
 
@@ -108,11 +108,13 @@ run_app_cb (GApplication *app, gpointer data)
 	
 	/* Set `GtkHeaderBar *head_bar` as titlebar. */
 	gtk_window_set_titlebar (GTK_WINDOW (main_window), header_bar);
-	gtk_window_set_default_size (GTK_WINDOW (main_window), 600, 220);
+	gtk_window_set_default_size (GTK_WINDOW (main_window), 650, 200);
 
 	gtk_container_add (GTK_CONTAINER (main_window), stack);	
 
-	/* Position `window` to show wherever current mouse position is located. */	
+    //gtk_window_set_resizable (GTK_WINDOW (main_window), FALSE);
+
+	/* Position `window` to show wherever current mouse position is located. */
 	gtk_window_set_position (GTK_WINDOW (main_window), GTK_WIN_POS_MOUSE);
 
     g_signal_connect (stack,

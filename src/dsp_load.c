@@ -10,10 +10,13 @@ struct _GtkPassedDspData {
 };
 
 static gboolean
-dsp_load (gpointer user_data)
+dsp_timeout_cb (gpointer user_data)
 {
-	/* Function that shows cpu load. Have to make `GJackCtl` a JACK
-	client in order to see cpu usage. */
+    /*
+     * Function that shows cpu load. Have to make `GJackCtl` a JACK
+     * client in order to see cpu usage.
+     */
+
 	gchar pid_string[6];
     GtkPassedDspData *rdata;
 
@@ -24,8 +27,6 @@ dsp_load (gpointer user_data)
         g_slice_free (GtkPassedDspData, rdata);
 
 		return FALSE;
-
-        
 	}
 	else
 	{		
@@ -34,7 +35,7 @@ dsp_load (gpointer user_data)
         gchar *label_dsp;
 		
 		dsp = jack_cpu_load (rdata -> client);	
-		g_sprintf (print_dsp, "%.2f%", dsp);
+		g_sprintf (print_dsp, "%.2f", dsp);
         label_dsp = g_strconcat (print_dsp, "%", NULL);
 		gtk_label_set_text (GTK_LABEL (rdata -> label), label_dsp);
         gtk_level_bar_set_value (GTK_LEVEL_BAR (rdata -> level_bar), dsp);
@@ -46,7 +47,10 @@ dsp_load (gpointer user_data)
 }
 
 void
-dsp_init (GtkWidget *sw, GtkWidget *label, jack_client_t *client, GtkWidget *level_bar)
+dsp_load (GtkWidget     *sw,
+          GtkWidget     *label,
+          jack_client_t *client,
+          GtkWidget     *level_bar)
 {
     GtkPassedDspData *pdata;
 
@@ -57,5 +61,5 @@ dsp_init (GtkWidget *sw, GtkWidget *label, jack_client_t *client, GtkWidget *lev
     pdata -> label = label;
     pdata -> level_bar = level_bar;
 
-    g_timeout_add (1000, (GSourceFunc) dsp_load, pdata);
+    g_timeout_add (1000, (GSourceFunc) dsp_timeout_cb, pdata);
 }

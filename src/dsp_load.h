@@ -13,6 +13,9 @@
 #include "jack_server_init.h"
 
 void
-dsp_init (GtkWidget *sw, GtkWidget *label, jack_client_t *client, GtkWidget *level_bar);
+dsp_load (GtkWidget     *sw,
+          GtkWidget     *label,
+          jack_client_t *client,
+          GtkWidget     *level_bar);
 
 #endif
