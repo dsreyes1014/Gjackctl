@@ -10,6 +10,7 @@ EXTRA_DIST = \
 bin_PROGRAMS = gjackctl
 gjackctl_SOURCES = \
     src/main.c \
+	src/main.h \
     src/server_switch.c \
     src/server_switch.h \
     src/alsa_device_names.c \
@@ -71,16 +72,12 @@ gjackctl_SOURCES = \
 
 gjackctl_CFLAGS = \
     $(GTK3_CFLAGS) \
-    $(CLUTTER_CFLAGS) \
-    $(CLUTTER_GTK_CFLAGS) \
     $(JACK1_CFLAGS) \
     $(LIBCONFIG_CFLAGS) \
     $(ALSA_CFLAGS)
 
 gjackctl_LDADD = \
     $(GTK3_LIBS) \
-    $(CLUTTER_LIBS) \
-    $(CLUTTER_GTK_LIBS) \
     $(JACK1_LIBS) \
     $(LIBCONFIG_LIBS) \
     $(ALSA_LIBS)
