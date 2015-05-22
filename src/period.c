@@ -5,6 +5,7 @@ get_period ()
 {
     const gchar *period;
     gchar *file;
+    const gchar *copy;
     config_t config;
 
     config_init (&config);
@@ -15,7 +16,11 @@ get_period ()
     config_read_file (&config, file);
     config_lookup_string (&config, "gjackctl.driver.period", &period);
 
-    return period;
+    copy = g_strdup (period);
+    g_free (file);
+    config_destroy (&config);
+
+    return copy;
 }
 
 static void

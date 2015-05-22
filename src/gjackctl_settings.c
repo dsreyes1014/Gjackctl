@@ -1,11 +1,5 @@
 #include "gjackctl_settings.h"
 
-typedef struct 
-{
-	GtkWidget *window;
-	GtkApplication *app;
-}GtkSettingsPassedData;
-
 static void
 close_period_window_cb (GtkWidget *widget,
                         GdkEvent  *event,
@@ -107,7 +101,7 @@ period_size_cb (GSimpleAction *simple,
     GtkWidget *grid;
     GtkWidget *spin_button;
     GtkAdjustment *adjustment;
-    GtkSettingsPassedData *rdata;
+    GtkPassedMainData *rdata;
     gint num;
 
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -144,7 +138,7 @@ activate_priority_cb (GSimpleAction *simple,
     GtkWidget *grid;
     GtkWidget *spin_button;
     GtkAdjustment *adjustment;
-    GtkSettingsPassedData *rdata;
+    GtkPassedMainData *rdata;
     gint num;
 
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -321,7 +315,7 @@ popover_destroy_cb (GtkWidget *popover,
 static void
 gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 {	
-    GtkSettingsPassedData *rdata;
+    GtkPassedMainData *rdata;
 
     rdata = user_data;
 
@@ -965,26 +959,19 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
 }
 
 void
-gjackctl_settings (GtkWidget *window,
-                   GtkApplication *app,
-                   GtkWidget *header_bar)
+gjackctl_settings (GtkPassedMainData *pdata)
 {
 	GtkWidget *settings_button;
 	GtkWidget *gear;
-	GtkSettingsPassedData *pdata;
 
-	pdata = g_slice_new (GtkSettingsPassedData);
-
-	pdata -> window = window;
-	pdata -> app = app;
 	settings_button = gtk_button_new ();
 	gear = gtk_image_new_from_file ("/usr/share/icons/Adwaita/scalable/actions/open-menu-symbolic.svg");
 
 	gtk_widget_set_size_request (settings_button, 30, 34);
 	gtk_widget_set_tooltip_text (settings_button, "Settings");
 	gtk_button_set_image (GTK_BUTTON (settings_button), gear);
-	
-	gtk_header_bar_pack_end (GTK_HEADER_BAR (header_bar), settings_button);
+
+	gtk_header_bar_pack_end (GTK_HEADER_BAR (pdata -> header_bar), settings_button);
 
 	g_signal_connect (settings_button, 
 					  "clicked", 

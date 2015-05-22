@@ -1,29 +1,8 @@
 #include "config_file_input.h"
 
-/*void
-config_file_input (gchar **argv, gint argc)
-{
-	gchar file[128];	
-	gint i;
-	FILE *jackdrc;
-	
-	g_sprintf (file, "%s/.jackdrc", g_getenv ("HOME"));
-
-	jackdrc = g_fopen (file, "w+");
-
-	for (i = 0; i < argc; i++)
-	{
-		g_fprintf (jackdrc, "%s ", argv[i]);
-	}
-		
-	fclose (jackdrc);
-
-	g_strfreev (argv);
-}*/
-
-gint 
-config_file_input (const gchar *config_path, 
-                   gint type, 
+gint
+config_file_input (const gchar *config_path,
+                   gint type,
                    gpointer user_data)
 {
 	gchar config_file[128];
@@ -32,7 +11,7 @@ config_file_input (const gchar *config_path,
 
 	g_sprintf (config_file,
                "%s/.config/gjackctl/gjackctl.conf",
-               g_getenv ("HOME"));	
+               g_getenv ("HOME"));
 
 	config_init (&config);
 	config_read_file (&config, config_file);
@@ -73,7 +52,6 @@ config_file_input (const gchar *config_path,
 	config_set_tab_width (&config, 4);
 	config_write_file (&config, config_file);
 	config_destroy (&config);
-    //g_free (config_path);
 
 	return 0;
 }

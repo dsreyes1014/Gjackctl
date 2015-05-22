@@ -7,8 +7,9 @@
 #include "dsp_load.h"
 #include "create_jack_client.h"
 #include "jack_ports.h"
+#include "main.h"
 
 void
-display (GtkWidget *stack, GtkWidget *sw);
+display (GtkPassedMainData *pdata);
 
 #endif

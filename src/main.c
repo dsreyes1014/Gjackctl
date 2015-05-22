@@ -1,11 +1,4 @@
-#include <config.h>
-#include <gtk/gtk.h>
-#include <jack/jack.h>
-
-#include "server_switch.h"
-#include "display.h"
-#include "jack_log.h"
-#include "config_file_init.h"
+#include "main.h"
 
 static void
 visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
@@ -26,6 +19,7 @@ visible_child_cb (GtkWidget *stack, GParamSpec *pspec, gpointer user_data)
     }
 }
 
+/*
 static void
 apply_theme ()
 {
@@ -58,74 +52,82 @@ apply_theme ()
 
         g_object_unref (file);
     }
-}
+}*/
 
 static void
 run_app_cb (GApplication *app, gpointer data)
 {
-	GtkWidget *main_window;	
-	GtkWidget *header_bar;
-	GtkWidget *stack;
-    GtkWidget *text;
-    GtkWidget *sswitcher;	
-    GtkWidget *sw;
+    GtkPassedMainData *pdata;
 
-	main_window = gtk_application_window_new (GTK_APPLICATION (app));
-	stack = gtk_stack_new ();
-	header_bar = gtk_header_bar_new ();
-    sw = gtk_switch_new ();    
-    text = gtk_text_view_new ();
-    sswitcher = gtk_stack_switcher_new ();
-    
-    gtk_stack_set_homogeneous (GTK_STACK (stack), FALSE);
+    pdata = g_slice_new (GtkPassedMainData);
+	pdata -> window = gtk_application_window_new (GTK_APPLICATION (app));
 
+    /*
+     * Initialize our widgets here so we can manipulate from
+     * different modules of our app.
+     */
+	pdata -> stack = gtk_stack_new ();
+	pdata -> header_bar = gtk_header_bar_new ();
+    pdata -> sw = gtk_switch_new ();
+    pdata -> text = gtk_text_view_new ();
+    pdata -> sswitcher = gtk_stack_switcher_new ();
+
+    gtk_stack_set_homogeneous (GTK_STACK (pdata -> stack), FALSE);
+
+    /*
+     * This function will setup our config file preset with some defaults.
+     * Call this first as some of our modules need this config file to
+     * reference certain jackd settings.
+     */
 	config_file_init ();
-    
-	server_switch (main_window, 
-                   text,
-                   GTK_APPLICATION (app),
-                   header_bar,
-                   sw);
 
-    display (stack, sw);
-    jack_log (stack, text);
-    apply_theme ();
+	server_switch (pdata);
+    gjackctl_settings (pdata);
+    display (pdata);
+    jack_log (pdata -> stack, pdata -> text);
 
-    
+    //apply_theme ();
+
     g_object_set (gtk_settings_get_default (),
                   "gtk-application-prefer-dark-theme",
                   TRUE,
-                  NULL);    
+                  NULL);
 
-	//gtk_header_bar_set_title (GTK_HEADER_BAR (header_bar), "GJackCtl");
-	gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);
-	gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (header_bar), ":close");
+	gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (pdata -> header_bar),
+                                          TRUE);
 
-    gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER (sswitcher),
-                                  GTK_STACK (stack));
+	gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (pdata -> header_bar),
+                                          ":close");
 
-	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);
-	
-	/* Set `GtkHeaderBar *head_bar` as titlebar. */
-	gtk_window_set_titlebar (GTK_WINDOW (main_window), header_bar);
-	gtk_window_set_default_size (GTK_WINDOW (main_window), 650, 200);
+    gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER (pdata -> sswitcher),
+                                  GTK_STACK (pdata -> stack));
 
-	gtk_container_add (GTK_CONTAINER (main_window), stack);	
+	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (pdata -> header_bar),
+                                     pdata -> sswitcher);
+
+	/* Set 'GtkHeaderBar *head_bar' as titlebar. */
+	gtk_window_set_titlebar (GTK_WINDOW (pdata -> window), pdata -> header_bar);
+	gtk_window_set_default_size (GTK_WINDOW (pdata -> window), 650, 200);
+
+	gtk_container_add (GTK_CONTAINER (pdata -> window), pdata -> stack);
 
     //gtk_window_set_resizable (GTK_WINDOW (main_window), FALSE);
 
-	/* Position `window` to show wherever current mouse position is located. */
-	gtk_window_set_position (GTK_WINDOW (main_window), GTK_WIN_POS_MOUSE);
+    /*
+     * Position 'window' to show wherever current mouse position is located.
+     * Does not work for Wayland backend.
+     */
+	gtk_window_set_position (GTK_WINDOW (pdata -> window), GTK_WIN_POS_MOUSE);
 
-    g_signal_connect (stack,
+    g_signal_connect (pdata -> stack,
                       "notify::visible-child-name",
                       G_CALLBACK (visible_child_cb),
-                      main_window);
+                      pdata -> window);
 
-	gtk_widget_show_all (main_window);
+	gtk_widget_show_all (pdata -> window);
 }
 
-int 
+gint
 main (int argc, char *argv[])
 {
 	GtkApplication *app;

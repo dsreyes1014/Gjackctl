@@ -19,10 +19,9 @@
 #include "toggle_verbose.h"
 #include "alsa_device_names.h"
 #include "period.h"
+#include "main.h"
 
 void
-gjackctl_settings (GtkWidget *window,
-                   GtkApplication *app,
-                   GtkWidget *header_bar);
+gjackctl_settings (GtkPassedMainData *pdata);
 
 #endif

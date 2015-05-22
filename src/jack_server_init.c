@@ -6,10 +6,11 @@ typedef struct _GtkPassedServerData {
 } GtkPassedServerData;
 
 /*
-    This struct is used to pass data 
-    through to the 'void suprocess2_pipe_cb ()'
-    function.
-*/
+ * This struct is used to pass data
+ * through to the 'void suprocess2_pipe_cb ()'
+ * function.
+ */
+
 typedef struct _GtkPassedServerData2 {
     gchar pbuffer2[2048];
     GtkWidget *psw;
@@ -453,6 +454,8 @@ jack_server_init (GtkWidget *sw,
     {
         return -1;
     }
+
+    g_strfreev (argv);
 
 	return 0;
 }

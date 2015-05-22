@@ -444,12 +444,22 @@ check_connections (GtkWidget   *view,
         rdata -> port_type == GTK_JACK_PORT_AUDIO_TO)
     {
         model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view));
+
+        if (model == NULL)
+        {
+            g_print ("GTK_CRITICAL: GtkTreeModel is NULL\n");
+        }
         from_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> from_audio)));
         to_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> to_audio)));
     }
     else
     {
         model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view2));
+
+        if (model == NULL)
+        {
+            g_print ("GTK_CRITICAL: GtkTreeModel is NULL\n");
+        }
         from_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> from_midi)));
         to_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> to_midi)));
     }

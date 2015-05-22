@@ -5,7 +5,6 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 
-#include "server_switch.h"
 #include "dsp_load.h"
 #include "get_jack_gpid.h"
 
