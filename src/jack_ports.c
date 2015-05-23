@@ -651,11 +651,12 @@ get_model (GtkWidget     *view,
 
     if (model != NULL)
     {
-        gtk_list_store_clear (GTK_LIST_STORE (model));
+        //gtk_list_store_clear (GTK_LIST_STORE (model));
         clear_tree_view (view);
+        gtk_tree_view_set_model (GTK_TREE_VIEW (view), NULL);
     }
-    else
-    {
+
+
         num_col = get_n_columns (array);
 
         /* Here we dynamically create an array for the 'GType *types'. */
@@ -683,7 +684,7 @@ get_model (GtkWidget     *view,
         g_object_unref (store);
 
         model = gtk_tree_view_get_model (GTK_TREE_VIEW (view));
-    }
+
 
     return model;
 }
