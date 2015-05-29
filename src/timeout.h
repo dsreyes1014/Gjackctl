@@ -8,9 +8,6 @@
 #include "label_toggle_attr.h"
 
 void
-timeout (GtkWidget *box, GtkWidget *button);
-
-const gchar *
-get_timeout ();
+timeout (GtkWidget *grid);
 
 #endif

@@ -11,9 +11,6 @@
 #include "label_toggle_attr.h"
 
 void
-toggle_verbose (GtkWidget *box, GtkWidget *button);
-
-gboolean
-get_verbose ();
+toggle_verbose (GtkWidget *grid);
 
 #endif

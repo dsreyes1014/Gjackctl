@@ -1,77 +1,88 @@
 #include "server_name.h"
 
 static const gchar *
-get_name (config_t config)
+get_server_name ()
 {
-	const gchar *name;
-	gchar config_file[128];
+    const gchar *string;
+    const gchar *copy;
+    gchar *file;
+    config_t config;
 
-	g_sprintf (config_file, "%s/.config/gjackctl/gjackctl.conf", g_getenv ("HOME"));
+    file = g_strconcat (g_getenv ("HOME"),
+                        "/.config/gjackctl/gjackctl.conf",
+                        NULL);
 
-	config_init (&config);
-	config_read_file (&config, config_file);
-	
-	config_lookup_string (&config, "gjackctl.server.name", &name);
+    config_init (&config);
+    config_read_file (&config, file);
+    if (config_lookup_string (&config, "gjackctl.server.name", &string) == CONFIG_FALSE)
+    {
+        gchar *value_copy;
+        config_setting_t *group;
+        config_setting_t *setting;
 
-	if (name == NULL)
-	{
-		config_destroy (&config);
+        g_print ("\'Timeout\' config option not available\n");
+        g_print ("Creating config setting now...\n");
 
-		return NULL;
-	}
+        value_copy = g_strdup ("500");
+        group = config_lookup (&config, "gjackctl.server");
+        setting = config_setting_add (group, "name", CONFIG_TYPE_STRING);
+        config_setting_set_string (setting, value_copy);
+        config_write_file (&config, file);
+        string = g_strdup (value_copy);
+        g_free (value_copy);
+    }
 
-	return name;
+    copy = g_strdup (string);
+    g_free (file);
+    config_destroy (&config);
+
+    return copy;
 }
 
-static void
-button_clicked_cb (GtkButton *button, gpointer user_data)
+static gboolean
+focus_out_event_cb (GtkWidget *widget,
+                    GdkEvent  *event,
+                    gpointer   user_data)
 {
-	GtkWidget *entry;
+    config_file_input ("gjackctl.server.name",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) gtk_entry_get_text (GTK_ENTRY (widget)));
 
-	entry = user_data;
-
-	config_file_input ("gjackctl.server.name", 
-                       CONFIG_TYPE_STRING, 
-                       (gpointer) gtk_entry_get_text (GTK_ENTRY (entry)));
+    return FALSE;
 }
 
 void
-server_name (GtkWidget *box, GtkWidget *button)
+server_name (GtkWidget *grid)
 {
-	/* This gets called from `gjackctl_setings_cb` that's in the 
-	`gjackctl_settings.c` module. */
-
     GtkWidget *label;
 	GtkWidget *entry;
-    GtkWidget *child_box;
 	const gchar *name;
-	config_t config;
 
     label = gtk_label_new ("Name");
-	entry = gtk_entry_new ();	
-	name = get_name (config);
-    child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-	
-	if (!name)
-	{
-		config_destroy (&config);
-	}
-	
-    gtk_entry_set_text (GTK_ENTRY (entry), name);	
+	entry = gtk_entry_new ();
+	name = get_server_name ();
+
+    gtk_entry_set_text (GTK_ENTRY (entry), name);
     gtk_entry_set_placeholder_text (GTK_ENTRY (entry), "default");
 
-	gtk_widget_set_tooltip_text (entry, "Enter the name of the JACK server");	
-	//gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
+	gtk_widget_set_tooltip_text (entry, "Enter the name of the JACK server");
 
-    gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (child_box), entry, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (box), child_box, FALSE, FALSE, 2);
+    gtk_grid_attach (GTK_GRID (grid),
+                     label,
+                     0, 0, 1, 1);
 
+    gtk_grid_attach_next_to (GTK_GRID (grid),
+                             entry,
+                             label,
+                             GTK_POS_RIGHT,
+                             1, 1);
+
+    //gtk_widget_set_margin_top (label, 10);
     gtk_widget_set_halign (label, GTK_ALIGN_START);
-    gtk_widget_set_halign (entry, GTK_ALIGN_START);
-    gtk_widget_set_margin_start (label, 20);
+    //gtk_widget_set_margin_start (label, 10);
     gtk_widget_set_margin_start (entry, 20);
-    gtk_widget_set_margin_top (label, 30);
+    //gtk_widget_set_margin_top (entry, 10);
+    gtk_widget_set_halign (entry, GTK_ALIGN_FILL);
 
-	g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), entry);
+    g_signal_connect (entry, "focus-out-event", G_CALLBACK (focus_out_event_cb), NULL);
 }

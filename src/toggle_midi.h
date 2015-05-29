@@ -4,13 +4,9 @@
 #include <gtk/gtk.h>
 #include <libconfig.h>
 
-#include "label_toggle_attr.h"
 #include "config_file_input.h"
 
 void
-toggle_midi (GtkWidget *box, GtkWidget *button);
-
-gboolean
-get_midi ();
+toggle_midi (GtkWidget *grid);
 
 #endif

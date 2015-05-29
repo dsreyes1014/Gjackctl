@@ -10,9 +10,6 @@
 #include "config_file_input.h"
 
 void
-rt_priority (GtkWidget *box, GtkWidget *button);
-
-const gchar *
-get_priority ();
+rt_priority (GtkWidget *grid);
 
 #endif

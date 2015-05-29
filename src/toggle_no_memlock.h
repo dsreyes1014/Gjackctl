@@ -9,9 +9,6 @@
 #include "label_toggle_attr.h"
 
 void
-toggle_no_memlock (GtkWidget *box, GtkWidget *button);
-
-gboolean
-get_no_memlock ();
+toggle_no_memlock (GtkWidget *grid);
 
 #endif

@@ -13,9 +13,6 @@
 //extern GtkWidget *popover;
 
 void
-sample_rate (GtkWidget *box, GtkWidget *button);
-
-const gchar *
-get_sample_rate ();
+sample_rate (GtkWidget *grid);
 
 #endif

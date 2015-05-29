@@ -29,9 +29,7 @@ alsa_device_names (GMenu *submenu)
 {
 	/* Fetch ALSA device names for menu selection */
 
-    GMenu *alsa_section;
-    
-	gint err;	
+	gint err;
 	gint card;
 	gint count;
 	
@@ -39,10 +37,8 @@ alsa_device_names (GMenu *submenu)
 	snd_ctl_card_info_t *info;
 
 	card = -1;
-	count = 0;	
-    alsa_section = g_menu_new ();
+	count = 0;
 
-		
 	/* First loop to obtain count of available cards */
 	for (;;)
 	{			
@@ -136,63 +132,47 @@ alsa_device_names (GMenu *submenu)
 			case 0:
 				id = g_variant_new_string (card_id);
 				item = g_menu_item_new (card_name, NULL);
-				g_menu_item_set_action_and_target_value (item, "settings.alsa", id);
-				g_menu_insert_item (alsa_section, 0, item);
+				g_menu_item_set_action_and_target_value (item, "driver.alsa", id);
+				g_menu_insert_item (submenu, 0, item);
 				break;		
 			case 1:
 				id = g_variant_new_string (card_id);
 				item = g_menu_item_new (card_name, NULL);
-				g_menu_item_set_action_and_target_value (item, "settings.alsa", id);
-				g_menu_insert_item (alsa_section, 1, item);
-                //*id_list = g_slist_prepend (*id_list, card_id);
-                //*name_list = g_slist_prepend (*name_list, card_name);
+				g_menu_item_set_action_and_target_value (item, "driver.alsa", id);
+				g_menu_insert_item (submenu, 1, item);
 				break;
 			case 2:
 				id = g_variant_new_string (card_id);
 				item = g_menu_item_new (card_name, NULL);
-				g_menu_item_set_action_and_target_value (item, "settings.alsa", id);
-				g_menu_insert_item (alsa_section, 2, item);
-                //*id_list = g_slist_prepend (*id_list, card_id);
-                //*name_list = g_slist_prepend (*name_list, card_name);
-				break;		
+				g_menu_item_set_action_and_target_value (item, "driver.alsa", id);
+				g_menu_insert_item (submenu, 2, item);
+				break;
 			case 3:
 				id = g_variant_new_string (card_id);
 				item = g_menu_item_new (card_name, NULL);
-				g_menu_item_set_action_and_target_value (item, "settings.alsa", id);
-				g_menu_insert_item (alsa_section, 3, item);
-                //*id_list = g_slist_prepend (*id_list, card_id);
-                //*name_list = g_slist_prepend (*name_list, card_name);
+				g_menu_item_set_action_and_target_value (item, "driver.alsa", id);
+				g_menu_insert_item (submenu, 3, item);
 				break;
 			case 4:
 				id = g_variant_new_string (card_id);
 				item = g_menu_item_new (card_name, NULL);
-				g_menu_item_set_action_and_target_value (item, "settings.alsa", id);
-				g_menu_insert_item (alsa_section, 4, item);
-                //*id_list = g_slist_prepend (*id_list, card_id);
-                //*name_list = g_slist_prepend (*name_list, card_name);
+				g_menu_item_set_action_and_target_value (item, "driver.alsa", id);
+				g_menu_insert_item (submenu, 4, item);
 				break;
 			case 5:
 				id = g_variant_new_string (card_id);
 				item = g_menu_item_new (card_name, NULL);
-				g_menu_item_set_action_and_target_value (item, "settings.alsa", id);
-				g_menu_insert_item (alsa_section, 5, item);
-                //*id_list = g_slist_prepend (*id_list, card_id);
-                //*name_list = g_slist_prepend (*name_list, card_name);
+				g_menu_item_set_action_and_target_value (item, "driver.alsa", id);
+				g_menu_insert_item (submenu, 5, item);
 				break;
 			case 6:
 				id = g_variant_new_string (card_id);
 				item = g_menu_item_new (card_name, NULL);
-				g_menu_item_set_action_and_target_value (item, "settings.alsa", id);
-				g_menu_insert_item (alsa_section, 6, item);
-                //*id_list = g_slist_prepend (*id_list, card_id);
-                //*name_list = g_slist_prepend (*name_list, card_name);
+				g_menu_item_set_action_and_target_value (item, "driver.alsa", id);
+				g_menu_insert_item (submenu, 6, item);
 				break;
 			default:
 				g_print ("There are only %d alsa devices.\n", card);
 		}
 	}	
-    g_menu_insert_section (submenu,
-                           0,
-                           "ALSA",
-                           G_MENU_MODEL (alsa_section));
 }

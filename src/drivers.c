@@ -1,83 +1,61 @@
 #include "drivers.h"
 
-/*const GActionEntry entries[] =
-	{
-		{"print_alsa_driver", print_alsa_driver_activate_cb, "s"}
-	};*/
-
-static void
-button_clicked_cb (GtkButton *button, gpointer user_data)
-{
-    GtkPassedDriverData *rdata;
-   
-    rdata = user_data;
-
-    config_file_input ("gjackctl.driver.type",
-                       CONFIG_TYPE_STRING,
-                       (gpointer) gtk_button_get_label (GTK_BUTTON (rdata -> pbutton)));
-
-    config_file_input ("gjackctl.driver.device",
-                       CONFIG_TYPE_STRING,
-                       (gpointer) gtk_label_get_text (GTK_LABEL (rdata -> label))); 
-}
-
-static void
-popover_button_clicked_cb (GtkWidget *button, GdkEvent *event, gpointer user_data)
-{
-	/* Creates popover menu for drivers button. */
-
-	GtkWidget *popover;	
-	GMenu *menu;  
-	GMenu *submenu;
-	GMenu *section; 
-	GMenuItem *item1;
-	
-	/* `menu` is the main menu which is a subclass of `GMenuModel`. 
-	All `GMenus` are. */
-	menu = g_menu_new ();	
-	section = g_menu_new ();	
-	submenu = g_menu_new ();
-	item1 = g_menu_item_new ("Dummy", NULL);
-	
-	//alsa_device_names (submenu);	
-		
-	/* Creates a submenu from an item in `section`. `GMenu submenu` 
-	is declared in `alsa_device_names.h` */
-	g_menu_insert_submenu (section, 0, "ALSA", G_MENU_MODEL (submenu));
-	g_menu_insert_item (section, 1, item1);
-	
-	/* Creates the first section of `menu` which labels drivers */
-	g_menu_insert_section (menu, 0, "Driver", G_MENU_MODEL (section));
-
-	popover = gtk_popover_new_from_model (button, G_MENU_MODEL (menu));	
-
-	gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_RIGHT);
-	gtk_popover_set_modal (GTK_POPOVER (popover), TRUE);
-	
-	gtk_widget_show_all (popover);
-} 
-
 static const gchar *
-get_driver_type (config_t config)
+get_driver_type ()
 {
     const gchar *string;
+    gchar *copy;
     gchar *file;
+    config_t config;
+    gint i;
 
+    i = 0;
     file = g_strconcat (g_getenv ("HOME"),
                         "/.config/gjackctl/gjackctl.conf",
                         NULL);
 
     config_init (&config);
     config_read_file (&config, file);
-    config_lookup_string (&config, "gjackctl.driver.type", &string);
-    
-    return string;
+    if (config_lookup_string (&config, "gjackctl.driver.type", &string) == CONFIG_FALSE)
+    {
+        gchar *value_copy;
+        config_setting_t *group;
+        config_setting_t *setting;
+
+        g_print ("\'Driver Type\' config option not available\n");
+        g_print ("Creating config setting now...\n");
+
+        value_copy = g_strdup ("Dummy");
+        group = config_lookup (&config, "gjackctl.driver");
+        setting = config_setting_add (group, "type", CONFIG_TYPE_STRING);
+        config_setting_set_string (setting, value_copy);
+        config_write_file (&config, file);
+        string = g_strdup (value_copy);
+        g_free (value_copy);
+    }
+
+    copy = g_strdup (string);
+    g_free (file);
+    config_destroy (&config);
+
+    /* Upper case 'alsa'. */
+    if (g_strcmp0 (copy, "alsa") == 0)
+    {
+        while (copy[i])
+        {
+            copy[i] = g_ascii_toupper (copy[i]);
+            i++;
+        }
+    }
+
+    return (const gchar *) copy;
 }
 
 const gchar *
 get_driver_device ()
 {
     const gchar *string;
+    const gchar *copy;
     gchar *file;
     config_t config;
 
@@ -87,58 +65,226 @@ get_driver_device ()
 
     config_init (&config);
     config_read_file (&config, file);
-    config_lookup_string (&config, "gjackctl.driver.device", &string);
-    
+    if (config_lookup_string (&config, "gjackctl.driver.device", &string) == CONFIG_FALSE)
+    {
+        gchar *value_copy;
+        config_setting_t *group;
+        config_setting_t *setting;
+
+        g_print ("\'Driver Device\' config option not available\n");
+        g_print ("Creating config setting now...\n");
+
+        value_copy = g_strdup ("");
+        group = config_lookup (&config, "gjackctl.device");
+        setting = config_setting_add (group, "type", CONFIG_TYPE_STRING);
+        config_setting_set_string (setting, value_copy);
+        config_write_file (&config, file);
+        string = g_strdup (value_copy);
+        g_free (value_copy);
+    }
+
+    copy = g_strdup (string);
+    g_free (file);
+    config_destroy (&config);
+
+    return copy;
+}
+
+static const gchar *
+create_label_string ()
+{
+    const gchar *string;
+
+    if (g_strcmp0 (get_driver_type (), "dummy") == 0)
+    {
+        gchar *modded;
+
+        modded = g_strdup (get_driver_type ());
+        modded[0] = g_ascii_toupper (modded[0]);
+        string = g_strdup (modded);
+
+        g_free (modded);
+    }
+    else
+    {
+        string = g_strconcat (get_driver_type (),
+                              " - ",
+                              "\"",
+                              get_driver_device (),
+                              "\"",
+                              NULL);
+    }
+
     return string;
 }
 
-void
-drivers (GtkWidget *box, GtkApplication *app, GtkWidget *button)
+static void
+alsa_action_activate_cb (GSimpleAction *action,
+                         GVariant *parameter,
+                         gpointer user_data)
 {
-    GtkWidget *child_box;
+    const gchar *driver_str;
+    const gchar *device_str;
+    const gchar *label_str;
+    gchar *modded_drv_str;
+    gsize length;
+    gint i;
+
+    i = 0;
+    driver_str = g_strdup ("alsa");
+    device_str = g_variant_get_string (parameter, &length);
+    modded_drv_str = g_strdup (driver_str);
+
+    while (modded_drv_str[i])
+    {
+        modded_drv_str[i] = g_ascii_toupper (modded_drv_str[i]);
+        i++;
+    }
+
+    label_str = g_strconcat (modded_drv_str,
+                             " - ",
+                             "\"",
+                             device_str,
+                             "\"",
+                             NULL);
+
+    gtk_label_set_text (GTK_LABEL (user_data), label_str);
+
+    config_file_input ("gjackctl.driver.type",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) driver_str);
+
+    config_file_input ("gjackctl.driver.device",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) g_variant_get_string (parameter, &length));
+
+    g_free (modded_drv_str);
+}
+
+static void
+dummy_action_activate_cb (GSimpleAction *action,
+                          GVariant      *parameter,
+                          gpointer       user_data)
+{
+    const gchar *string;
+    const gchar *device;
+    gsize length;
+
+    string = g_variant_get_string (parameter, &length);
+    device = g_strdup ("");
+
+    config_file_input ("gjackctl.driver.type",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) string);
+
+    config_file_input ("gjackctl.driver.device",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) device);
+
+    gtk_label_set_text (GTK_LABEL (user_data), create_label_string ());
+}
+
+static GMenuItem *
+create_dummy_menu_item ()
+{
+    GMenuItem *item;
+
+    item = g_menu_item_new ("Dummy", NULL);
+
+    g_menu_item_set_action_and_target_value (item,
+                                             "driver.dummy",
+                                             g_variant_new_string ("dummy"));
+
+    return item;
+}
+
+void
+drivers (GtkWidget *grid)
+{
 	GtkWidget *label;
-    GtkWidget *separator;
-    GtkPassedDriverData *pdata;
-    gchar *tt;
-    config_t config;
-	
-    pdata = g_malloc (sizeof (GtkPassedDriverData));	
+    GtkWidget *mbutton;
+    GtkWidget *mbutton_hbox;
+    GtkWidget *mbutton_label;
+    GtkWidget *img;
+    GtkPopover *popover;
+    GMenu *main_menu;
+    GMenu *alsa_submenu;
+    GSimpleAction *alsa_action;
+    GSimpleAction *dummy_action;
+    GSimpleActionGroup *group;
 
-    label = gtk_label_new ("Driver");	
-	pdata -> pbutton = gtk_button_new_with_label (get_driver_type (config));
-    pdata -> label = gtk_label_new (get_driver_device ());	
-    child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-    separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
+    main_menu = g_menu_new ();
+    alsa_submenu = g_menu_new ();
+    group = g_simple_action_group_new ();
+    alsa_action = g_simple_action_new ("alsa", G_VARIANT_TYPE_STRING);
+    dummy_action = g_simple_action_new ("dummy", G_VARIANT_TYPE_STRING);
+    label = gtk_label_new ("Interface");
+    mbutton = gtk_menu_button_new ();
+    mbutton_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+    mbutton_label = gtk_label_new (create_label_string ());
+    img = gtk_image_new_from_icon_name ("pan-down-symbolic",
+                                        GTK_ICON_SIZE_BUTTON);
 
-    tt = g_strconcat ("Current interface is ", 
-                      "\"",
-                      get_driver_device (config),
-                      "\"", 
-                      "\n",
-                      "Click to choose driver/device",
-                      NULL);
+    /* Pack our menu button. */
+    gtk_box_pack_start (GTK_BOX (mbutton_hbox),
+                        mbutton_label,
+                        FALSE,
+                        FALSE,
+                        2);
 
-	/*g_action_map_add_action_entries (G_ACTION_MAP (app),
-									 entries, 
-									 G_N_ELEMENTS (entries), 
-									 pdata);*/
-	
-    gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
+    gtk_box_pack_end (GTK_BOX (mbutton_hbox),
+                      img,
+                      FALSE,
+                      FALSE,
+                      2);
 
-    //gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
-    gtk_widget_set_size_request (pdata -> pbutton, 80, 10);
-    gtk_widget_set_tooltip_text (pdata -> pbutton, tt);
+    gtk_container_add (GTK_CONTAINER (mbutton), mbutton_hbox);
+    gtk_widget_set_halign (img, GTK_ALIGN_END);
+    gtk_widget_set_halign (mbutton_label, GTK_ALIGN_FILL);
 
-    gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (child_box), pdata -> pbutton, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (child_box), separator, FALSE, FALSE, 2); 
-    gtk_box_pack_start (GTK_BOX (box), child_box, FALSE, FALSE, 2);
+    g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (alsa_action));
+    g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (dummy_action));
+    gtk_widget_insert_action_group (mbutton,
+                                    "driver",
+                                    G_ACTION_GROUP (group));
 
-    //gtk_widget_set_halign (pdata -> pbutton, GTK_ALIGN_START);
-    //tk_widget_set_margin_start (pdata -> pbutton, 22);
-    //gtk_widget_set_margin_start (label, 18);
-    gtk_widget_set_margin_top (child_box, 6);
-	
-    g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), NULL);
-    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);
+    alsa_device_names (alsa_submenu);
+
+    g_menu_append_submenu (G_MENU (main_menu),
+                           "ALSA",
+                           G_MENU_MODEL (alsa_submenu));
+
+    g_menu_append_item (G_MENU (main_menu), create_dummy_menu_item ());
+
+    gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (mbutton),
+                                    G_MENU_MODEL (main_menu));
+
+    gtk_menu_button_set_use_popover (GTK_MENU_BUTTON (mbutton), TRUE);
+    popover = gtk_menu_button_get_popover (GTK_MENU_BUTTON (mbutton));
+    gtk_popover_set_position (popover, GTK_POS_BOTTOM);
+    gtk_popover_set_relative_to (popover, img);
+
+    gtk_grid_attach (GTK_GRID (grid),
+                     label,
+                     0, 0, 1, 1);
+
+    gtk_grid_attach_next_to (GTK_GRID (grid),
+                             mbutton,
+                             label,
+                             GTK_POS_RIGHT,
+                             2, 1);
+
+    gtk_widget_set_halign (label, GTK_ALIGN_END);
+    gtk_widget_set_margin_start (mbutton, 20);
+    gtk_widget_set_halign (mbutton, GTK_ALIGN_FILL);
+
+    g_signal_connect (alsa_action,
+                      "activate",
+                      G_CALLBACK (alsa_action_activate_cb),
+                      mbutton_label);
+
+    g_signal_connect (dummy_action,
+                      "activate",
+                      G_CALLBACK (dummy_action_activate_cb),
+                      mbutton_label);
 }

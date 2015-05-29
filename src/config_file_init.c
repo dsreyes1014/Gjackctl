@@ -55,11 +55,11 @@ config_file_init ()
 			setting = config_setting_add (group_setting, "name", CONFIG_TYPE_STRING);
 		}
 
-		setting = config_setting_get_member (group_setting, "priority");
+		setting = config_setting_get_member (group_setting, "rt_priority");
 
 		if (setting == NULL)
 		{
-			setting = config_setting_add (group_setting, "priority", CONFIG_TYPE_STRING);
+			setting = config_setting_add (group_setting, "rt_priority", CONFIG_TYPE_STRING);
             config_setting_set_string (setting, "75");
 		}
 

@@ -92,7 +92,7 @@ alsa_state_cb (GSimpleAction *action,
                        (gpointer) g_variant_get_string (parameter, &length));
 }
 
-static void
+/*static void
 period_size_cb (GSimpleAction *simple,
                 GVariant      *parameter,
                 gpointer       user_data)
@@ -127,9 +127,9 @@ period_size_cb (GSimpleAction *simple,
 
     gtk_widget_show_all (window);
 
-}
+}*/
 
-static void
+/*static void
 activate_priority_cb (GSimpleAction *simple,
                       GVariant *parameter,
                       gpointer user_data)
@@ -163,7 +163,7 @@ activate_priority_cb (GSimpleAction *simple,
                       spin_button);
     
     gtk_widget_show_all (window);
-}
+}*/
 
 static void
 port_max_state_cb (GSimpleAction *simple,
@@ -314,7 +314,7 @@ popover_destroy_cb (GtkWidget *popover,
 
 static void
 gjackctl_settings_cb (GtkButton *button, gpointer user_data)
-{	
+{/*
     GtkPassedMainData *rdata;
 
     rdata = user_data;
@@ -431,7 +431,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     frames_variant = g_variant_new_string (get_frames ());
 
     /* Our actions. */
-    rt_action = g_simple_action_new_stateful ("realtime",
+    /*rt_action = g_simple_action_new_stateful ("realtime",
                                               NULL,
                                               rt_variant);
 
@@ -484,7 +484,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                                                   frames_variant);
 
     /* Add our actions to the action group. */
-    g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (rt_action));
+    /*g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (rt_action));
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (midi_action));
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (no_memlock_action));
     g_action_map_add_action (G_ACTION_MAP (group), G_ACTION (verbose_action));
@@ -503,7 +503,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     //g_menu_item_set_attribute (G_MENU_ITEM ())
 
     /* Initialize our menu items. */
-    rt_item = g_menu_item_new ("Realtime", "settings.realtime");
+    /*rt_item = g_menu_item_new ("Realtime", "settings.realtime");
     midi_item = g_menu_item_new ("MIDI", "settings.midi");
     no_memlock_item = g_menu_item_new ("No Memlock", "settings.no-memlock");
     verbose_item = g_menu_item_new ("Verbose", "settings.verbose");
@@ -542,7 +542,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     frames_item9 = g_menu_item_new ("4096", NULL);
 
     /* Here we create radio buttons for the 'clocksource_submenu'. */
-    g_menu_item_set_action_and_target_value (clocksource_item1,
+    /*g_menu_item_set_action_and_target_value (clocksource_item1,
                                              "settings.clocksource",
                                              g_variant_new_string ("Cycle"));
     g_menu_item_set_action_and_target_value (clocksource_item2,
@@ -553,7 +553,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                                              g_variant_new_string ("System"));
 
     /* Here we create radio buttons for the 'timeout_submenu'. */
-    g_menu_item_set_action_and_target_value (timeout_item1,
+    /*g_menu_item_set_action_and_target_value (timeout_item1,
                                              "settings.timeout",
                                              g_variant_new_string ("200"));
     g_menu_item_set_action_and_target_value (timeout_item2,
@@ -575,7 +575,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
     
 
     /* Here we create radio buttons for the 'port_max_ submenu'. */
-    g_menu_item_set_action_and_target_value (port_max_item1,
+    /*g_menu_item_set_action_and_target_value (port_max_item1,
                                              "settings.port-max",
                                              g_variant_new_string ("128"));
     g_menu_item_set_action_and_target_value (port_max_item2,
@@ -589,7 +589,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                                              g_variant_new_string ("1024"));  
 
     /* Here we create radio buttons for the 'sample_rate_submenu'. */ 
-    g_menu_item_set_action_and_target_value (sample_rate_item1,
+    /*g_menu_item_set_action_and_target_value (sample_rate_item1,
                                              "settings.sample-rate",
                                              g_variant_new_string ("22050"));
     g_menu_item_set_action_and_target_value (sample_rate_item2,
@@ -640,13 +640,13 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                                              g_variant_new_string ("4096"));                                      
 
     /* 'server_section' is a GMenu that contains the server options for JACK. */
-    g_menu_insert_section (main_menu,
+    /*g_menu_insert_section (main_menu,
                            0,
                            "Server Settings",
                            G_MENU_MODEL (server_section)); 
 
     /* 'driver_section' is a GMenu that contains the driver options for JACK. */
-    g_menu_insert_section (main_menu,
+    /*g_menu_insert_section (main_menu,
                            1,
                            "Driver Settings",
                            G_MENU_MODEL (driver_section));   
@@ -669,7 +669,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                            G_MENU_MODEL (priority_submenu));
 
     /* Pack 'clocksource_submenu'. */
-    g_menu_insert_item (clocksource_submenu,
+    /*g_menu_insert_item (clocksource_submenu,
                         0,
                         clocksource_item1);
 
@@ -687,7 +687,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                            G_MENU_MODEL (clocksource_submenu));
     
     /* Pack 'timeout_submenu'. */
-    g_menu_insert_item (timeout_submenu,
+    /*g_menu_insert_item (timeout_submenu,
                         0,
                         timeout_item1);
     
@@ -712,13 +712,13 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                         timeout_item6);
 
     /* Add 'timeout_submenu' to 'options1_submenu'. */
-    g_menu_insert_submenu (options1_submenu,
+    /*g_menu_insert_submenu (options1_submenu,
                            4,
                            "Timeout",
                            G_MENU_MODEL (timeout_submenu));   
 
     /* Pack 'port_max_submenu'. */ 
-    g_menu_insert_item (port_max_submenu,
+    /*g_menu_insert_item (port_max_submenu,
                         0,
                         port_max_item1);  
 
@@ -735,7 +735,7 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                         port_max_item4);
 
     /* Add 'port_max_submenu' to 'options1_submenu'. */
-    g_menu_insert_submenu (options1_submenu,
+    /*g_menu_insert_submenu (options1_submenu,
                            5,
                            "Port Max",
                            G_MENU_MODEL (port_max_submenu)); 
@@ -955,21 +955,123 @@ gjackctl_settings_cb (GtkButton *button, gpointer user_data)
                       G_CALLBACK (popover_destroy_cb),
                       NULL);
 
-    gtk_widget_show_all (popover);
+    gtk_widget_show_all (popover);*/
+
+    GtkWidget *settings_window;
+    GtkWidget *stack;
+    GtkWidget *sswitcher;
+    GtkWidget *server_grid;
+    GtkWidget *driver_grid;
+    GtkWidget *header_bar;
+    GtkWidget *sep;
+    GSimpleActionGroup *group;
+    GtkPassedMainData *rdata;
+    GtkWidget *server_features_frame;
+    GtkWidget *server_rt_frame;
+    GtkWidget *features_frame_grid;
+    GtkWidget *rt_frame_grid;
+
+    rdata = user_data;
+    settings_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    stack = gtk_stack_new ();
+    sswitcher = gtk_stack_switcher_new ();
+    server_grid = gtk_grid_new ();
+    driver_grid = gtk_grid_new ();
+    header_bar = gtk_header_bar_new ();
+    sep = gtk_separator_new (GTK_ORIENTATION_VERTICAL);
+    group = g_simple_action_group_new ();
+    server_features_frame = gtk_frame_new ("Features");
+    server_rt_frame = gtk_frame_new ("Realtime Options");
+    features_frame_grid = gtk_grid_new ();
+    rt_frame_grid = gtk_grid_new ();
+
+    gtk_window_set_transient_for (GTK_WINDOW (settings_window),
+                                  GTK_WINDOW (rdata -> window));
+
+    gtk_window_set_attached_to (GTK_WINDOW (settings_window),
+                                GTK_WIDGET (button));
+
+    gtk_stack_add_titled (GTK_STACK (stack),
+                          server_grid,
+                          "server",
+                          "Server");
+
+    gtk_stack_add_titled (GTK_STACK (stack),
+                          driver_grid,
+                          "driver",
+                          "Driver");
+
+    gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER (sswitcher),
+                                  GTK_STACK (stack));
+
+    gtk_widget_insert_action_group (GTK_WIDGET (button),
+                                    "settings",
+                                    G_ACTION_GROUP (group));
+
+    /* Pack server grid. */
+    server_name (server_grid);
+    timeout (server_grid);
+    port_max (server_grid);
+    clocksource (server_grid);
+    toggle_rt (features_frame_grid);
+    toggle_midi (features_frame_grid);
+    toggle_no_memlock (features_frame_grid);
+    toggle_no_zombies (features_frame_grid);
+    toggle_unlock_libs (features_frame_grid);
+    toggle_verbose (features_frame_grid);
+    rt_priority (rt_frame_grid);
+    gtk_container_add (GTK_CONTAINER (server_features_frame), features_frame_grid);
+    gtk_container_add (GTK_CONTAINER (server_rt_frame), rt_frame_grid);
+    gtk_grid_attach (GTK_GRID (server_grid), server_features_frame, 0, 4, 2, 1);
+    gtk_grid_attach (GTK_GRID (server_grid), server_rt_frame, 0, 5, 2, 1);
+
+    /* Pack driver grid. */
+    drivers (driver_grid);
+    sample_rate (driver_grid);
+
+    gtk_frame_set_shadow_type (GTK_FRAME (server_features_frame),
+                               GTK_SHADOW_NONE);
+    gtk_frame_set_shadow_type (GTK_FRAME (server_rt_frame),
+                               GTK_SHADOW_NONE);
+
+    gtk_grid_set_row_spacing (GTK_GRID (server_grid), 4);
+    gtk_grid_set_row_spacing (GTK_GRID (driver_grid), 4);
+    gtk_widget_set_margin_start (server_grid, 10);
+    gtk_widget_set_margin_end (server_grid, 8);
+    gtk_widget_set_margin_start (driver_grid, 8);
+    gtk_widget_set_margin_end (driver_grid, 8);
+    gtk_widget_set_margin_top (server_grid, 8);
+    gtk_widget_set_margin_top (driver_grid, 8);
+    gtk_widget_set_margin_start (server_features_frame, 10);
+    gtk_widget_set_margin_start (server_rt_frame, 10);
+    gtk_widget_set_margin_top (server_features_frame, 10);
+
+    gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);
+    gtk_header_bar_pack_end (GTK_HEADER_BAR (header_bar), sep);
+    gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);
+    gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (header_bar), ":close");
+    gtk_window_set_titlebar (GTK_WINDOW (settings_window), header_bar);
+
+    gtk_window_set_default_size (GTK_WINDOW (settings_window), 350, 200);
+    gtk_container_add (GTK_CONTAINER (settings_window), stack);
+
+    gtk_widget_show_all (settings_window);
 }
 
 void
 gjackctl_settings (GtkPassedMainData *pdata)
 {
 	GtkWidget *settings_button;
-	GtkWidget *gear;
+	//GtkWidget *gear;
 
-	settings_button = gtk_button_new ();
-	gear = gtk_image_new_from_file ("/usr/share/icons/Adwaita/scalable/actions/open-menu-symbolic.svg");
+	settings_button = gtk_button_new_from_icon_name ("open-menu-symbolic",
+                                                     GTK_ICON_SIZE_SMALL_TOOLBAR);
+
+	//gear = gtk_image_new_from_file ("/usr/share/icons/Adwaita/scalable/actions/open-menu-symbolic.svg");
 
 	gtk_widget_set_size_request (settings_button, 30, 34);
 	gtk_widget_set_tooltip_text (settings_button, "Settings");
-	gtk_button_set_image (GTK_BUTTON (settings_button), gear);
+	//gtk_button_set_image (GTK_BUTTON (settings_button), gear);
 
 	gtk_header_bar_pack_end (GTK_HEADER_BAR (pdata -> header_bar), settings_button);
 

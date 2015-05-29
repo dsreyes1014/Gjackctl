@@ -52,7 +52,7 @@ button_toggled_cb (GtkToggleButton *tb, gpointer user_data)
     gtk_widget_hide (rdata -> popover);
 }
 
-const gchar *
+static const gchar *
 get_sample_rate ()
 {
     const gchar *string;
@@ -139,35 +139,37 @@ popover_button_clicked_cb (GtkWidget *button, gpointer user_data)
 }
 
 void
-sample_rate (GtkWidget *box, GtkWidget *button)
+sample_rate (GtkWidget *grid)
 {
     GtkWidget *label;
-    GtkWidget *child_box;
-    GtkWidget *separator;
-	gchar *string;
-    config_t config;
-    GtkPassedSampleRateData *pdata;
-    
+    GtkWidget *mbutton;
+    GtkWidget *mbutton_grid;
+    GtkWidget *img;
+    GtkWidget *entry;
+
     label = gtk_label_new ("Sample Rate");
-    child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-    separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
+    mbutton = gtk_menu_button_new ();
+    mbutton_grid = gtk_grid_new ();
+    img = gtk_image_new_from_icon_name ("pan-down-symbolic",
+                                        GTK_ICON_SIZE_BUTTON);
+    entry = gtk_entry_new ();
 
-    pdata = g_slice_new (GtkPassedSampleRateData);
-    pdata -> pbutton = gtk_button_new_with_label (get_sample_rate ());
+    gtk_grid_attach (GTK_GRID (grid),
+                     label,
+                     0, 1, 1, 1);
 
-    gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
+    gtk_grid_attach_next_to (GTK_GRID (grid),
+                             entry,
+                             label,
+                             GTK_POS_RIGHT,
+                             1, 1);
+    gtk_grid_attach_next_to (GTK_GRID (grid),
+                             mbutton,
+                             entry,
+                             GTK_POS_RIGHT,
+                             1, 1);
 
-    gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (child_box), pdata -> pbutton, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (child_box), separator, FALSE, FALSE, 2); 
-    gtk_box_pack_start (GTK_BOX (box), child_box, FALSE, FALSE, 2);
-
-    gtk_widget_set_tooltip_text (pdata -> pbutton, "Choose sample rate (hz)");
-	gtk_widget_set_size_request (pdata -> pbutton, 80, 10);	
-    //gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
-    //gtk_widget_set_margin_start (label, 20);
-    //gtk_widget_set_margin_start (pdata -> pbutton, 20);
-	
-	g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), pdata);
-    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);
+    gtk_widget_set_halign (label, GTK_ALIGN_START);
+    gtk_widget_set_margin_start (entry, 20);
+    gtk_widget_set_halign (entry, GTK_ALIGN_FILL);
 }

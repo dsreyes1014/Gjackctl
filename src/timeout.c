@@ -1,181 +1,95 @@
 #include "timeout.h"
 
-typedef struct _GtkPassedTimeoutData {
-    GtkWidget *pbutton;
-    GtkWidget *popover;
-} GtkPassedTimeoutData;
-
-static void
-button_clicked_cb (GtkButton *button, gpointer user_data)
-{
-    GtkPassedTimeoutData *rdata;
-
-    rdata = user_data;
-    
-    config_file_input ("gjackctl.server.timeout",
-                       CONFIG_TYPE_STRING,
-                       (gpointer) gtk_button_get_label (GTK_BUTTON (rdata -> pbutton)));
-
-    g_slice_free (GtkPassedTimeoutData, rdata);
-}
-
-static void
-notify_button_toggled_cb (GtkToggleButton *tb, GParamSpec *pspec, gpointer user_data)
-{
-    GtkPassedTimeoutData *rdata;
-
-    rdata = user_data;
-
-    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (tb)) == TRUE)
-    {
-        gtk_button_set_label (GTK_BUTTON (rdata -> pbutton),
-                              gtk_button_get_label (GTK_BUTTON (tb)));
-    }
-
-    gtk_widget_hide (rdata -> popover);
-}
-
-const gchar *
+static const gchar *
 get_timeout ()
 {
     const gchar *string;
+    const gchar *copy;
     gchar *file;
     config_t config;
 
     file = g_strconcat (g_getenv ("HOME"),
-                               "/.config/gjackctl/gjackctl.conf",
-                               NULL);
+                        "/.config/gjackctl/gjackctl.conf",
+                        NULL);
+
     config_init (&config);
     config_read_file (&config, file);
-    config_lookup_string (&config, "gjackctl.server.timeout", &string);
-    
-    return string;
+    if (config_lookup_string (&config, "gjackctl.server.timeout", &string) == CONFIG_FALSE)
+    {
+        gchar *value_copy;
+        config_setting_t *group;
+        config_setting_t *setting;
+
+        g_print ("\'Timeout\' config option not available\n");
+        g_print ("Creating config setting now...\n");
+
+        value_copy = g_strdup ("500");
+        group = config_lookup (&config, "gjackctl.server");
+        setting = config_setting_add (group, "timeout", CONFIG_TYPE_STRING);
+        config_setting_set_string (setting, value_copy);
+        config_write_file (&config, file);
+        string = g_strdup (value_copy);
+        g_free (value_copy);
+    }
+
+    copy = g_strdup (string);
+    g_free (file);
+    config_destroy (&config);
+
+    return copy;
 }
 
 static void
-popover_button_clicked_cb (GtkButton *button, gpointer user_data)
+value_changed_cb (GtkSpinButton *button,
+                  gpointer       user_data)
 {
-    GtkWidget *tb;
-    GtkWidget *box;
-    GtkWidget *radio1;
-    GtkWidget *radio2;
-    GtkWidget *radio3;
-    GtkWidget *radio4;
-    GtkWidget *radio5;
-    GtkWidget *radio6;
-    GtkPassedTimeoutData *pdata;
-    GSList *list; 
-    config_t config;   
+    GtkAdjustment *adj;
+    gchar *str;
+    gint value;
 
-    box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);    
-    radio1 = gtk_radio_button_new_with_label (NULL, "200");
-    radio2 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1), "500");
-    radio3 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1), "1000");
-    radio4 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1), "2000");
-    radio5 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1), "5000");
-    radio6 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1), "10000");    
-    list = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
+    adj = gtk_spin_button_get_adjustment (GTK_SPIN_BUTTON (button));
+    value = gtk_spin_button_get_value_as_int (button);
+    str = g_strdup_printf ("%d", value);
 
-    pdata = user_data;  
+    config_file_input ("gjackctl.server.timeout",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) str);
 
-    if (pdata -> popover == NULL)
-    {
-        pdata -> popover = gtk_popover_new (GTK_WIDGET (button));
-
-        while (list)
-        {
-            tb = list -> data;
-
-            if (g_strcmp0 (gtk_button_get_label (GTK_BUTTON (tb)),
-                get_timeout (config)) == 0)
-            {
-                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (tb), TRUE);
-            }
-
-            list = list -> next;
-        }
-    
-        gtk_box_pack_start (GTK_BOX (box), radio1, FALSE, FALSE, 2);
-        gtk_box_pack_start (GTK_BOX (box), radio2, FALSE, FALSE, 2);
-        gtk_box_pack_start (GTK_BOX (box), radio3, FALSE, FALSE, 2);
-        gtk_box_pack_start (GTK_BOX (box), radio4, FALSE, FALSE, 2);
-        gtk_box_pack_start (GTK_BOX (box), radio5, FALSE, FALSE, 2);
-        gtk_box_pack_start (GTK_BOX (box), radio6, FALSE, FALSE, 2);
-        gtk_container_add (GTK_CONTAINER (pdata -> popover), box);
-    }
-    else
-    {
-        g_print ("Not NULL\n");
-    }
-
-    list = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
-
-    gtk_popover_set_position (GTK_POPOVER (pdata -> popover), GTK_POS_RIGHT);
-
-    g_signal_connect (radio1,
-                      "notify::active",
-                      G_CALLBACK (notify_button_toggled_cb),
-                      pdata);
-
-    g_signal_connect (radio2,
-                      "notify::active",
-                      G_CALLBACK (notify_button_toggled_cb),
-                      pdata);
-
-    g_signal_connect (radio3,
-                      "notify::active",
-                      G_CALLBACK (notify_button_toggled_cb),
-                      pdata);
-
-    g_signal_connect (radio4,
-                      "notify::active",
-                      G_CALLBACK (notify_button_toggled_cb),
-                      pdata);
-
-    g_signal_connect (radio5,
-                      "notify::active",
-                      G_CALLBACK (notify_button_toggled_cb),
-                      pdata);
-
-    g_signal_connect (radio6,
-                      "notify::active",
-                      G_CALLBACK (notify_button_toggled_cb),
-                      pdata);
-   
-    gtk_widget_show_all (pdata -> popover);   
+    g_free (str);
 }
 
 void
-timeout (GtkWidget *box, GtkWidget *button)
+timeout (GtkWidget *grid)
 {
     GtkWidget *label;
-    GtkWidget *child_box1;
-    config_t config;
-    GtkPassedTimeoutData *pdata;
-    
-    label = gtk_label_new ("Timeout"); 
-    child_box1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+    GtkAdjustment *adj;
+    gdouble k;
+    const gchar * str;
 
-    pdata = g_slice_new (GtkPassedTimeoutData);
-    pdata -> pbutton = gtk_button_new_with_label (get_timeout ());
-    pdata -> popover = NULL;
-    
-    //gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
-    gtk_widget_set_size_request (pdata -> pbutton, 80, 10);
-    gtk_widget_set_tooltip_text (pdata -> pbutton, "Set JACK client timeout in milliseconds");
-    //label_underline (label);
+    str = get_timeout ();
+    k = g_ascii_strtod (str, NULL);
+    GtkWidget *spin_button;
+    label = gtk_label_new ("Timeout (ms)");
+    adj = gtk_adjustment_new (k, 200, 10000, 100, 0, 0);
+    spin_button = gtk_spin_button_new (adj, 100, 0);
 
-    gtk_button_set_relief (GTK_BUTTON (pdata -> pbutton), GTK_RELIEF_NONE);
+    gtk_grid_attach (GTK_GRID (grid),
+                     label,
+                     0, 1, 1, 1);
 
-    /* Pack box. */
-    gtk_box_pack_start (GTK_BOX (child_box1), label, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (child_box1), pdata -> pbutton, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (box), child_box1, FALSE, FALSE, 2);
+    gtk_grid_attach_next_to (GTK_GRID (grid),
+                             spin_button,
+                             label,
+                             GTK_POS_RIGHT,
+                             1, 1);
 
-    gtk_widget_set_margin_start (label, 10);
-    gtk_widget_set_margin_start (pdata -> pbutton, 10);
-    gtk_widget_set_name (label, "timeout-label-title");
+    //gtk_widget_set_margin_start (label, 10);
+    gtk_widget_set_halign (label, GTK_ALIGN_START);
+    gtk_widget_set_halign (spin_button, GTK_ALIGN_FILL);
+    gtk_widget_set_margin_start (spin_button, 20);
 
-    g_signal_connect (pdata -> pbutton, "clicked", G_CALLBACK (popover_button_clicked_cb), pdata);
-    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), pdata);
+    g_signal_connect (spin_button,
+                      "value-changed",
+                      G_CALLBACK (value_changed_cb),
+                      &k);
 }

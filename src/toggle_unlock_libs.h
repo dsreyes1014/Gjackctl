@@ -8,9 +8,6 @@
 #include "config_file_input.h"
 
 void
-toggle_unlock_libs (GtkWidget *box, GtkWidget *button);
-
-gboolean
-get_unlock_libs ();
+toggle_unlock_libs (GtkWidget *grid);
 
 #endif

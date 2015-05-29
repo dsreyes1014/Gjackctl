@@ -8,9 +8,9 @@
 #include "label_toggle_attr.h"
 
 void
-clocksource (GtkWidget *box, GtkWidget *button);
+clocksource (GtkWidget *grid);
 
-const gchar *
-get_clocksource ();
+/*const gchar *
+get_clocksource ();*/
 
 #endif

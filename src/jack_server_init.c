@@ -77,10 +77,14 @@ jackdrc_init_input ()
 
         g_fprintf (fp, " -n%s", value);
     }
+
+    value = NULL;
     /*********************************************************************/
-    config_lookup_string (&config, "gjackctl.server.priority", &value);
+    config_lookup_string (&config, "gjackctl.server.rt_priority", &value);
 
     g_fprintf (fp, " -P%s", value);
+
+    value = NULL;
     /*********************************************************************/
     config_lookup_string (&config, "gjackctl.server.port_max", &value);
 
@@ -88,6 +92,8 @@ jackdrc_init_input ()
     {
         g_fprintf (fp, " -p%s", value);    
     }
+
+    value = NULL;
     /*********************************************************************/
     config_lookup_string (&config, "gjackctl.server.timeout", &value);
 
@@ -95,6 +101,8 @@ jackdrc_init_input ()
     {
         g_fprintf (fp, " -t%s", value);    
     }
+
+    value = NULL;
     /*********************************************************************/
     config_lookup_string (&config, "gjackctl.server.clocksource", &value);
 
@@ -109,6 +117,8 @@ jackdrc_init_input ()
             g_fprintf (fp, " -ch");
         }
     }
+
+    value = NULL;
     /*********************************************************************/
     config_lookup_bool (&config, "gjackctl.server.realtime", &value2);
 
@@ -154,42 +164,57 @@ jackdrc_init_input ()
     /*********************************************************************/
     config_lookup_string (&config, "gjackctl.driver.type", &value);
 
-    if ((g_strcmp0 (value, NULL) != 0) && (g_strcmp0 (value, "ALSA") == 0))
-    {
-        value = g_strconcat ("alsa", NULL);
-        g_fprintf (fp, " -d%s", value);
-    }
-    else if (g_strcmp0 (value, NULL) != 0)
+
+    if (g_strcmp0 (value, NULL) != 0 && g_strcmp0 (value, "dummy") == 0)
     {
         g_fprintf (fp," -d%s", value);
     }
-    /*********************************************************************/
-    config_lookup_string (&config, "gjackctl.driver.device", &value);
-
-    if (g_strcmp0 (value, NULL) != 0)
+    else if ((g_strcmp0 (value, NULL) != 0) && (g_strcmp0 (value, "alsa") == 0))
     {
-        g_fprintf (fp, " -dhw:%s", value);
-    }    
-    /*********************************************************************/
-    config_lookup_string (&config, "gjackctl.driver.sample_rate", &value);
+        g_fprintf (fp, " -d%s", value);
 
-    if (g_strcmp0 (value, NULL) != 0)
-    {
-        g_fprintf (fp, " -r%s", value);
-    }
-    /*********************************************************************/
-    config_lookup_string (&config, "gjackctl.driver.frames", &value);
+        value = NULL;
 
-    if (g_strcmp0 (value, NULL) != 0)
-    {
-        g_fprintf (fp, " -p%s", value);
-    }
-    /*********************************************************************/
-    config_lookup_string (&config, "gjackctl.driver.period", &value);
+        config_lookup_string (&config, "gjackctl.driver.device", &value);
 
-    if (g_strcmp0 (value, NULL) != 0)
-    {
-        g_fprintf (fp, " -n%s", value);
+        if (g_strcmp0 (value, NULL) != 0)
+        {
+            g_fprintf (fp, " -dhw:%s", value);
+        }
+
+        value = NULL;
+    /*********************************************************************
+        config_lookup_string (&config, "gjackctl.driver.device", &value);
+
+        if (g_strcmp0 (value, NULL) != 0)
+        {
+            g_fprintf (fp, " -dhw:%s", value);
+        }
+    *********************************************************************/
+        config_lookup_string (&config, "gjackctl.driver.sample_rate", &value);
+
+        if (g_strcmp0 (value, NULL) != 0)
+        {
+            g_fprintf (fp, " -r%s", value);
+        }
+
+        value = NULL;
+    /*********************************************************************/
+        config_lookup_string (&config, "gjackctl.driver.frames", &value);
+
+        if (g_strcmp0 (value, NULL) != 0)
+        {
+            g_fprintf (fp, " -p%s", value);
+        }
+
+        value = NULL;
+    /*********************************************************************/
+        config_lookup_string (&config, "gjackctl.driver.period", &value);
+
+        if (g_strcmp0 (value, NULL) != 0)
+        {
+            g_fprintf (fp, " -n%s", value);
+        }
     }
     /*********************************************************************/    
 
