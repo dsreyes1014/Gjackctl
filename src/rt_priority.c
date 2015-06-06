@@ -20,7 +20,7 @@ get_priority ()
                         NULL);
 
     config_read_file (&config, file);
-    config_lookup_string (&config, "gjackctl.server.priority", &priority);
+    config_lookup_string (&config, "gjackctl.server.rt_priority", &priority);
 
     g_free (file);
 
