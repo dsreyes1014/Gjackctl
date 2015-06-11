@@ -12,7 +12,7 @@
 
 #include "drivers.h"
 #include "jack_server_init.h"
-#include "jack_log.h"
+//#include "jack_log.h"
 #include "get_jack_gpid.h"
 #include "main.h"
 

@@ -66,13 +66,18 @@ run_app_cb (GApplication *app, gpointer data)
      * Initialize our widgets here so we can manipulate from
      * different modules of our app.
      */
-	pdata -> stack = gtk_stack_new ();
+    pdata -> vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+	//pdata -> stack = gtk_stack_new ();
+    pdata -> button_box = gtk_button_box_new (GTK_ORIENTATION_HORIZONTAL);
 	pdata -> header_bar = gtk_header_bar_new ();
     pdata -> sw = gtk_switch_new ();
     pdata -> text = gtk_text_view_new ();
-    pdata -> sswitcher = gtk_stack_switcher_new ();
+    //pdata -> sswitcher = gtk_stack_switcher_new ();
 
-    gtk_stack_set_homogeneous (GTK_STACK (pdata -> stack), FALSE);
+    gtk_button_box_set_layout (GTK_BUTTON_BOX (pdata -> button_box),
+                               GTK_BUTTONBOX_END);
+
+    //gtk_stack_set_homogeneous (GTK_STACK (pdata -> stack), FALSE);
 
     /*
      * This function will setup our config file preset with some defaults.
@@ -84,7 +89,7 @@ run_app_cb (GApplication *app, gpointer data)
 	server_switch (pdata);
     gjackctl_settings (pdata);
     display (pdata);
-    jack_log (pdata -> stack, pdata -> text);
+    jack_log (pdata);
 
     //apply_theme ();
 
@@ -99,17 +104,25 @@ run_app_cb (GApplication *app, gpointer data)
 	gtk_header_bar_set_decoration_layout (GTK_HEADER_BAR (pdata -> header_bar),
                                           ":close");
 
-    gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER (pdata -> sswitcher),
-                                  GTK_STACK (pdata -> stack));
+    /*gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER (pdata -> sswitcher),
+                                  GTK_STACK (pdata -> stack));*/
 
-	gtk_header_bar_set_custom_title (GTK_HEADER_BAR (pdata -> header_bar),
-                                     pdata -> sswitcher);
+	/* (GTK_HEADER_BAR (pdata -> header_bar),
+                                     pdata -> sswitcher);*/
+
+    gtk_header_bar_set_title (GTK_HEADER_BAR (pdata -> header_bar),
+                              "GJACKCTL");
 
 	/* Set 'GtkHeaderBar *head_bar' as titlebar. */
 	gtk_window_set_titlebar (GTK_WINDOW (pdata -> window), pdata -> header_bar);
-	gtk_window_set_default_size (GTK_WINDOW (pdata -> window), 650, 200);
+	gtk_window_set_default_size (GTK_WINDOW (pdata -> window), 650, 370);
+    gtk_box_pack_end (GTK_BOX (pdata -> vbox),
+                      pdata -> button_box,
+                      FALSE,
+                      TRUE,
+                      2);
 
-	gtk_container_add (GTK_CONTAINER (pdata -> window), pdata -> stack);
+	gtk_container_add (GTK_CONTAINER (pdata -> window), pdata -> vbox);
 
     //gtk_window_set_resizable (GTK_WINDOW (main_window), FALSE);
 
@@ -119,10 +132,15 @@ run_app_cb (GApplication *app, gpointer data)
      */
 	gtk_window_set_position (GTK_WINDOW (pdata -> window), GTK_WIN_POS_MOUSE);
 
-    g_signal_connect (pdata -> stack,
+    /*g_signal_connect (pdata -> stack,
                       "notify::visible-child-name",
                       G_CALLBACK (visible_child_cb),
-                      pdata -> window);
+                      pdata -> window);*/
+
+    g_signal_connect (pdata -> window,
+                      "destroy",
+                      G_CALLBACK (gtk_widget_destroy),
+                      NULL);
 
 	gtk_widget_show_all (pdata -> window);
 }

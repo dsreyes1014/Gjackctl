@@ -79,7 +79,7 @@ grid_on (GtkPassedDisplayData *rdata)
                             GTK_LEVEL_BAR_MODE_CONTINUOUS);
 
     if (jack_client_init (rdata -> pdata -> sw,
-                          rdata -> pdata -> stack,
+                          rdata -> pdata -> button_box,
                           labela,
                           label2a,
                           level_bar) != 0)
@@ -170,33 +170,33 @@ pulse_timeout_cb (gpointer user_data)
 static void
 grid_off (GtkPassedDisplayData *rdata)
 {
-    GtkWidget *stack_child;
+    //GtkWidget *stack_child;
 
-    rdata -> pbar = gtk_progress_bar_new ();
+    //rdata -> pbar = gtk_progress_bar_new ();
 
     clear_container (rdata -> grid);
 
-    stack_child = gtk_stack_get_child_by_name (GTK_STACK (rdata -> pdata -> stack),
-                                               "ports");
+    /*stack_child = gtk_stack_get_child_by_name (GTK_STACK (rdata -> pdata -> stack),
+                                               "ports");*/
 
-    if (stack_child != NULL)
+    /*if (stack_child != NULL)
     {
         gtk_widget_destroy (stack_child);
-    }
+    }*/
 
-    gtk_grid_attach (GTK_GRID (rdata -> grid),
+    /*gtk_grid_attach (GTK_GRID (rdata -> grid),
                      rdata -> pbar,
-                     0, 0, 1, 1);
+                     0, 0, 1, 1);*/
 
     /* Setting 'GtkProgressBar' attributes inside of 'GtkGrid'. */
-    gtk_widget_set_halign (rdata -> pbar, GTK_ALIGN_FILL);
-    gtk_widget_set_valign (rdata -> pbar, GTK_ALIGN_CENTER);
-    gtk_widget_set_hexpand (rdata -> pbar, TRUE);
-    gtk_widget_set_margin_start (rdata -> pbar, 80);
-    gtk_widget_set_margin_end (rdata -> pbar, 80);
-    gtk_widget_set_margin_top (rdata -> pbar, 40);
+    //gtk_widget_set_halign (rdata -> pbar, GTK_ALIGN_FILL);
+    //gtk_widget_set_valign (rdata -> pbar, GTK_ALIGN_CENTER);
+    //gtk_widget_set_hexpand (rdata -> pbar, TRUE);
+    //gtk_widget_set_margin_start (rdata -> pbar, 80);
+    //gtk_widget_set_margin_end (rdata -> pbar, 80);
+    //gtk_widget_set_margin_top (rdata -> pbar, 40);
 
-    g_timeout_add (500, (GSourceFunc) pulse_timeout_cb, rdata);
+    //g_timeout_add (500, (GSourceFunc) pulse_timeout_cb, rdata);
 }
 
 static void
@@ -211,26 +211,13 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
     GtkPassedDisplayData *rdata;
     
     rdata = user_data;
-    stack_child = gtk_stack_get_child_by_name (GTK_STACK (rdata -> pdata -> stack),
-                                               "log");
 
     if (gtk_switch_get_active (sw) == TRUE)
     {
-        g_object_ref (stack_child);
-        gtk_container_remove (GTK_CONTAINER (rdata -> pdata -> stack),
-                              stack_child);
-
         if (grid_on (rdata) == FALSE)
         {
             grid_off (rdata);
         }
-
-        gtk_stack_add_titled (GTK_STACK (rdata -> pdata -> stack),
-                              stack_child,
-                              "log",
-                              "Log");
-
-        g_object_unref (stack_child);
     }
     else
     {
@@ -243,55 +230,29 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 void
 display (GtkPassedMainData *pdata)
 {
-    GtkWidget *stack_child;
-    GtkWidget *stack_child2;
     GtkPassedDisplayData *rdata;
 
     rdata = g_slice_new (GtkPassedDisplayData);
     rdata -> grid = gtk_grid_new ();
     rdata -> pdata = pdata;
-    stack_child = NULL;
 
     if (gtk_switch_get_active (GTK_SWITCH (rdata -> pdata -> sw)) == TRUE)
     {
         grid_on (rdata);
-
-        /*
-         * Here we remove the 'Ports' tab of our stack so that the 'Display'
-         * tab our stack shows first.
-         */
-        stack_child = gtk_stack_get_child_by_name (GTK_STACK (rdata -> pdata -> stack),
-                                                   "ports");
-
-        g_object_ref (stack_child);
-        gtk_container_remove (GTK_CONTAINER (pdata -> stack), stack_child);
     }
 	else
     {
         grid_off (rdata);
     }
 
-	gtk_stack_add_titled (GTK_STACK (rdata -> pdata -> stack),
-                          rdata -> grid,
-                          "display",
-                          "Display");
+    gtk_box_pack_start (GTK_BOX (pdata -> vbox),
+                        rdata -> grid,
+                        FALSE,
+                        FALSE,
+                        2);
 
-    g_signal_connect (rdata -> pdata -> sw,
+    g_signal_connect (pdata -> sw,
                       "notify::active",
                       G_CALLBACK (switch_pos_cb),
                       rdata);
-
-    if (stack_child != NULL)
-    {
-        /*
-         * Here we add the 'Ports' tab of our stack back into the stack
-         * and 'unref' it so it will be released when our app is destroyed.
-         */
-        gtk_stack_add_titled (GTK_STACK (rdata -> pdata -> stack),
-                              stack_child,
-                              "ports",
-                              "Ports");
-
-        g_object_unref (stack_child);
-    }
 }

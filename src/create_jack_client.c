@@ -26,6 +26,17 @@ jack_shutdown_cb (gpointer user_data)
 
     rdata = user_data;
 
+    gtk_widget_destroy (rdata -> button);
+    gtk_widget_destroy (rdata -> pwindow);
+    /*gtk_widget_destroy (rdata -> view);
+    gtk_widget_destroy (rdata -> view2);
+    gtk_widget_destroy (rdata -> from_audio);
+    gtk_widget_destroy (rdata -> to_audio);
+    gtk_widget_destroy (rdata -> from_midi);
+    gtk_widget_destroy (rdata -> to_midi);
+    gtk_widget_destroy (rdata -> sc_window);
+    gtk_widget_destroy (rdata -> sc_window2);*/
+
     g_slice_free (GtkPassedJackPortsData, rdata);
 }
 
@@ -45,21 +56,21 @@ srate_cb (jack_nframes_t nframes, gpointer user_data)
 
 gint
 jack_client_init (GtkWidget *sw,
-                  GtkWidget *stack,
+                  GtkWidget *button_box,
                   GtkWidget *label,
                   GtkWidget *label2,
                   GtkWidget *level_bar)
 {
-    /*  
-        This function creates a client for the JACK server
-        to provide some info of the jackd server. 
-
-        Argument info:
-            --argument 1 'GtkWidget *sw' is declared in 'main.c'
-            --argument 2 'GtkWidget *label' is declared in 'display.c'
-            --argument 3 'GtkWidget *label2' is declared in 'display.c'
-            --argument 4 'GtkWidget *level_bar' is declared in 'display.c'
-    */
+    /*
+     * This function creates a client for the JACK server
+     * to provide some info of the jackd server.
+     *
+     *  Argument info:
+     *      --argument 1 'GtkWidget *sw' is declared in 'main.c'
+     *      --argument 2 'GtkWidget *label' is declared in 'display.c'
+     *      --argument 3 'GtkWidget *label2' is declared in 'display.c'
+     *      --argument 4 'GtkWidget *level_bar' is declared in 'display.c'
+     */
 
     jack_status_t status;
     gchar srate[10];
@@ -73,12 +84,8 @@ jack_client_init (GtkWidget *sw,
                                         JackUseExactName,
                                         &status);
 
-
-
     if (pdata -> client == NULL)
     {
-        //g_print ("'create_jack_client.c': Gjackctl client couldn't be created\n");
-
         return -1;
     }
 
@@ -86,9 +93,10 @@ jack_client_init (GtkWidget *sw,
     jack_on_shutdown (pdata -> client, jack_shutdown_cb, pdata);
     jack_set_sample_rate_callback (pdata -> client, srate_cb, label2);
 
-    jack_activate (pdata -> client);
 
-    jack_ports (stack, pdata);
+    //jack_activate (pdata -> client);
+
+    jack_ports (button_box, pdata);
 
     /* Function updates label to show cpu load. */
     dsp_load (sw, label, pdata -> client, level_bar);

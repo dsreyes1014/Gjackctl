@@ -7,8 +7,9 @@
 
 #include "dsp_load.h"
 #include "get_jack_gpid.h"
+#include "main.h"
 
-gint 
-jack_server_init (GtkWidget *sw, GtkWidget *text, GtkWidget *window);
+gint
+jack_server_init (GtkPassedMainData *pdata);
 
 #endif

@@ -1,21 +1,8 @@
 #include "jack_server_init.h"
 
-typedef struct _GtkPassedServerData {
-    GtkWidget *ptext_view;
-    gchar pbuffer[8192];   
-} GtkPassedServerData;
-
-/*
- * This struct is used to pass data
- * through to the 'void suprocess2_pipe_cb ()'
- * function.
- */
-
-typedef struct _GtkPassedServerData2 {
-    gchar pbuffer2[2048];
-    GtkWidget *psw;
-    GtkWidget *pwindow;
-} GtkPassedServerData2;
+gchar *log_out;
+gchar *log_err;
+gchar *check;
 
 static gchar **
 get_arg_vector ()
@@ -248,7 +235,7 @@ static void
 subprocess_out_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
 {
     GtkTextBuffer *buffer;
-    GtkPassedServerData *rdata;
+    GtkPassedMainData *rdata;
     gchar *string;
     gssize bytes;
 
@@ -257,10 +244,11 @@ subprocess_out_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
                                         res,
                                         NULL);
 
-    g_print ("'jack_server_init.c': number of bytes in log out pipe %d\n", bytes);
+    g_print ("1.'jack_server_init.c': number of bytes in log out pipe %d\n", bytes);
 
-    string = g_strndup (rdata -> pbuffer, bytes - 1);
-    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> ptext_view));
+    string = g_strndup (log_out, bytes - 1);
+
+    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> text));
 
     gtk_text_buffer_insert_at_cursor (buffer, string, -1);
 
@@ -273,7 +261,7 @@ static void
 subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
 {
     GtkTextBuffer *buffer;
-    GtkPassedServerData *rdata;
+    GtkPassedMainData *rdata;
     gchar *string1;
     //const gchar *string2;
     gssize bytes;
@@ -287,9 +275,8 @@ subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
 
     g_print ("'jack_server_init.c': number of bytes in log err pipe %d\n", bytes);
 
-    string1 = g_strndup (rdata -> pbuffer, bytes - 1);
-    //string2 = g_strdup ("\n\nERROR:\n");
-    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> ptext_view));
+    string1 = g_strndup (log_err, bytes - 1);
+    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> text));
     table = gtk_text_buffer_get_tag_table (buffer);
     
     if (gtk_text_tag_table_lookup (table, "red_fg") == NULL)
@@ -316,22 +303,22 @@ subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
 }
 
 static void
-subprocess2_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
+subprocess2_pipe_cb (GObject *source, GAsyncResult *res, gpointer user_data)
 {
     gssize bytes;
     GInputStream *out2;
     const gchar *string;
-    GtkPassedServerData2 *rdata2;
+    GtkPassedMainData *rdata;
 
-    rdata2 = data;
+    rdata = user_data;
 
     bytes = g_input_stream_read_finish (G_INPUT_STREAM (source),
                                         res,
                                         NULL);
 
-    string = g_strndup (rdata2 -> pbuffer2, bytes - 1);
+    string = g_strndup (check, bytes - 1);
 
-    g_print ("'jack_server_init.c': number of bytes %d\n", bytes);
+    g_print ("'jack_server_init.c': number of bytes in log check pipe %d\n", bytes);
 
     g_print ("%s\n", string);
 
@@ -343,9 +330,9 @@ subprocess2_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
     {
         g_print ("failure\n");
 
-        err_msg_box (rdata2 -> pwindow);
+        err_msg_box (rdata -> window);
 
-        gtk_switch_set_active (GTK_SWITCH (rdata2 -> psw), FALSE);
+        gtk_switch_set_active (GTK_SWITCH (rdata -> sw), FALSE);
     }
 }
 
@@ -362,15 +349,38 @@ subprocess_wait_cb (GObject *source, GAsyncResult *res, gpointer data)
 
     if (check == TRUE)
     {
-        g_print ("'jack_server_init.c': %d\n", g_subprocess_get_exit_status (G_SUBPROCESS (source)));
-        g_print ("'jack_server_init.c': jackd terminated\n");
+        g_slice_free1 (4096, log_out);
+        g_slice_free1 (4096, log_err);
+        g_print ("log_out & log_err freed successfully\n");
+    }
+    else
+    {
+        g_slice_free1 (4096, log_out);
+        g_slice_free1 (4096, log_err);
+        g_print ("check has not exited successfully\n");
     }
 }
 
-gint 
-jack_server_init (GtkWidget *sw, 
-                  GtkWidget *text,
-                  GtkWidget *window)
+static void
+subprocess2_wait_cb (GObject *source, GAsyncResult *res, gpointer data)
+{
+    gboolean status;
+    gboolean ret;
+    GError *error;
+
+    ret = g_subprocess_get_if_exited (G_SUBPROCESS (source));
+
+    status = g_subprocess_wait_finish (G_SUBPROCESS (source), res, &error);
+
+    if (ret == TRUE)
+    {
+        g_slice_free1 (4096, check);
+        g_print ("check freed successfully\n");
+    }
+}
+
+gint
+jack_server_init (GtkPassedMainData *pdata)
 {
 	/*
         This functions starts the JACK server using a
@@ -396,8 +406,6 @@ jack_server_init (GtkWidget *sw,
     GPid pid;
 	gint check_pid;
 	gchar **argv;
-    GtkPassedServerData *pdata;
-    GtkPassedServerData2 *pdata2; 
     GSubprocess *subprocess;
     GSubprocess *subprocess2;
     const gchar *pid_string;
@@ -405,14 +413,12 @@ jack_server_init (GtkWidget *sw,
     GInputStream *err;
     GInputStream *out2;
 
-    pdata = g_slice_new (GtkPassedServerData);
-    pdata -> ptext_view = text;
-    pdata2 = g_slice_new (GtkPassedServerData2);
-    pdata2 -> psw = sw;
-    pdata2 -> pwindow = window;
-
     jackdrc_init_input ();
 	argv = get_arg_vector ();
+
+    log_out = g_slice_alloc (4096);
+    log_err = g_slice_alloc (4096);
+    check = g_slice_alloc (4096);
 
     subprocess = g_subprocess_newv ((const gchar *const *) argv,
                                     G_SUBPROCESS_FLAGS_STDOUT_PIPE |
@@ -424,11 +430,13 @@ jack_server_init (GtkWidget *sw,
                              subprocess_wait_cb,
                              NULL);
 
+
+
     out = g_subprocess_get_stdout_pipe (subprocess);
     err = g_subprocess_get_stderr_pipe (subprocess);
 
     g_input_stream_read_async (out,
-                               pdata -> pbuffer,
+                               log_out,
                                4096,
                                G_PRIORITY_DEFAULT,
                                NULL,
@@ -436,22 +444,22 @@ jack_server_init (GtkWidget *sw,
                                pdata);
 
     g_input_stream_read_async (err,
-                               pdata -> pbuffer,
+                               log_err,
                                4096,
                                G_PRIORITY_DEFAULT,
                                NULL,
                                subprocess_err_pipe_cb,
-                               pdata);    
+                               pdata);
 
-    
+
 
     sleep (1);
 
-    /* 
-        Check here to see if 'jackd' didn't stop 
-        after starting it with 'GSubprocess *subprocess' 
-        using 'GSubprocess *subprocess2'.
-    */
+    /*
+     * Check here to see if 'jackd' didn't stop
+     * after starting it with 'GSubprocess *subprocess'
+     * using 'GSubprocess *subprocess2'.
+     */
     subprocess2 = g_subprocess_new (G_SUBPROCESS_FLAGS_STDOUT_PIPE |
                                     G_SUBPROCESS_FLAGS_STDERR_PIPE,
                                     NULL,
@@ -459,15 +467,20 @@ jack_server_init (GtkWidget *sw,
                                     "-c",
                                     NULL);
 
+    g_subprocess_wait_async (subprocess2,
+                             NULL,
+                             subprocess2_wait_cb,
+                             NULL);
+
     out2 = g_subprocess_get_stdout_pipe (subprocess2);
 
     g_input_stream_read_async (out2,
-                               pdata2 -> pbuffer2,
-                               2048,
+                               check,
+                               4096,
                                G_PRIORITY_DEFAULT,
                                NULL,
                                subprocess2_pipe_cb,
-                               pdata2);
+                               pdata);
 
     pid_string = g_subprocess_get_identifier (subprocess);
 

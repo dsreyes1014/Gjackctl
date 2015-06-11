@@ -3,7 +3,9 @@
 
 #include <gtk/gtk.h>
 
+#include "main.h"
+
 void
-jack_log (GtkWidget *stack, GtkWidget *text);
+jack_log (GtkPassedMainData *pdata);
 
 #endif

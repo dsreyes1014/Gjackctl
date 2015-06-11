@@ -10,9 +10,6 @@
 #include "config_file_input.h"
 
 void
-period (GtkWidget *box, GtkWidget *button);
-
-const gchar *
-get_period ();
+period (GtkWidget *grid);
 
 #endif

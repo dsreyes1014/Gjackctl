@@ -7,9 +7,6 @@
 #include "config_file_input.h"
 
 void
-frames (GtkWidget *box, GtkWidget *button);
-
-const gchar *
-get_frames ();
+frames (GtkWidget *grid);
 
 #endif

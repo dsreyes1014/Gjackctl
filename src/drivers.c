@@ -119,9 +119,9 @@ create_label_string ()
 }
 
 static void
-alsa_action_activate_cb (GSimpleAction *action,
-                         GVariant *parameter,
-                         gpointer user_data)
+alsa_action_change_state_cb (GSimpleAction *action,
+                             GVariant *parameter,
+                             gpointer user_data)
 {
     const gchar *driver_str;
     const gchar *device_str;
@@ -198,6 +198,13 @@ create_dummy_menu_item ()
     return item;
 }
 
+static void
+destroy_popover_cb (GtkPopover *popover,
+                    gpointer    user_data)
+{
+    //gtk_widget_destroy (GTK_WIDGET (popover));
+}
+
 void
 drivers (GtkWidget *grid)
 {
@@ -209,6 +216,7 @@ drivers (GtkWidget *grid)
     GtkPopover *popover;
     GMenu *main_menu;
     GMenu *alsa_submenu;
+    GVariant *alsa_variant;
     GSimpleAction *alsa_action;
     GSimpleAction *dummy_action;
     GSimpleActionGroup *group;
@@ -216,7 +224,10 @@ drivers (GtkWidget *grid)
     main_menu = g_menu_new ();
     alsa_submenu = g_menu_new ();
     group = g_simple_action_group_new ();
-    alsa_action = g_simple_action_new ("alsa", G_VARIANT_TYPE_STRING);
+    alsa_variant = g_variant_new_string (get_driver_device ());
+    alsa_action = g_simple_action_new_stateful ("alsa",
+                                                G_VARIANT_TYPE_STRING,
+                                                alsa_variant);
     dummy_action = g_simple_action_new ("dummy", G_VARIANT_TYPE_STRING);
     label = gtk_label_new ("Interface");
     mbutton = gtk_menu_button_new ();
@@ -274,13 +285,19 @@ drivers (GtkWidget *grid)
                              GTK_POS_RIGHT,
                              2, 1);
 
-    gtk_widget_set_halign (label, GTK_ALIGN_END);
+    gtk_widget_set_halign (label, GTK_ALIGN_START);
     gtk_widget_set_margin_start (mbutton, 20);
     gtk_widget_set_halign (mbutton, GTK_ALIGN_FILL);
+    gtk_widget_set_tooltip_text (mbutton, "driver/soundcard");
+
+    g_signal_connect (popover,
+                      "closed",
+                      G_CALLBACK (destroy_popover_cb),
+                      NULL);
 
     g_signal_connect (alsa_action,
-                      "activate",
-                      G_CALLBACK (alsa_action_activate_cb),
+                      "change-state",
+                      G_CALLBACK (alsa_action_change_state_cb),
                       mbutton_label);
 
     g_signal_connect (dummy_action,

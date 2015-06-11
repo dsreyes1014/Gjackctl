@@ -5,11 +5,10 @@
 #include <gtk/gtk.h>
 #include <jack/jack.h>
 
-#include "jack_log.h"
-#include "config_file_init.h"
-
 typedef struct _GtkPassedMainData GtkPassedMainData;
 
+#include "jack_log.h"
+#include "config_file_init.h"
 #include "server_switch.h"
 #include "gjackctl_settings.h"
 #include "display.h"
@@ -18,7 +17,8 @@ struct _GtkPassedMainData {
     GtkWidget *window;
     GtkWidget *text;
     GtkWidget *sw;
-    GtkWidget *stack;
+    GtkWidget *button_box;
+    GtkWidget *vbox;
     GtkWidget *sswitcher;
     GtkWidget *header_bar;
 };

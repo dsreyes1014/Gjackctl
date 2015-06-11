@@ -26,7 +26,7 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 	{		
         clear_log_view (rdata -> text);				 
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw) , "Shutdown Server");
-	    jack_server_init (GTK_WIDGET (sw), rdata -> text, rdata -> window);
+	    jack_server_init (rdata);
 	}
 	else
 	{	        

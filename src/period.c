@@ -3,20 +3,36 @@
 const gchar *
 get_period ()
 {
-    const gchar *period;
-    gchar *file;
+    const gchar *string;
     const gchar *copy;
+    gchar *file;
     config_t config;
 
-    config_init (&config);
     file = g_strconcat (g_getenv ("HOME"),
                         "/.config/gjackctl/gjackctl.conf",
                         NULL);
 
+    config_init (&config);
     config_read_file (&config, file);
-    config_lookup_string (&config, "gjackctl.driver.period", &period);
+    if (config_lookup_string (&config, "gjackctl.driver.period", &string) == CONFIG_FALSE)
+    {
+        gchar *value_copy;
+        config_setting_t *group;
+        config_setting_t *setting;
 
-    copy = g_strdup (period);
+        g_print ("\'Period Size\' config option not available\n");
+        g_print ("Creating config setting now...\n");
+
+        value_copy = g_strdup ("2");
+        group = config_lookup (&config, "gjackctl.driver");
+        setting = config_setting_add (group, "period", CONFIG_TYPE_STRING);
+        config_setting_set_string (setting, value_copy);
+        config_write_file (&config, file);
+        string = g_strdup (value_copy);
+        g_free (value_copy);
+    }
+
+    copy = g_strdup (string);
     g_free (file);
     config_destroy (&config);
 
@@ -39,8 +55,17 @@ button_clicked_cb (GtkButton *button, gpointer user_data)
                        (gpointer) string);    
 }
 
+static void
+value_changed_cb (GtkSpinButton *button,
+                  gpointer       user_data)
+{
+    config_file_input ("gjackctl.driver.period",
+                       CONFIG_TYPE_STRING,
+                       (gpointer) gtk_entry_get_text (GTK_ENTRY (button)));
+}
+
 void
-period (GtkWidget *box, GtkWidget *button)
+period (GtkWidget *grid)
 {
 	/* This gets called from `gjackctl_setings_cb` that's in the 
 	`gjackctl_settings.c` module. */
@@ -49,31 +74,33 @@ period (GtkWidget *box, GtkWidget *button)
 	GtkWidget *spin_button;
     GtkWidget *child_box;
 	GtkAdjustment *adjustment;
-    gint period;
+    gdouble value;
     config_t config;
 
+    value = g_ascii_strtod (get_period (), NULL);
     label = gtk_label_new ("Period");
-	adjustment = gtk_adjustment_new (2, 0, 6, 1, 0, 0);
-	spin_button = gtk_spin_button_new (adjustment, 1, 0);
-    period = g_ascii_strtoll (get_period (), NULL, 0);
-    child_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+	adjustment = gtk_adjustment_new (value, 0, 6, 1, 0, 0);
+	spin_button = gtk_spin_button_new (adjustment, 0, 0);
 
-    //gtk_widget_override_font (label, pango_font_description_from_string ("Cantarell Bold 11.5"));
-    gtk_widget_set_tooltip_text (spin_button, "Number of periods of latency");
+    gtk_widget_set_tooltip_text (spin_button,
+                                 "Number of periods of playback latency");
 
-    gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin_button), period);
+    gtk_grid_attach (GTK_GRID (grid),
+                     label,
+                     0, 3, 1, 1);
 
-	/* Pack `box` which is declared in `gjackctl_settings.c`
-	in the `gjackctl_settings_cb` function. */
-    gtk_box_pack_start (GTK_BOX (child_box), label, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (child_box), spin_button, FALSE, FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (box), child_box, FALSE, FALSE, 2);
-	
-    //gtk_widget_set_halign (label, GTK_ALIGN_START);
-    //gtk_widget_set_halign (spin_button, GTK_ALIGN_START);
-    gtk_widget_set_margin_start (label, 10);
-    gtk_widget_set_margin_start (spin_button, 10);
-    //gtk_widget_set_margin_end (spin_button, 70);
+    gtk_grid_attach_next_to (GTK_GRID (grid),
+                             spin_button,
+                             label,
+                             GTK_POS_RIGHT,
+                             2, 1);
 
-    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked_cb), spin_button);
+    gtk_widget_set_halign (label, GTK_ALIGN_START);
+    gtk_widget_set_margin_start (spin_button, 20);
+    gtk_widget_set_halign (spin_button, GTK_ALIGN_FILL);
+
+    g_signal_connect (spin_button,
+                      "value-changed",
+                      G_CALLBACK (value_changed_cb),
+                      NULL);
 }

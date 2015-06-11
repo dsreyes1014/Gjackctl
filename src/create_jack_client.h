@@ -27,17 +27,25 @@ struct _GtkPassedJackPortsData {
     jack_client_t *client;
     GtkListStore *list_store;
     GtkListStore *list_store2;
+    GtkWidget *pwindow;
     GtkWidget *view;
     GtkWidget *view2;
+    GtkWidget *sc_window;
+    GtkWidget *sc_window2;
+    GtkWidget *audio_from_button;
+    GtkWidget *audio_to_button;
+    GtkWidget *midi_from_button;
+    GtkWidget *midi_to_button;
     gint col_num;
-    GtkWidget *from_audio;  /* GtkLabel */
-    GtkWidget *to_audio;    /* GtkLabel */
-    GtkWidget *from_midi;   /* GtkLabel */
-    GtkWidget *to_midi;     /* GtkLabel */
+    GtkWidget *from_audio;  /* for a GtkLabel */
+    GtkWidget *to_audio;    /* for a GtkLabel */
+    GtkWidget *from_midi;   /* for a GtkLabel */
+    GtkWidget *to_midi;     /* for a GtkLabel */
     enum GtkJackPortType port_type;
     GSimpleAction *audio_action;
-	GSimpleAction *midi_action;
+    GSimpleAction *midi_action;
     GSimpleActionGroup *group;
+    GtkWidget *button;
 };
 
 gint
