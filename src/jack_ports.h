@@ -8,7 +8,8 @@
 #include "create_jack_client.h"
 
 gint
-jack_ports (GtkWidget *stack, gpointer user_data);
+jack_ports (GtkWidget     *stack,
+            gpointer       user_data);
 
 #endif
 

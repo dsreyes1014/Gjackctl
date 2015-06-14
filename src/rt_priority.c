@@ -62,13 +62,13 @@ void
 rt_priority (GtkWidget *grid)
 {
     GtkWidget *label;
+    GtkWidget *spin_button;
     GtkAdjustment *adj;
     gdouble k;
     const gchar * str;
 
     str = get_rt_priority ();
     k = g_ascii_strtod (str, NULL);
-    GtkWidget *spin_button;
     label = gtk_label_new ("Priority");
     adj = gtk_adjustment_new (k, 0, 99, 1, 0, 0);
     spin_button = gtk_spin_button_new (adj, 1, 0);

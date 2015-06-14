@@ -6,6 +6,7 @@ struct _GtkPassedDisplayData {
     GtkWidget *grid;
     GtkWidget *pbar;
     GtkPassedMainData *pdata;
+    gint handler_id;
 };
 
 static const gchar *
@@ -71,14 +72,15 @@ grid_on (GtkPassedDisplayData *rdata)
     label4a = gtk_label_new (get_config_setting_string ("gjackctl.driver.device"));
     level_bar = gtk_level_bar_new ();    
 
-    clear_container (rdata -> grid);
+    //clear_container (rdata -> grid);
 
     gtk_level_bar_set_min_value (GTK_LEVEL_BAR (level_bar), 0);
     gtk_level_bar_set_max_value (GTK_LEVEL_BAR (level_bar), 100);
     gtk_level_bar_set_mode (GTK_LEVEL_BAR (level_bar),
                             GTK_LEVEL_BAR_MODE_CONTINUOUS);
 
-    if (jack_client_init (rdata -> pdata -> sw,
+    if (jack_client_init (rdata -> pdata -> client,
+                          rdata -> pdata -> sw,
                           rdata -> pdata -> button_box,
                           labela,
                           label2a,
@@ -158,10 +160,6 @@ pulse_timeout_cb (gpointer user_data)
         gtk_progress_bar_set_pulse_step (GTK_PROGRESS_BAR (rdata -> pbar),
                                          0.3);
 
-        /*gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR (rdata -> pbar), TRUE);
-        gtk_progress_bar_set_text (GTK_PROGRESS_BAR (rdata -> pbar),
-                                   "jackd not running");*/
-
         gtk_progress_bar_pulse (GTK_PROGRESS_BAR (rdata -> pbar));
         return TRUE;
     }
@@ -170,33 +168,7 @@ pulse_timeout_cb (gpointer user_data)
 static void
 grid_off (GtkPassedDisplayData *rdata)
 {
-    //GtkWidget *stack_child;
-
-    //rdata -> pbar = gtk_progress_bar_new ();
-
     clear_container (rdata -> grid);
-
-    /*stack_child = gtk_stack_get_child_by_name (GTK_STACK (rdata -> pdata -> stack),
-                                               "ports");*/
-
-    /*if (stack_child != NULL)
-    {
-        gtk_widget_destroy (stack_child);
-    }*/
-
-    /*gtk_grid_attach (GTK_GRID (rdata -> grid),
-                     rdata -> pbar,
-                     0, 0, 1, 1);*/
-
-    /* Setting 'GtkProgressBar' attributes inside of 'GtkGrid'. */
-    //gtk_widget_set_halign (rdata -> pbar, GTK_ALIGN_FILL);
-    //gtk_widget_set_valign (rdata -> pbar, GTK_ALIGN_CENTER);
-    //gtk_widget_set_hexpand (rdata -> pbar, TRUE);
-    //gtk_widget_set_margin_start (rdata -> pbar, 80);
-    //gtk_widget_set_margin_end (rdata -> pbar, 80);
-    //gtk_widget_set_margin_top (rdata -> pbar, 40);
-
-    //g_timeout_add (500, (GSourceFunc) pulse_timeout_cb, rdata);
 }
 
 static void
@@ -206,10 +178,10 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
      * Here we destroy the 'GtkWidget *grid' passed through by the struct
      * and create a new one for on/off functionality.
      */
-     
+
     GtkWidget *stack_child;
     GtkPassedDisplayData *rdata;
-    
+
     rdata = user_data;
 
     if (gtk_switch_get_active (sw) == TRUE)

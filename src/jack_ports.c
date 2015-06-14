@@ -1679,6 +1679,16 @@ popover_button_clicked_cb (GtkButton *button, gpointer user_data)
     }
 }
 
+static gint
+graph_reorder_cb (gpointer user_data)
+{
+    /*GtkPassedJackPortsData *pdata;
+
+    pdata = user_data;
+    */
+    return 0;
+}
+
 static void
 check_ports (GtkWidget              *view,
              gchar                  *port1_str,
@@ -1712,6 +1722,7 @@ check_ports (GtkWidget              *view,
         port_from_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (pdata -> from_midi)));
     }
 
+
     /* Get available 'to' ports. */
     gchar *array_to[num_col];
     for (i = 1; i < num_col; i++)
@@ -1731,7 +1742,7 @@ check_ports (GtkWidget              *view,
      * Get the column number of tree view if it matches.  If it
      * doesn't match then 'col_num' will return -1 when it's referenced.
      */
-    for (i = 0; i < num_col; i++)
+    for (i = 0; i <= num_col; i++)
     {
         if ((g_strcmp0 (array_to[i], port1_str) == 0) ||
             (g_strcmp0 (array_to[i], port2_str) == 0))
@@ -1744,7 +1755,6 @@ check_ports (GtkWidget              *view,
     /* Get available 'from' ports. */
     gchar *array_from[num_rows];
     gtk_tree_model_get_iter_first (model, &iter);
-
     for (i = 0; i < num_rows; i++)
     {
         gchar *string;
@@ -1831,7 +1841,8 @@ check_connect_cb (jack_port_id_t a,
 }
 
 gint
-jack_ports (GtkWidget *button_box, gpointer user_data)
+jack_ports (GtkWidget     *button_box,
+            gpointer       user_data)
 {
     GtkPassedJackPortsData *pdata;
 
@@ -1922,12 +1933,11 @@ jack_ports (GtkWidget *button_box, gpointer user_data)
                                  gtk_label_get_text (GTK_LABEL (pdata -> to_midi)),
                                  pdata);
 
-    if (jack_set_port_connect_callback (pdata -> client, check_connect_cb, pdata) != 0)
-    {
-        g_print ("Port connection error\n");
-    }
+    jack_set_port_connect_callback (pdata -> client, check_connect_cb, pdata);
+    jack_set_graph_order_callback (pdata -> client, graph_reorder_cb, pdata);
 
-    /* We activate here so we can set our 'port_connect_cb'. */
+    /* We activate here so we can set up our 'check_connect_cb'. */
     jack_activate (pdata -> client);
+
     return 0;
 }

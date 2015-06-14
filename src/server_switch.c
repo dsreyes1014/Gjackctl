@@ -31,7 +31,7 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 	else
 	{	        
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw), "Start Server");
-		kill (get_jack_gpid (NULL), SIGKILL);	 
+		kill (get_jack_gpid (NULL), SIGTERM);
 	}
 }   
 

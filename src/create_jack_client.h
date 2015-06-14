@@ -9,6 +9,7 @@
 
 #include "jack_ports.h"
 #include "dsp_load.h"
+#include "main.h"
 
 /*
  * Declaring struct here to be used in 'jack_ports.c' so that we clean up when
@@ -46,10 +47,12 @@ struct _GtkPassedJackPortsData {
     GSimpleAction *midi_action;
     GSimpleActionGroup *group;
     GtkWidget *button;
+    gint handler_id;
 };
 
 gint
-jack_client_init (GtkWidget *sw,
+jack_client_init (jack_client_t *client,
+		  GtkWidget *sw,
                   GtkWidget *stack,
                   GtkWidget *label,
                   GtkWidget *label2,

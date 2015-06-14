@@ -244,7 +244,7 @@ subprocess_out_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
                                         res,
                                         NULL);
 
-    g_print ("1.'jack_server_init.c': number of bytes in log out pipe %d\n", bytes);
+    g_print ("1.'jack_server_init.c': number of bytes in log out pipe %d\n", (gint) bytes);
 
     string = g_strndup (log_out, bytes - 1);
 
@@ -273,7 +273,7 @@ subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
                                         res,
                                         NULL);
 
-    g_print ("'jack_server_init.c': number of bytes in log err pipe %d\n", bytes);
+    g_print ("2. 'jack_server_init.c': number of bytes in log err pipe %d\n", (gint) bytes);
 
     string1 = g_strndup (log_err, bytes - 1);
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> text));
@@ -318,15 +318,11 @@ subprocess2_pipe_cb (GObject *source, GAsyncResult *res, gpointer user_data)
 
     string = g_strndup (check, bytes - 1);
 
-    g_print ("'jack_server_init.c': number of bytes in log check pipe %d\n", bytes);
+    g_print ("3. 'jack_server_init.c': number of bytes in log check pipe %d\n", (gint) bytes);
 
     g_print ("%s\n", string);
 
-    if (g_strcmp0 (string, "running") == 0)
-    {
-        g_print ("success\n");
-    }
-    else if (g_strcmp0 (string, "not running") == 0)
+    if (g_strcmp0 (string, "not running") == 0)
     {
         g_print ("failure\n");
 
@@ -343,8 +339,8 @@ subprocess_wait_cb (GObject *source, GAsyncResult *res, gpointer data)
     gboolean check;
     GError *error;
 
+    //error = NULL;
     check = g_subprocess_get_if_exited (G_SUBPROCESS (source));
-
     status = g_subprocess_wait_finish (G_SUBPROCESS (source), res, &error);
 
     if (check == TRUE)
@@ -357,7 +353,7 @@ subprocess_wait_cb (GObject *source, GAsyncResult *res, gpointer data)
     {
         g_slice_free1 (4096, log_out);
         g_slice_free1 (4096, log_err);
-        g_print ("check has not exited successfully\n");
+        g_print ("log_out & log_err has not exited successfully\n");
     }
 }
 
@@ -368,8 +364,8 @@ subprocess2_wait_cb (GObject *source, GAsyncResult *res, gpointer data)
     gboolean ret;
     GError *error;
 
+    //error = NULL;
     ret = g_subprocess_get_if_exited (G_SUBPROCESS (source));
-
     status = g_subprocess_wait_finish (G_SUBPROCESS (source), res, &error);
 
     if (ret == TRUE)
@@ -430,8 +426,6 @@ jack_server_init (GtkPassedMainData *pdata)
                              subprocess_wait_cb,
                              NULL);
 
-
-
     out = g_subprocess_get_stdout_pipe (subprocess);
     err = g_subprocess_get_stderr_pipe (subprocess);
 
@@ -457,8 +451,8 @@ jack_server_init (GtkPassedMainData *pdata)
 
     /*
      * Check here to see if 'jackd' didn't stop
-     * after starting it with 'GSubprocess *subprocess'
-     * using 'GSubprocess *subprocess2'.
+     * after starting it with 'subprocess'
+     * using 'subprocess2'.
      */
     subprocess2 = g_subprocess_new (G_SUBPROCESS_FLAGS_STDOUT_PIPE |
                                     G_SUBPROCESS_FLAGS_STDERR_PIPE,
@@ -481,6 +475,8 @@ jack_server_init (GtkPassedMainData *pdata)
                                NULL,
                                subprocess2_pipe_cb,
                                pdata);
+
+
 
     pid_string = g_subprocess_get_identifier (subprocess);
 

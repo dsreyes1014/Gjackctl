@@ -20,24 +20,34 @@ process_cb (jack_nframes_t nframes, gpointer user_data)
 }
 
 static void
+switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
+{
+    GtkPassedJackPortsData *pdata;
+    gboolean active;
+
+    pdata = user_data;
+    active = gtk_switch_get_active (sw);
+
+    if (active == FALSE)
+    {
+        gtk_widget_destroy (pdata -> button);
+        if (pdata -> pwindow != NULL)
+        {
+            gtk_widget_destroy (pdata -> pwindow);
+        }
+
+        g_print ("Right before closing client\n");
+        jack_client_close (pdata -> client);
+
+        g_slice_free (GtkPassedJackPortsData, pdata);
+        g_signal_handler_disconnect (sw, pdata -> handler_id);
+    }
+}
+
+static void
 jack_shutdown_cb (gpointer user_data)
 {
-    GtkPassedJackPortsData *rdata;
 
-    rdata = user_data;
-
-    gtk_widget_destroy (rdata -> button);
-    gtk_widget_destroy (rdata -> pwindow);
-    /*gtk_widget_destroy (rdata -> view);
-    gtk_widget_destroy (rdata -> view2);
-    gtk_widget_destroy (rdata -> from_audio);
-    gtk_widget_destroy (rdata -> to_audio);
-    gtk_widget_destroy (rdata -> from_midi);
-    gtk_widget_destroy (rdata -> to_midi);
-    gtk_widget_destroy (rdata -> sc_window);
-    gtk_widget_destroy (rdata -> sc_window2);*/
-
-    g_slice_free (GtkPassedJackPortsData, rdata);
 }
 
 static gint
@@ -55,7 +65,8 @@ srate_cb (jack_nframes_t nframes, gpointer user_data)
 }
 
 gint
-jack_client_init (GtkWidget *sw,
+jack_client_init (jack_client_t *client,
+                  GtkWidget *sw,
                   GtkWidget *button_box,
                   GtkWidget *label,
                   GtkWidget *label2,
@@ -63,13 +74,15 @@ jack_client_init (GtkWidget *sw,
 {
     /*
      * This function creates a client for the JACK server
-     * to provide some info of the jackd server.
+     * to provide some info from the jackd server.
      *
      *  Argument info:
-     *      --argument 1 'GtkWidget *sw' is declared in 'main.c'
-     *      --argument 2 'GtkWidget *label' is declared in 'display.c'
-     *      --argument 3 'GtkWidget *label2' is declared in 'display.c'
-     *      --argument 4 'GtkWidget *level_bar' is declared in 'display.c'
+     *      --argument 1 'client' is declared in 'main.h'
+     *      --argument 2 'sw' is declared in 'main.h'
+     *      --argument 3 'button_box' is declared in 'main.h'
+     *      --argument 4 'label' is declared in 'display.c'
+     *      --argument 5 'label2' is declared in 'display.c'
+     *      --argument 6 'level_bar' is declared in 'display.c'
      */
 
     jack_status_t status;
@@ -78,11 +91,13 @@ jack_client_init (GtkWidget *sw,
 
     pdata = g_slice_new (GtkPassedJackPortsData);
     sleep (1);
-    pdata -> client = NULL;
-    pdata -> client = jack_client_open ("gjackctl",
-                                        JackNoStartServer |
-                                        JackUseExactName,
-                                        &status);
+    client = jack_client_open ("gjackctl",
+                               JackNoStartServer |
+                               JackUseExactName,
+                               &status);
+
+    pdata -> client = client;
+    pdata -> pwindow = NULL;
 
     if (pdata -> client == NULL)
     {
@@ -93,7 +108,7 @@ jack_client_init (GtkWidget *sw,
     jack_on_shutdown (pdata -> client, jack_shutdown_cb, pdata);
     jack_set_sample_rate_callback (pdata -> client, srate_cb, label2);
 
-
+    /* We activate in 'jack_ports.c' to set up our 'check_connect_cb'. */
     //jack_activate (pdata -> client);
 
     jack_ports (button_box, pdata);
@@ -103,6 +118,11 @@ jack_client_init (GtkWidget *sw,
 
     g_sprintf (srate, "%d", jack_get_sample_rate (pdata -> client));
     gtk_label_set_text (GTK_LABEL (label2), g_strdup (srate));
+
+    pdata -> handler_id = g_signal_connect (sw,
+                                            "notify::active",
+                                            G_CALLBACK (switch_pos_cb),
+                                            pdata);
 
     return 0;
 }

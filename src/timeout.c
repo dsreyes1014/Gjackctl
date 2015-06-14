@@ -116,8 +116,6 @@ output_cb (GtkSpinButton *spin_button,
         }
     }
 
-    g_print ("Test if this reaches\n");
-
     return TRUE;
 }
 

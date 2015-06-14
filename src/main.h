@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <config.h>
+#include <libconfig.h>
 #include <gtk/gtk.h>
 #include <jack/jack.h>
 
@@ -12,6 +12,7 @@ typedef struct _GtkPassedMainData GtkPassedMainData;
 #include "server_switch.h"
 #include "gjackctl_settings.h"
 #include "display.h"
+#include "create_jack_client.h"
 
 struct _GtkPassedMainData {
     GtkWidget *window;
@@ -21,6 +22,7 @@ struct _GtkPassedMainData {
     GtkWidget *vbox;
     GtkWidget *sswitcher;
     GtkWidget *header_bar;
+    jack_client_t *client;
 };
 
 gint

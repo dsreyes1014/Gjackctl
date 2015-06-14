@@ -77,11 +77,8 @@ server_name (GtkWidget *grid)
                              GTK_POS_RIGHT,
                              1, 1);
 
-    //gtk_widget_set_margin_top (label, 10);
     gtk_widget_set_halign (label, GTK_ALIGN_START);
-    //gtk_widget_set_margin_start (label, 10);
     gtk_widget_set_margin_start (entry, 20);
-    //gtk_widget_set_margin_top (entry, 10);
     gtk_widget_set_halign (entry, GTK_ALIGN_FILL);
 
     g_signal_connect (entry, "focus-out-event", G_CALLBACK (focus_out_event_cb), NULL);
