@@ -58,6 +58,7 @@ static void
 run_app_cb (GApplication *app, gpointer data)
 {
     GtkPassedMainData *pdata;
+    jack_status_t status;
 
     pdata = g_slice_new (GtkPassedMainData);
 	pdata -> window = gtk_application_window_new (GTK_APPLICATION (app));
@@ -72,6 +73,7 @@ run_app_cb (GApplication *app, gpointer data)
 	pdata -> header_bar = gtk_header_bar_new ();
     pdata -> sw = gtk_switch_new ();
     pdata -> text = gtk_text_view_new ();
+    pdata -> client = NULL;
     //pdata -> sswitcher = gtk_stack_switcher_new ();
 
     gtk_button_box_set_layout (GTK_BUTTON_BOX (pdata -> button_box),
@@ -111,7 +113,7 @@ run_app_cb (GApplication *app, gpointer data)
                                      pdata -> sswitcher);*/
 
     gtk_header_bar_set_title (GTK_HEADER_BAR (pdata -> header_bar),
-                              "GJACKCTL");
+                              "Gjackctl");
 
 	/* Set 'GtkHeaderBar *head_bar' as titlebar. */
 	gtk_window_set_titlebar (GTK_WINDOW (pdata -> window), pdata -> header_bar);
@@ -140,7 +142,7 @@ run_app_cb (GApplication *app, gpointer data)
     g_signal_connect (pdata -> window,
                       "destroy",
                       G_CALLBACK (gtk_widget_destroy),
-                      NULL);
+                      pdata -> client);
 
 	gtk_widget_show_all (pdata -> window);
 }

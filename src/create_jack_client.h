@@ -52,10 +52,11 @@ struct _GtkPassedJackPortsData {
 
 gint
 jack_client_init (jack_client_t *client,
-		  GtkWidget *sw,
-                  GtkWidget *stack,
-                  GtkWidget *label,
-                  GtkWidget *label2,
-                  GtkWidget *level_bar);
+                  GtkWidget     *sw,
+                  GtkWidget     *button_box,
+                  GtkWidget     *label,
+                  GtkWidget     *label2,
+                  GtkWidget     *level_bar,
+                  GtkWidget     *view);
 
 #endif

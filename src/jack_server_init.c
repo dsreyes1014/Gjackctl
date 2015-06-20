@@ -445,8 +445,6 @@ jack_server_init (GtkPassedMainData *pdata)
                                subprocess_err_pipe_cb,
                                pdata);
 
-
-
     sleep (1);
 
     /*

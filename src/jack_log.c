@@ -1,5 +1,7 @@
 #include "jack_log.h"
 
+GtkWidget *text_view;
+
 static GtkWidget *
 check_if_parent_container (GtkWidget *child)
 {
@@ -40,6 +42,49 @@ close_popover_cb (GtkPopover *popover,
 }
 
 static void
+info_msg_cb (const gchar *msg)
+{
+    GtkTextBuffer *buffer;
+    gchar *copy;
+
+    copy = g_strdup (msg);
+    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (text_view));
+
+    gtk_text_buffer_insert_at_cursor (buffer, msg, -1);
+    g_print ("From info_cb: \n%s\n", msg);
+}
+
+static void
+error_msg_cb (const gchar *msg)
+{
+    GtkTextBuffer *buffer;
+    GtkTextIter iter;
+    GtkTextTagTable *table;
+    gchar *copy;
+
+    copy = g_strdup (msg);
+    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (text_view));
+
+    if (gtk_text_tag_table_lookup (table, "red_fg") == NULL)
+    {
+        gtk_text_buffer_create_tag (buffer,
+                                    "red_fg",
+                                    "foreground",
+                                    "red",
+                                    NULL);
+    }
+
+    gtk_text_buffer_get_end_iter (buffer, &iter);
+    gtk_text_buffer_insert_with_tags_by_name (buffer,
+                                              &iter,
+                                              copy,
+                                              -1,
+                                              "red_fg",
+                                              NULL);
+}
+
+
+static void
 button_clicked_cb (GtkButton *button,
                    gpointer   user_data)
 {
@@ -55,6 +100,8 @@ button_clicked_cb (GtkButton *button,
 									GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
     g_object_ref (rdata -> text);
+    //jack_set_info_function (info_msg_cb);
+    //jack_set_error_function (error_msg_cb);
 
     gtk_container_add (GTK_CONTAINER (scwindow), rdata -> text);
 
@@ -76,6 +123,7 @@ jack_log (GtkPassedMainData *pdata)
 {
     GtkWidget *button;
 
+    text_view = pdata -> text;
     button = gtk_button_new_from_icon_name ("accessories-text-editor-symbolic",
                                             GTK_ICON_SIZE_BUTTON);
 

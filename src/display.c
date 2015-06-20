@@ -84,7 +84,8 @@ grid_on (GtkPassedDisplayData *rdata)
                           rdata -> pdata -> button_box,
                           labela,
                           label2a,
-                          level_bar) != 0)
+                          level_bar,
+                          rdata -> pdata -> text) != 0)
     {
         return FALSE;
     }

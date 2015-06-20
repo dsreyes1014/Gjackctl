@@ -1125,6 +1125,8 @@ create_midi_jack_ports_view (const gchar  *from_port_clicked,
     GtkTreeIter iter;
     GtkPassedJackPortsData *rdata;
 
+    from_ports_array = NULL;
+    to_ports_array = NULL;
     rdata = user_data;
     i = 0;
     renderer = gtk_cell_renderer_text_new ();
@@ -1156,6 +1158,14 @@ create_midi_jack_ports_view (const gchar  *from_port_clicked,
                                      NULL,
                                      JACK_DEFAULT_MIDI_TYPE,
                                      JackPortIsInput);
+
+    if (from_ports_array == NULL && to_ports_array == NULL)
+    {
+        gtk_label_set_text (GTK_LABEL (rdata -> from_midi), "-");
+        gtk_label_set_text (GTK_LABEL (rdata -> to_midi), "-");
+
+        return -1;
+    }
 
     model = get_midi_model (rdata -> view2,
                             rdata -> list_store2,
@@ -1274,9 +1284,12 @@ midi_action_activate_cb (GSimpleAction *action,
         gtk_label_set_text (GTK_LABEL (rdata -> to_midi), string);
     }
 
-    create_midi_jack_ports_view (gtk_label_get_text (GTK_LABEL (rdata -> from_midi)),
-                                 gtk_label_get_text (GTK_LABEL (rdata -> to_midi)),
-                                 rdata);
+    if (create_midi_jack_ports_view (gtk_label_get_text (GTK_LABEL (rdata -> from_midi)),
+                                     gtk_label_get_text (GTK_LABEL (rdata -> to_midi)),
+                                     rdata) == -1)
+    {
+        g_print ("No midi ports available.\nPlease check the MIDI option in settings\n");
+    }
 
 }
 
@@ -1308,14 +1321,15 @@ audio_action_activate_cb (GSimpleAction *action,
 }
 
 static GMenu *
-create_audio_menu_model (jack_client_t        *client,
-                         enum GtkJackPortType  type)
+create_menu_model (jack_client_t        *client,
+                   enum GtkJackPortType  type)
 {
     GMenu *menu;
     gchar **port_prefix;
     const gchar **ports;
     gint i;
 
+    ports = NULL;
     menu = g_menu_new ();
     i = 0;
 
@@ -1345,6 +1359,12 @@ create_audio_menu_model (jack_client_t        *client,
                                     JACK_DEFAULT_MIDI_TYPE,
                                     JackPortIsInput);
             break;
+    }
+
+    if (ports == NULL)
+    {
+        g_print ("Ports equal NULL\n");
+        return NULL;
     }
 
     port_prefix = modified_ports_array (ports);
@@ -1387,18 +1407,11 @@ audio_from_button_clicked_cb (GtkButton *button, gpointer user_data)
 {
     GtkWidget *popover;
     GMenu *menu;
-    GMenu *from_section;
     GtkPassedJackPortsData *rdata;
 
     rdata = user_data;
     rdata -> port_type = GTK_JACK_PORT_AUDIO_FROM;
-    menu = create_audio_menu_model (rdata -> client, rdata -> port_type);
-    from_section = g_menu_new ();
-
-    g_menu_insert_section (menu,
-                           0,
-                           "From",
-                           G_MENU_MODEL (from_section));
+    menu = create_menu_model (rdata -> client, rdata -> port_type);
 
     popover = gtk_popover_new_from_model (GTK_WIDGET (button),
                                           G_MENU_MODEL (menu));
@@ -1424,18 +1437,11 @@ audio_to_button_clicked_cb (GtkButton *button, gpointer user_data)
 {
     GtkWidget *popover;
     GMenu *menu;
-    GMenu *from_section;
     GtkPassedJackPortsData *rdata;
 
     rdata = user_data;
     rdata -> port_type = GTK_JACK_PORT_AUDIO_TO;
-    menu = create_audio_menu_model (rdata -> client, rdata -> port_type);
-    from_section = g_menu_new ();
-
-    g_menu_insert_section (menu,
-                           0,
-                           "To",
-                           G_MENU_MODEL (from_section));
+    menu = create_menu_model (rdata -> client, rdata -> port_type);
 
     popover = gtk_popover_new_from_model (GTK_WIDGET (button),
                                           G_MENU_MODEL (menu));
@@ -1461,36 +1467,32 @@ midi_from_button_clicked_cb (GtkButton *button, gpointer user_data)
 {
     GtkWidget *popover;
     GMenu *menu;
-    GMenu *from_section;
     GtkPassedJackPortsData *rdata;
 
     rdata = user_data;
     rdata -> port_type = GTK_JACK_PORT_MIDI_FROM;
-    menu = create_audio_menu_model (rdata -> client, rdata -> port_type);
-    from_section = g_menu_new ();
+    menu = create_menu_model (rdata -> client, rdata -> port_type);
 
-    g_menu_insert_section (menu,
-                           0,
-                           "From",
-                           G_MENU_MODEL (from_section));
-
-    popover = gtk_popover_new_from_model (GTK_WIDGET (button),
-                                          G_MENU_MODEL (menu));
+    if (menu)
+    {
+        popover = gtk_popover_new_from_model (GTK_WIDGET (button),
+                                              G_MENU_MODEL (menu));
 
 
-    gtk_widget_insert_action_group (GTK_WIDGET (button),
-                                    "ports",
-                                    G_ACTION_GROUP (rdata -> group));
+        gtk_widget_insert_action_group (GTK_WIDGET (button),
+                                        "ports",
+                                        G_ACTION_GROUP (rdata -> group));
 
-    gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_BOTTOM);
-    gtk_popover_set_transitions_enabled (GTK_POPOVER (popover), TRUE);
+        gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_BOTTOM);
+        gtk_popover_set_transitions_enabled (GTK_POPOVER (popover), TRUE);
 
-    g_signal_connect (rdata -> midi_action,
-                      "activate",
-                      G_CALLBACK (midi_action_activate_cb),
-                      rdata);
+        g_signal_connect (rdata -> midi_action,
+                          "activate",
+                          G_CALLBACK (midi_action_activate_cb),
+                          rdata);
 
-    gtk_widget_show_all (popover);
+        gtk_widget_show_all (popover);
+    }
 }
 
 static void
@@ -1498,36 +1500,32 @@ midi_to_button_clicked_cb (GtkButton *button, gpointer user_data)
 {
     GtkWidget *popover;
     GMenu *menu;
-    GMenu *from_section;
     GtkPassedJackPortsData *rdata;
 
     rdata = user_data;
     rdata -> port_type = GTK_JACK_PORT_MIDI_TO;
-    menu = create_audio_menu_model (rdata -> client, rdata -> port_type);
-    from_section = g_menu_new ();
+    menu = create_menu_model (rdata -> client, rdata -> port_type);
 
-    g_menu_insert_section (menu,
-                           0,
-                           "To",
-                           G_MENU_MODEL (from_section));
-
-    popover = gtk_popover_new_from_model (GTK_WIDGET (button),
-                                          G_MENU_MODEL (menu));
+    if (menu)
+    {
+        popover = gtk_popover_new_from_model (GTK_WIDGET (button),
+                                              G_MENU_MODEL (menu));
 
 
-    gtk_widget_insert_action_group (GTK_WIDGET (button),
-                                    "ports",
-                                    G_ACTION_GROUP (rdata -> group));
+        gtk_widget_insert_action_group (GTK_WIDGET (button),
+                                        "ports",
+                                        G_ACTION_GROUP (rdata -> group));
 
-    gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_BOTTOM);
-    gtk_popover_set_transitions_enabled (GTK_POPOVER (popover), TRUE);
+        gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_BOTTOM);
+        gtk_popover_set_transitions_enabled (GTK_POPOVER (popover), TRUE);
 
-    g_signal_connect (rdata -> midi_action,
-                      "activate",
-                      G_CALLBACK (midi_action_activate_cb),
-                      rdata);
+        g_signal_connect (rdata -> midi_action,
+                          "activate",
+                          G_CALLBACK (midi_action_activate_cb),
+                          rdata);
 
-    gtk_widget_show_all (popover);
+        gtk_widget_show_all (popover);
+    }
 }
 
 static GtkWidget *
@@ -1732,10 +1730,18 @@ check_ports (GtkWidget              *view,
 
         column = gtk_tree_view_get_column (GTK_TREE_VIEW (view), i);
         label = gtk_tree_view_column_get_widget (column);
-        array_to[i] = g_strconcat (port_to_prefix,
+        array_to[i - 1] = g_strconcat (port_to_prefix,
                                    ":",
                                    gtk_label_get_text (GTK_LABEL (label)),
                                    NULL);
+
+        /* Terminate our array with 'NULL'. */
+        if (i == num_col)
+        {
+            array_to[i] = NULL;
+        }
+
+        g_print ("Available To Ports: %s\n", array_to[i - 1]);
     }
 
     /*
@@ -1744,10 +1750,33 @@ check_ports (GtkWidget              *view,
      */
     for (i = 0; i <= num_col; i++)
     {
-        if ((g_strcmp0 (array_to[i], port1_str) == 0) ||
-            (g_strcmp0 (array_to[i], port2_str) == 0))
+        g_print ("Port Name Count: %s\n", array_to[i]);
+        gchar *copy1;
+        gchar *copy2;
+        gchar *copy3;
+
+        copy1 = g_strdup (array_to[i]);
+        copy2 = g_strdup (port1_str);
+        copy3 = g_strdup (port2_str);
+
+        if ((g_strcmp0 (copy1, copy2) == 0) ||
+            (g_strcmp0 (copy1, copy3) == 0))
         {
-            col_num = i;
+            col_num = i + 1;
+            g_free (copy1);
+            g_free (copy2);
+            g_free (copy3);
+            g_print ("Column number selected: %d\n", i);
+            break;
+        }
+
+        g_print ("Port number count: %d\n", i);
+        g_free (copy1);
+        g_free (copy2);
+        g_free (copy3);
+
+        if (i == num_col)
+        {
             break;
         }
     }
@@ -1822,19 +1851,25 @@ check_connect_cb (jack_port_id_t a,
     port1_str = g_strdup (jack_port_name (port1));
     port2_str = g_strdup (jack_port_name (port2));
 
-    check_ports (pdata -> view,
-                 port1_str,
-                 port2_str,
-                 connect,
-                 GTK_JACK_PORT_AUDIO_FROM,
-                 pdata);
 
-    check_ports (pdata -> view2,
-                 port1_str,
-                 port2_str,
-                 connect,
-                 GTK_JACK_PORT_MIDI_FROM,
-                 pdata);
+    if (g_strcmp0 (jack_port_type (port1), JACK_DEFAULT_AUDIO_TYPE) == 0)
+    {
+        check_ports (pdata -> view,
+                     port1_str,
+                     port2_str,
+                     connect,
+                     GTK_JACK_PORT_AUDIO_FROM,
+                     pdata);
+    }
+    else
+    {
+        check_ports (pdata -> view2,
+                     port1_str,
+                     port2_str,
+                     connect,
+                     GTK_JACK_PORT_MIDI_FROM,
+                     pdata);
+    }
 
     g_free (port1_str);
     g_free (port2_str);

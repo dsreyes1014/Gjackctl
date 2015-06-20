@@ -1,5 +1,7 @@
 #include "server_switch.h"
 
+gint handler_id;
+
 static void
 clear_log_view (GtkWidget *text)
 {
@@ -28,14 +30,9 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw) , "Shutdown Server");
 	    jack_server_init (rdata);
 	}
-	else
-	{	        
-		gtk_widget_set_tooltip_text (GTK_WIDGET (sw), "Start Server");
-		kill (get_jack_gpid (NULL), SIGTERM);
-	}
-}   
+}
 
-void 
+void
 server_switch (GtkPassedMainData *pdata)
 {
 	gint check_pid;
@@ -60,12 +57,17 @@ server_switch (GtkPassedMainData *pdata)
 
 	if (gtk_switch_get_active (GTK_SWITCH (pdata -> sw)) == TRUE)
 	{
-		gtk_widget_set_tooltip_text (GTK_WIDGET (pdata -> sw), "Shutdown Server");
+		gtk_widget_set_tooltip_text (GTK_WIDGET (pdata -> sw),
+                                     "Shutdown Server");
 	}
 	else
 	{
-		gtk_widget_set_tooltip_text (GTK_WIDGET (pdata -> sw), "Start Server");
+		gtk_widget_set_tooltip_text (GTK_WIDGET (pdata -> sw),
+                                     "Start Server");
 	}
 
-    g_signal_connect (pdata -> sw, "notify::active", G_CALLBACK (switch_pos_cb), pdata);
+    g_signal_connect (pdata -> sw,
+                      "notify::active",
+                      G_CALLBACK (switch_pos_cb),
+                      pdata);
 }

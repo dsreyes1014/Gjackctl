@@ -1,5 +1,7 @@
 #include "create_jack_client.h"
 
+GtkWidget *text_view;
+
 static gint
 process_cb (jack_nframes_t nframes, gpointer user_data)
 {
@@ -40,6 +42,9 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
         jack_client_close (pdata -> client);
 
         g_slice_free (GtkPassedJackPortsData, pdata);
+
+        gtk_widget_set_tooltip_text (GTK_WIDGET (sw), "Start Server");
+		kill (get_jack_gpid (NULL), SIGTERM);
         g_signal_handler_disconnect (sw, pdata -> handler_id);
     }
 }
@@ -64,13 +69,56 @@ srate_cb (jack_nframes_t nframes, gpointer user_data)
     return 0;
 }
 
+static void
+info_msg_cb (const gchar *msg)
+{
+    GtkTextBuffer *buffer;
+    gchar *copy;
+
+    copy = g_strdup (msg);
+    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (text_view));
+
+    gtk_text_buffer_insert_at_cursor (buffer, msg, -1);
+    g_print ("From info_cb: \n%s\n", msg);
+}
+
+static void
+error_msg_cb (const gchar *msg)
+{
+    GtkTextBuffer *buffer;
+    GtkTextIter iter;
+    GtkTextTagTable *table;
+    gchar *copy;
+
+    copy = g_strdup (msg);
+    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (text_view));
+
+    if (gtk_text_tag_table_lookup (table, "red_fg") == NULL)
+    {
+        gtk_text_buffer_create_tag (buffer,
+                                    "red_fg",
+                                    "foreground",
+                                    "red",
+                                    NULL);
+    }
+
+    gtk_text_buffer_get_end_iter (buffer, &iter);
+    gtk_text_buffer_insert_with_tags_by_name (buffer,
+                                              &iter,
+                                              copy,
+                                              -1,
+                                              "red_fg",
+                                              NULL);
+}
+
 gint
 jack_client_init (jack_client_t *client,
-                  GtkWidget *sw,
-                  GtkWidget *button_box,
-                  GtkWidget *label,
-                  GtkWidget *label2,
-                  GtkWidget *level_bar)
+                  GtkWidget     *sw,
+                  GtkWidget     *button_box,
+                  GtkWidget     *label,
+                  GtkWidget     *label2,
+                  GtkWidget     *level_bar,
+                  GtkWidget     *view)
 {
     /*
      * This function creates a client for the JACK server
@@ -98,6 +146,7 @@ jack_client_init (jack_client_t *client,
 
     pdata -> client = client;
     pdata -> pwindow = NULL;
+    text_view = view;
 
     if (pdata -> client == NULL)
     {
@@ -107,6 +156,8 @@ jack_client_init (jack_client_t *client,
     jack_set_process_callback (pdata -> client, process_cb, NULL);
     jack_on_shutdown (pdata -> client, jack_shutdown_cb, pdata);
     jack_set_sample_rate_callback (pdata -> client, srate_cb, label2);
+    //jack_set_info_function (info_msg_cb);
+    //jack_set_error_function (error_msg_cb);
 
     /* We activate in 'jack_ports.c' to set up our 'check_connect_cb'. */
     //jack_activate (pdata -> client);
