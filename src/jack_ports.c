@@ -1721,7 +1721,10 @@ check_ports (GtkWidget              *view,
     }
 
 
-    /* Get available 'to' ports. */
+    /*
+     * Get available 'to' ports.  We start on 1 to ignore the first column
+     * which is of G_TYPE_STRING.
+     */
     gchar *array_to[num_col];
     for (i = 1; i < num_col; i++)
     {
@@ -1746,39 +1749,23 @@ check_ports (GtkWidget              *view,
 
     /*
      * Get the column number of tree view if it matches.  If it
-     * doesn't match then 'col_num' will return -1 when it's referenced.
+     * doesn't match then 'col_num' will return -1 when it's referenced.  We
+     * add 1 if it matches to compensate for the first string column which is
+     * ignored.
      */
     for (i = 0; i <= num_col; i++)
     {
         g_print ("Port Name Count: %s\n", array_to[i]);
-        gchar *copy1;
-        gchar *copy2;
-        gchar *copy3;
 
-        copy1 = g_strdup (array_to[i]);
-        copy2 = g_strdup (port1_str);
-        copy3 = g_strdup (port2_str);
-
-        if ((g_strcmp0 (copy1, copy2) == 0) ||
-            (g_strcmp0 (copy1, copy3) == 0))
+        if ((g_strcmp0 (array_to[i], port1_str) == 0) ||
+            (g_strcmp0 (array_to[i], port2_str) == 0))
         {
             col_num = i + 1;
-            g_free (copy1);
-            g_free (copy2);
-            g_free (copy3);
             g_print ("Column number selected: %d\n", i);
             break;
         }
 
         g_print ("Port number count: %d\n", i);
-        g_free (copy1);
-        g_free (copy2);
-        g_free (copy3);
-
-        if (i == num_col)
-        {
-            break;
-        }
     }
 
     /* Get available 'from' ports. */
