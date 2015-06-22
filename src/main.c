@@ -73,7 +73,15 @@ run_app_cb (GApplication *app, gpointer data)
 	pdata -> header_bar = gtk_header_bar_new ();
     pdata -> sw = gtk_switch_new ();
     pdata -> text = gtk_text_view_new ();
-    pdata -> client = NULL;
+
+    if (get_jack_gpid (NULL) != -2)
+    {
+        pdata -> client = jack_client_open ("gjackctl", JackNoStartServer, &status);
+    }
+    else
+    {
+        pdata -> client = NULL;
+    }
     //pdata -> sswitcher = gtk_stack_switcher_new ();
 
     gtk_button_box_set_layout (GTK_BUTTON_BOX (pdata -> button_box),

@@ -39,7 +39,7 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
         }
 
         g_print ("Right before closing client\n");
-        jack_client_close (pdata -> client);
+        jack_deactivate (pdata -> client);
 
         g_slice_free (GtkPassedJackPortsData, pdata);
 
@@ -138,11 +138,10 @@ jack_client_init (jack_client_t *client,
     GtkPassedJackPortsData *pdata;
 
     pdata = g_slice_new (GtkPassedJackPortsData);
-    sleep (1);
-    client = jack_client_open ("gjackctl",
+    /*client = jack_client_open ("gjackctl",
                                JackNoStartServer |
                                JackUseExactName,
-                               &status);
+                               &status);*/
 
     pdata -> client = client;
     pdata -> pwindow = NULL;
@@ -150,6 +149,7 @@ jack_client_init (jack_client_t *client,
 
     if (pdata -> client == NULL)
     {
+        g_print ("client creation failed in main\n");
         return -1;
     }
 
@@ -163,6 +163,8 @@ jack_client_init (jack_client_t *client,
     //jack_activate (pdata -> client);
 
     jack_ports (button_box, pdata);
+
+    //sleep (1);
 
     /* Function updates label to show cpu load. */
     dsp_load (sw, label, pdata -> client, level_bar);

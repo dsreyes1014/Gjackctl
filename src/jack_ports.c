@@ -1786,7 +1786,7 @@ check_ports (GtkWidget              *view,
     {
 
         /*
-         * If our available from port matches the port given
+         * If our available 'from' port matches the port given
          * in our callback and our col_num isn't -1 then we
          * activate/deactivate the matching ports.
          */

@@ -21,6 +21,7 @@ static void
 switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 {	
     GtkPassedMainData *rdata;
+    jack_status_t status;
 
 	rdata = user_data;
 
@@ -29,6 +30,14 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
         clear_log_view (rdata -> text);				 
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw) , "Shutdown Server");
 	    jack_server_init (rdata);
+        if (rdata -> client == NULL)
+        {
+            rdata -> client = jack_client_open ("gjackctl", JackNoStartServer, &status);
+        }
+        else
+        {
+            jack_activate (rdata -> client);
+        }
 	}
 }
 

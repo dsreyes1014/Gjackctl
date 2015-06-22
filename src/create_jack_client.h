@@ -25,7 +25,7 @@ enum GtkJackPortType {
 };
 
 struct _GtkPassedJackPortsData {
-    jack_client_t *client;
+    gpointer client;
     GtkListStore *list_store;
     GtkListStore *list_store2;
     GtkWidget *pwindow;
