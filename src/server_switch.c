@@ -22,21 +22,33 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
 {	
     GtkPassedMainData *rdata;
     jack_status_t status;
+    gint res;
 
 	rdata = user_data;
 
 	if (gtk_switch_get_active (sw) == TRUE)
-	{		
-        clear_log_view (rdata -> text);				 
+	{
+        //clear_log_view (rdata -> text);
 		gtk_widget_set_tooltip_text (GTK_WIDGET (sw) , "Shutdown Server");
+
+        /*
+         * We have to start the server first so our app can make itself a
+         * client.
+         */
 	    jack_server_init (rdata);
+
+        /*
+         * We make our app a jack client if server was not running else we
+         * just activate ourselves after making ourselves a client in 'main.c'.
+         */
         if (rdata -> client == NULL)
         {
             rdata -> client = jack_client_open ("gjackctl", JackNoStartServer, &status);
         }
         else
         {
-            jack_activate (rdata -> client);
+            res = jack_activate (rdata -> client);
+            g_print ("client activate result: %d\n", res);
         }
 	}
 }
@@ -49,7 +61,7 @@ server_switch (GtkPassedMainData *pdata)
 
 	check = gtk_switch_get_active (GTK_SWITCH (pdata -> sw));
 
-    gtk_text_view_set_editable (GTK_TEXT_VIEW (pdata -> text), FALSE);
+
 
 	/* Check to see if jackd server is already started. */
 	check_pid = kill (get_jack_gpid (NULL), 0);

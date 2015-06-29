@@ -10,11 +10,15 @@
 #include "jack_ports.h"
 #include "dsp_load.h"
 #include "main.h"
+#include "jack_log.h"
+#include "display.h"
 
 /*
  * Declaring struct here to be used in 'jack_ports.c' so that we clean up when
  * we're done using it.
  */
+
+
 typedef struct _GtkPassedJackPortsData GtkPassedJackPortsData;
 
 enum GtkJackPortType {
@@ -29,8 +33,10 @@ struct _GtkPassedJackPortsData {
     GtkListStore *list_store;
     GtkListStore *list_store2;
     GtkWidget *pwindow;
-    GtkWidget *view;
-    GtkWidget *view2;
+    GtkWidget *fview1;
+    GtkWidget *tview1;
+    GtkWidget *fview2;
+    GtkWidget *tview2;
     GtkWidget *sc_window;
     GtkWidget *sc_window2;
     GtkWidget *audio_from_button;
@@ -56,7 +62,6 @@ jack_client_init (jack_client_t *client,
                   GtkWidget     *button_box,
                   GtkWidget     *label,
                   GtkWidget     *label2,
-                  GtkWidget     *level_bar,
-                  GtkWidget     *view);
+                  GtkWidget     *level_bar);
 
 #endif

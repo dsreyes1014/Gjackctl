@@ -6,6 +6,9 @@
 #include "main.h"
 
 void
+timestamp_newline (GtkTextBuffer *buffer);
+
+void
 jack_log (GtkPassedMainData *pdata);
 
 #endif

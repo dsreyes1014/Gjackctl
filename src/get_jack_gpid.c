@@ -10,9 +10,10 @@ get_jack_gpid (const gchar *string_arg)
     cmd = popen ("pgrep jackd", "r");
     pid = -2;
 
-    
-    /* Here we get the `GPid pid` from the `cmd` statement and convert 
-	it to a gint using the `g_ascii_strtoll ()` function. */
+    /*
+     * Here we get the pid from the 'cmd' statement and convert
+     * it to a gint using the 'g_ascii_strtoll ()' function.
+     */
     if (string_arg == NULL)
     {
 	    while (fgets (string, sizeof (string), cmd) != NULL)
@@ -26,8 +27,6 @@ get_jack_gpid (const gchar *string_arg)
     }
 	
 	pclose (cmd);
-
-    //g_print ("From `get_jack_gpid.c`: %d\n", pid);
 
     if (kill (pid, 0) < 0)
     {

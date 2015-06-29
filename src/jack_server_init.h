@@ -8,6 +8,7 @@
 #include "dsp_load.h"
 #include "get_jack_gpid.h"
 #include "main.h"
+#include "jack_log.h"
 
 gint
 jack_server_init (GtkPassedMainData *pdata);

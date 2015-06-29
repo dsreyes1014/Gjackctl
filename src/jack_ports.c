@@ -132,7 +132,7 @@ clear_tree_view (GtkWidget *view)
 
         gtk_tree_view_remove_column (GTK_TREE_VIEW (view), column);
 
-        col = gtk_tree_view_get_n_columns (GTK_TREE_VIEW (view));
+        //col = gtk_tree_view_get_n_columns (GTK_TREE_VIEW (view));
     }
 
     return col;
@@ -159,9 +159,9 @@ disconnect_midi_jack_port (const gchar *path_str,
 
     rdata = user_data;
     path = gtk_tree_path_new_from_string (path_str);
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view2));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> fview2));
     from_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> from_midi)));
-    column = gtk_tree_view_get_column (GTK_TREE_VIEW (rdata -> view2), col_num);
+    column = gtk_tree_view_get_column (GTK_TREE_VIEW (rdata -> tview2), col_num);
     to_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> to_midi)));
 
     gtk_tree_model_get_iter (model, &iter, path);
@@ -215,9 +215,9 @@ disconnect_audio_jack_port (const gchar *path_str,
 
     rdata = user_data;
     path = gtk_tree_path_new_from_string (path_str);
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> fview1));
     from_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> from_audio)));
-    column = gtk_tree_view_get_column (GTK_TREE_VIEW (rdata -> view), col_num);
+    column = gtk_tree_view_get_column (GTK_TREE_VIEW (rdata -> tview1), col_num);
     to_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> to_audio)));
 
     gtk_tree_model_get_iter (model, &iter, path);
@@ -271,9 +271,9 @@ connect_midi_jack_port (const gchar *path_str,
 
     rdata = user_data;
     path = gtk_tree_path_new_from_string (path_str);
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view2));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> fview2));
     from_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> from_midi)));
-    column = gtk_tree_view_get_column (GTK_TREE_VIEW (rdata -> view2), col_num);
+    column = gtk_tree_view_get_column (GTK_TREE_VIEW (rdata -> tview2), col_num);
     to_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> to_midi)));
 
     gtk_tree_model_get_iter (model, &iter, path);
@@ -327,9 +327,9 @@ connect_audio_jack_port (const gchar *path_str,
 
     rdata = user_data;
     path = gtk_tree_path_new_from_string (path_str);
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> fview1));
     from_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> from_audio)));
-    column = gtk_tree_view_get_column (GTK_TREE_VIEW (rdata -> view), col_num);
+    column = gtk_tree_view_get_column (GTK_TREE_VIEW (rdata -> tview1), col_num);
     to_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> to_audio)));
 
     gtk_tree_model_get_iter (model, &iter, path);
@@ -378,13 +378,13 @@ toggled_midi_cb (GtkCellRendererToggle *cell,
     /* This is how we obtain the column num. */
     column = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (cell), "column"));
 
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view2));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> fview2));
 
     gtk_tree_model_get_iter (model,
                              &iter,
                              gtk_tree_path_new_from_string (path));
 
-    gtk_tree_model_get (model, &iter, column, &toggled, -1);
+    gtk_tree_model_get (model, &iter, column + 1, &toggled, -1);
 
     if (toggled == FALSE)
     {
@@ -401,9 +401,10 @@ toggled_midi_cb (GtkCellRendererToggle *cell,
                                    rdata);
     }
 
+    g_print ("MIDI Column Number Selected: %d\n", column);
     gtk_list_store_set (GTK_LIST_STORE (model),
                         &iter,
-                        column,
+                        column + 1,
                         toggled,
                         -1);
 }
@@ -424,13 +425,14 @@ toggled_audio_cb (GtkCellRendererToggle *cell,
     /* This is how we obtain the column num. */
     column = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (cell), "column"));
 
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> fview1));
 
     gtk_tree_model_get_iter (model,
                              &iter,
                              gtk_tree_path_new_from_string (path));
 
-    gtk_tree_model_get (model, &iter, column, &toggled, -1);
+    /* We add one to column number because both views use the same model. */
+    gtk_tree_model_get (model, &iter, column + 1, &toggled, -1);
 
     if (toggled == FALSE)
     {
@@ -447,9 +449,11 @@ toggled_audio_cb (GtkCellRendererToggle *cell,
                                     rdata);
     }
 
+    g_print ("Column Number Selected: %d\n", column);
+    /* We add one to column number because both views use the same model. */
     gtk_list_store_set (GTK_LIST_STORE (model),
                         &iter,
-                        column,
+                        column + 1,
                         toggled,
                         -1);
 }
@@ -536,7 +540,7 @@ check_midi_connections (GtkWidget   *view,
     i = 0;
     j = 0;
     rdata = user_data;
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view2));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> fview2));
     from_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> from_midi)));
     to_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> to_midi)));
 
@@ -571,7 +575,7 @@ check_midi_connections (GtkWidget   *view,
             {
                 gtk_list_store_set (GTK_LIST_STORE (model),
                                     &iter,
-                                    rdata -> col_num,
+                                    rdata -> col_num + 1,
                                     TRUE,
                                     -1);
 
@@ -618,7 +622,7 @@ check_audio_connections (GtkWidget   *view,
     i = 0;
     j = 0;
     rdata = user_data;
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> view));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (rdata -> fview1));
     from_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> from_audio)));
     to_port_prefix = g_strdup (gtk_label_get_text (GTK_LABEL (rdata -> to_audio)));
     full_to_port = g_strconcat (to_port_prefix, ":", port_str, NULL);
@@ -652,7 +656,7 @@ check_audio_connections (GtkWidget   *view,
             {
                 gtk_list_store_set (GTK_LIST_STORE (model),
                                     &iter,
-                                    rdata -> col_num,
+                                    rdata -> col_num + 1,
                                     TRUE,
                                     -1);
 
@@ -716,7 +720,7 @@ create_midi_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
     num_col = get_n_columns (array);
     i = 0;
     rdata = user_data;
-    rdata -> col_num = 1;
+    rdata -> col_num = 0;
 
     while (array[i])
     {
@@ -729,7 +733,6 @@ create_midi_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
         if (jack_port_string != NULL)
         {
             GtkWidget *label;
-            GValue *value;
 
             label = create_label (jack_port_string);
 
@@ -744,7 +747,7 @@ create_midi_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
             column = gtk_tree_view_column_new_with_attributes (jack_port_string,
                                                                cell,
                                                                "active",
-                                                               rdata -> col_num,
+                                                               rdata -> col_num + 1,
                                                                NULL);
 
             gtk_tree_view_column_set_widget (column, label);
@@ -757,26 +760,28 @@ create_midi_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
             g_object_set_data (G_OBJECT (cell),
                                "column",
                                GUINT_TO_POINTER (rdata -> col_num));
+            //g_object_set (cell, "indicator-size", 20, NULL);
 
             gtk_tree_model_get_iter_first (model, &iter);
 
+            /* We add one to column number because both views use the same model. */
             gtk_list_store_set (GTK_LIST_STORE (model),
                                 &iter,
-                                rdata -> col_num,
+                                rdata -> col_num + 1,
                                 FALSE,
                                 -1);
 
             gtk_tree_view_append_column (GTK_TREE_VIEW (view), column);
 
-            check_midi_connections (view,
-                                    jack_port_string,
-                                    rdata);
+            check_audio_connections (view,
+                                     jack_port_string,
+                                     rdata);
 
             g_signal_connect (cell,
                               "toggled",
                               G_CALLBACK (toggled_midi_cb),
                               rdata);
-
+            g_print ("Number Of MIDI Columns: %d\n", rdata -> col_num);
             rdata -> col_num++;
         }
 
@@ -811,7 +816,7 @@ create_audio_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
     num_col = get_n_columns (array);
     i = 0;
     rdata = user_data;
-    rdata -> col_num = 1;
+    rdata -> col_num = 0;
 
     while (array[i])
     {
@@ -824,7 +829,6 @@ create_audio_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
         if (jack_port_string != NULL)
         {
             GtkWidget *label;
-            GValue *value;
 
             label = create_label (jack_port_string);
 
@@ -839,7 +843,7 @@ create_audio_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
             column = gtk_tree_view_column_new_with_attributes (jack_port_string,
                                                                cell,
                                                                "active",
-                                                               rdata -> col_num,
+                                                               rdata -> col_num + 1,
                                                                NULL);
 
             gtk_tree_view_column_set_widget (column, label);
@@ -852,12 +856,14 @@ create_audio_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
             g_object_set_data (G_OBJECT (cell),
                                "column",
                                GUINT_TO_POINTER (rdata -> col_num));
+            //g_object_set (cell, "indicator-size", 20, NULL);
 
             gtk_tree_model_get_iter_first (model, &iter);
 
+            /* We add one to column number because both views use the same model. */
             gtk_list_store_set (GTK_LIST_STORE (model),
                                 &iter,
-                                rdata -> col_num,
+                                rdata -> col_num + 1,
                                 FALSE,
                                 -1);
 
@@ -871,7 +877,7 @@ create_audio_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
                               "toggled",
                               G_CALLBACK (toggled_audio_cb),
                               rdata);
-
+            g_print ("Number Of Columns: %d\n", rdata -> col_num);
             rdata -> col_num++;
         }
 
@@ -885,11 +891,12 @@ create_audio_to_jack_port_filtered_model (GtkTreeViewColumn  *column,
 }
 
 static gint
-create_midi_from_jack_port_filtered_model (GtkWidget    *view,
-                                           GtkTreeViewColumn *column,
-                                           const gchar  *from_port_clicked,
-                                           const gchar **array,
-                                           gpointer      user_data)
+create_midi_from_jack_port_filtered_model (GtkWidget          *view,
+                                           GtkTreeViewColumn  *column,
+                                           GtkCellRenderer    *cell,
+                                           const gchar        *from_port_clicked,
+                                           const gchar       **array,
+                                           gpointer            user_data)
 {
     /*
      * This will build the from ports part of the 'gtk_tree_model'
@@ -900,7 +907,6 @@ create_midi_from_jack_port_filtered_model (GtkWidget    *view,
     GtkTreeModel *model;
     GtkTreeIter iter;
     gint i;
-    GtkWidget *vbox;
 
     i = 0;
     rdata = user_data;
@@ -956,12 +962,10 @@ create_audio_from_jack_port_filtered_model (GtkWidget          *view,
     GtkTreeModel *model;
     GtkTreeIter iter;
     gint i;
-    GtkWidget *col_button;
 
     i = 0;
     rdata = user_data;
     model = gtk_tree_view_get_model (GTK_TREE_VIEW (view));
-    col_button = gtk_tree_view_column_get_button (column);
 
     while (array[i])
     {
@@ -997,7 +1001,8 @@ create_audio_from_jack_port_filtered_model (GtkWidget          *view,
 }
 
 static GtkTreeModel *
-get_midi_model (GtkWidget     *view,
+get_midi_model (GtkWidget     *fview,
+                GtkWidget     *tview,
                 GtkListStore  *store,
                 const gchar  **array)
 {
@@ -1011,16 +1016,15 @@ get_midi_model (GtkWidget     *view,
     gint i;
 
     num_col = 0;
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (view));
-
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (fview));
 
     if (model != NULL)
     {
-        //gtk_list_store_clear (GTK_LIST_STORE (model));
-        clear_tree_view (view);
-        gtk_tree_view_set_model (GTK_TREE_VIEW (view), NULL);
+        clear_tree_view (fview);
+        clear_tree_view (tview);
+        gtk_tree_view_set_model (GTK_TREE_VIEW (fview), NULL);
+        gtk_tree_view_set_model (GTK_TREE_VIEW (tview), NULL);
     }
-
 
     num_col = get_n_columns (array);
 
@@ -1041,19 +1045,23 @@ get_midi_model (GtkWidget     *view,
 
     store = gtk_list_store_newv (num_col, types);
 
-    gtk_tree_view_set_model (GTK_TREE_VIEW (view),
+    gtk_tree_view_set_model (GTK_TREE_VIEW (fview),
+                             GTK_TREE_MODEL (store));
+
+    gtk_tree_view_set_model (GTK_TREE_VIEW (tview),
                              GTK_TREE_MODEL (store));
 
     /* Clean up. */
     g_object_unref (store);
 
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (view));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (fview));
 
     return model;
 }
 
 static GtkTreeModel *
-get_audio_model (GtkWidget     *view,
+get_audio_model (GtkWidget     *fview,
+                 GtkWidget     *tview,
                  GtkListStore  *store,
                  const gchar  **array)
 {
@@ -1067,14 +1075,15 @@ get_audio_model (GtkWidget     *view,
     gint i;
 
     num_col = 0;
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (view));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (fview));
 
 
     if (model != NULL)
     {
-        clear_tree_view (view);
-        gtk_tree_view_set_model (GTK_TREE_VIEW (view), NULL);
-        //g_object_unref (model);
+        clear_tree_view (fview);
+        clear_tree_view (tview);
+        gtk_tree_view_set_model (GTK_TREE_VIEW (fview), NULL);
+        gtk_tree_view_set_model (GTK_TREE_VIEW (tview), NULL);
     }
 
 
@@ -1097,13 +1106,16 @@ get_audio_model (GtkWidget     *view,
 
     store = gtk_list_store_newv (num_col, types);
 
-    gtk_tree_view_set_model (GTK_TREE_VIEW (view),
+    gtk_tree_view_set_model (GTK_TREE_VIEW (fview),
+                             GTK_TREE_MODEL (store));
+
+    gtk_tree_view_set_model (GTK_TREE_VIEW (tview),
                              GTK_TREE_MODEL (store));
 
     /* Clean up. */
     g_object_unref (store);
 
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (view));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (fview));
 
     return model;
 }
@@ -1117,6 +1129,7 @@ create_midi_jack_ports_view (const gchar  *from_port_clicked,
     GtkTreeViewColumn *column;
     GtkCellRenderer *toggle;
     GtkTreeModel *model;
+    GtkWidget *label;
     jack_port_t *jack_port;
     gint i;
     gint j;
@@ -1125,17 +1138,18 @@ create_midi_jack_ports_view (const gchar  *from_port_clicked,
     GtkTreeIter iter;
     GtkPassedJackPortsData *rdata;
 
-    from_ports_array = NULL;
-    to_ports_array = NULL;
     rdata = user_data;
     i = 0;
     renderer = gtk_cell_renderer_text_new ();
+    label = create_label ("");
+
     column = gtk_tree_view_column_new_with_attributes (NULL,
                                                        renderer,
                                                        "text", 0,
                                                        NULL);
 
     gtk_tree_view_column_set_fixed_width (column, 160);
+    gtk_tree_view_column_set_widget (column, label);
 
     g_object_set (G_OBJECT (renderer),
                   "ellipsize",
@@ -1147,7 +1161,7 @@ create_midi_jack_ports_view (const gchar  *from_port_clicked,
                   0.5,
                   NULL);
 
-
+    g_object_set (renderer, "height", 20, NULL);
 
     from_ports_array = jack_get_ports (rdata -> client,
                                        NULL,
@@ -1159,30 +1173,28 @@ create_midi_jack_ports_view (const gchar  *from_port_clicked,
                                      JACK_DEFAULT_MIDI_TYPE,
                                      JackPortIsInput);
 
-    if (from_ports_array == NULL && to_ports_array == NULL)
+    if (from_ports_array == NULL)
     {
-        gtk_label_set_text (GTK_LABEL (rdata -> from_midi), "-");
-        gtk_label_set_text (GTK_LABEL (rdata -> to_midi), "-");
-
         return -1;
     }
-
-    model = get_midi_model (rdata -> view2,
+    model = get_midi_model (rdata -> fview2,
+                            rdata -> tview2,
                             rdata -> list_store2,
                             to_ports_array);
 
-    create_midi_from_jack_port_filtered_model (rdata -> view2,
+    create_midi_from_jack_port_filtered_model (rdata -> fview2,
                                                column,
+                                               renderer,
                                                from_port_clicked,
                                                from_ports_array,
                                                rdata);
 
-    gtk_tree_view_append_column (GTK_TREE_VIEW (rdata -> view2), column);
+    gtk_tree_view_append_column (GTK_TREE_VIEW (rdata -> fview2), column);
 
     create_midi_to_jack_port_filtered_model (column,
                                              toggle,
                                              model,
-                                             rdata -> view2,
+                                             rdata -> tview2,
                                              to_port_clicked,
                                              to_ports_array,
                                              rdata);
@@ -1199,6 +1211,7 @@ create_audio_jack_ports_view (const gchar  *from_port_clicked,
     GtkTreeViewColumn *column;
     GtkCellRenderer *toggle;
     GtkTreeModel *model;
+    GtkWidget *label;
     jack_port_t *jack_port;
     gint i;
     gint j;
@@ -1210,12 +1223,15 @@ create_audio_jack_ports_view (const gchar  *from_port_clicked,
     rdata = user_data;
     i = 0;
     renderer = gtk_cell_renderer_text_new ();
+    label = create_label ("");
+
     column = gtk_tree_view_column_new_with_attributes (NULL,
                                                        renderer,
                                                        "text", 0,
                                                        NULL);
 
     gtk_tree_view_column_set_fixed_width (column, 160);
+    gtk_tree_view_column_set_widget (column, label);
 
     g_object_set (G_OBJECT (renderer),
                   "ellipsize",
@@ -1227,6 +1243,8 @@ create_audio_jack_ports_view (const gchar  *from_port_clicked,
                   0.5,
                   NULL);
 
+    g_object_set (renderer, "height", 20, NULL);
+
     from_ports_array = jack_get_ports (rdata -> client,
                                        NULL,
                                        JACK_DEFAULT_AUDIO_TYPE,
@@ -1237,23 +1255,29 @@ create_audio_jack_ports_view (const gchar  *from_port_clicked,
                                      JACK_DEFAULT_AUDIO_TYPE,
                                      JackPortIsInput);
 
-    model = get_audio_model (rdata -> view,
+    if (from_ports_array == NULL)
+    {
+        return -1;
+    }
+
+    model = get_audio_model (rdata -> fview1,
+                             rdata -> tview1,
                              rdata -> list_store,
                              to_ports_array);
 
-    create_audio_from_jack_port_filtered_model (rdata -> view,
+    create_audio_from_jack_port_filtered_model (rdata -> fview1,
                                                 column,
                                                 renderer,
                                                 from_port_clicked,
                                                 from_ports_array,
                                                 rdata);
 
-    gtk_tree_view_append_column (GTK_TREE_VIEW (rdata -> view), column);
+    gtk_tree_view_append_column (GTK_TREE_VIEW (rdata -> fview1), column);
 
     create_audio_to_jack_port_filtered_model (column,
                                               toggle,
                                               model,
-                                              rdata -> view,
+                                              rdata -> tview1,
                                               to_port_clicked,
                                               to_ports_array,
                                               rdata);
@@ -1560,7 +1584,7 @@ delete_event_cb (GtkWidget *window,
 }
 
 static void
-popover_button_clicked_cb (GtkButton *button, gpointer user_data)
+popup_button_clicked_cb (GtkButton *button, gpointer user_data)
 {
     GtkPassedJackPortsData *pdata;
 
@@ -1575,10 +1599,17 @@ popover_button_clicked_cb (GtkButton *button, gpointer user_data)
         GtkWidget *midi_box;
         GtkWidget *audio_bbox;
         GtkWidget *midi_bbox;
-        GtkWidget *sc_window;
-        GtkWidget *sc_window2;
+        GtkWidget *audio_sub_hbox;
+        GtkWidget *midi_sub_hbox;
+        GtkWidget *fsc_window1;
+        GtkWidget *tsc_window1;
+        GtkWidget *fsc_window2;
+        GtkWidget *tsc_window2;
         GtkWidget *label_from;
         GtkWidget *label_to;
+        gdouble page_size;
+        GtkAdjustment *vadj1;
+        GtkAdjustment *vadj2;
 
         label_from = gtk_label_new ("From");
         label_to = gtk_label_new ("To");
@@ -1592,21 +1623,33 @@ popover_button_clicked_cb (GtkButton *button, gpointer user_data)
         midi_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
         audio_bbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
         midi_bbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
-        sc_window = gtk_scrolled_window_new (NULL, NULL);
-        sc_window2 = gtk_scrolled_window_new (NULL, NULL);
+        audio_sub_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+        midi_sub_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+        fsc_window1 = gtk_scrolled_window_new (NULL, NULL);
+        tsc_window1 = gtk_scrolled_window_new (NULL, NULL);
+        fsc_window2 = gtk_scrolled_window_new (NULL, NULL);
+        tsc_window2 = gtk_scrolled_window_new (NULL, NULL);
 
         gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (header_bar), TRUE);
         gtk_header_bar_set_custom_title (GTK_HEADER_BAR (header_bar), sswitcher);
 
-        gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sc_window),
+        gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (fsc_window1),
                                         GTK_POLICY_AUTOMATIC,
                                         GTK_POLICY_AUTOMATIC);
-        gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sc_window2),
+        gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (tsc_window1),
+                                        GTK_POLICY_AUTOMATIC,
+                                        GTK_POLICY_AUTOMATIC);
+        gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (fsc_window2),
+                                        GTK_POLICY_AUTOMATIC,
+                                        GTK_POLICY_AUTOMATIC);
+        gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (tsc_window2),
                                         GTK_POLICY_AUTOMATIC,
                                         GTK_POLICY_AUTOMATIC);
 
-        gtk_container_add (GTK_CONTAINER (sc_window), pdata -> view);
-        gtk_container_add (GTK_CONTAINER (sc_window2), pdata -> view2);
+        gtk_container_add (GTK_CONTAINER (fsc_window1), pdata -> fview1);
+        gtk_container_add (GTK_CONTAINER (tsc_window1), pdata -> tview1);
+        gtk_container_add (GTK_CONTAINER (fsc_window2), pdata -> fview2);
+        gtk_container_add (GTK_CONTAINER (tsc_window2), pdata -> tview2);
 
         gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER (sswitcher),
                                       GTK_STACK (stack));
@@ -1645,24 +1688,36 @@ popover_button_clicked_cb (GtkButton *button, gpointer user_data)
 
         gtk_box_pack_start (GTK_BOX (audio_box), audio_bbox, FALSE, FALSE, 2);
         gtk_box_pack_start (GTK_BOX (midi_box), midi_bbox, FALSE, FALSE, 2);
-        gtk_box_pack_start (GTK_BOX (audio_box), sc_window, FALSE, FALSE, 2);
-        gtk_box_pack_start (GTK_BOX (midi_box), sc_window2, FALSE, FALSE, 2);
+        //gtk_box_pack_start (GTK_BOX (audio_sub_hbox), pdata -> fview1, FALSE, FALSE, 0);
+        gtk_box_pack_start (GTK_BOX (audio_sub_hbox), fsc_window1, FALSE, FALSE, 0);
+        gtk_box_pack_start (GTK_BOX (audio_sub_hbox), tsc_window1, FALSE, FALSE, 0);
+        gtk_box_pack_start (GTK_BOX (audio_box), audio_sub_hbox, FALSE, FALSE, 2);
+        gtk_box_pack_start (GTK_BOX (midi_sub_hbox), fsc_window2, FALSE, FALSE, 0);
+        gtk_box_pack_start (GTK_BOX (midi_sub_hbox), tsc_window2, FALSE, FALSE, 0);
+        //gtk_box_pack_start (GTK_BOX (audio_box), sc_window, FALSE, FALSE, 2);
+        gtk_box_pack_start (GTK_BOX (midi_box), midi_sub_hbox, FALSE, FALSE, 2);
         gtk_stack_add_titled (GTK_STACK (stack), audio_box, "audio", "Audio");
         gtk_stack_add_titled (GTK_STACK (stack), midi_box, "midi", "MIDI");
 
         gtk_window_set_titlebar (GTK_WINDOW (pdata -> pwindow), header_bar);
         gtk_container_add (GTK_CONTAINER (pdata -> pwindow), stack);
         gtk_widget_set_halign (sswitcher, GTK_ALIGN_CENTER);
-        gtk_widget_set_size_request (sc_window, 450, 300);
-        gtk_widget_set_size_request (sc_window2, 450, 300);
-        gtk_widget_set_halign (pdata -> view, GTK_ALIGN_CENTER);
-        gtk_widget_set_halign (pdata -> view2, GTK_ALIGN_CENTER);
+        gtk_widget_set_size_request (fsc_window1, 160, 40);
+        gtk_widget_set_size_request (tsc_window1, 500, 400);
+        gtk_widget_set_size_request (fsc_window2, 160, 40);
+        gtk_widget_set_size_request (tsc_window2, 500, 400);
+        gtk_widget_set_halign (pdata -> fview1, GTK_ALIGN_END);
+        gtk_widget_set_halign (pdata -> tview1, GTK_ALIGN_START);
+        gtk_widget_set_halign (pdata -> fview2, GTK_ALIGN_END);
+        gtk_widget_set_halign (pdata -> tview2, GTK_ALIGN_START);
         gtk_widget_set_halign (audio_bbox, GTK_ALIGN_CENTER);
         gtk_widget_set_halign (midi_bbox, GTK_ALIGN_CENTER);
         gtk_widget_set_margin_start (label_to, 40);
 
-        g_print ("Page-size %f\n",
-                 gtk_adjustment_get_page_size (gtk_scrolled_window_get_hadjustment (GTK_SCROLLED_WINDOW (sc_window))));
+        vadj1 = gtk_scrollable_get_vadjustment (GTK_SCROLLABLE (pdata -> tview1));
+        gtk_scrollable_set_vadjustment (GTK_SCROLLABLE (pdata -> fview1), vadj1);
+        vadj2 = gtk_scrollable_get_vadjustment (GTK_SCROLLABLE (pdata -> tview2));
+        gtk_scrollable_set_vadjustment (GTK_SCROLLABLE (pdata -> fview2), vadj2);
 
         g_signal_connect (pdata ->pwindow,
                           "delete-event",
@@ -1675,6 +1730,8 @@ popover_button_clicked_cb (GtkButton *button, gpointer user_data)
     {
         gtk_widget_show_all (pdata -> pwindow);
     }
+
+    gtk_window_set_resizable (GTK_WINDOW (pdata -> pwindow), FALSE);
 }
 
 static gint
@@ -1688,7 +1745,8 @@ graph_reorder_cb (gpointer user_data)
 }
 
 static void
-check_ports (GtkWidget              *view,
+check_ports (GtkWidget              *fview,
+             GtkWidget              *tview,
              gchar                  *port1_str,
              gchar                  *port2_str,
              gint                    connect,
@@ -1704,8 +1762,8 @@ check_ports (GtkWidget              *view,
     gint i;
     gint col_num;
 
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (view));
-    num_col = gtk_tree_view_get_n_columns (GTK_TREE_VIEW (view));
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (fview));
+    num_col = gtk_tree_view_get_n_columns (GTK_TREE_VIEW (tview));
     num_rows = gtk_tree_model_iter_n_children (model, NULL);
     col_num = -1;
 
@@ -1726,25 +1784,25 @@ check_ports (GtkWidget              *view,
      * which is of G_TYPE_STRING.
      */
     gchar *array_to[num_col];
-    for (i = 1; i < num_col; i++)
+    for (i = 0; i < num_col; i++)
     {
         GtkTreeViewColumn *column;
         GtkWidget *label;
 
-        column = gtk_tree_view_get_column (GTK_TREE_VIEW (view), i);
+        column = gtk_tree_view_get_column (GTK_TREE_VIEW (tview), i);
         label = gtk_tree_view_column_get_widget (column);
-        array_to[i - 1] = g_strconcat (port_to_prefix,
+        array_to[i] = g_strconcat (port_to_prefix,
                                    ":",
                                    gtk_label_get_text (GTK_LABEL (label)),
                                    NULL);
 
-        /* Terminate our array with 'NULL'. */
+        /* Terminate our array with 'NULL' if it reaches. */
         if (i == num_col)
         {
             array_to[i] = NULL;
         }
 
-        g_print ("Available To Ports: %s\n", array_to[i - 1]);
+        g_print ("Available To Ports: %s\n", array_to[i]);
     }
 
     /*
@@ -1760,7 +1818,7 @@ check_ports (GtkWidget              *view,
         if ((g_strcmp0 (array_to[i], port1_str) == 0) ||
             (g_strcmp0 (array_to[i], port2_str) == 0))
         {
-            col_num = i + 1;
+            col_num = i;
             g_print ("Column number selected: %d\n", i);
             break;
         }
@@ -1796,9 +1854,10 @@ check_ports (GtkWidget              *view,
         {
             if (connect != 0)
             {
+
                 gtk_list_store_set (GTK_LIST_STORE (model),
                                     &iter,
-                                    col_num,
+                                    col_num + 1,
                                     TRUE,
                                     -1);
             }
@@ -1806,7 +1865,7 @@ check_ports (GtkWidget              *view,
             {
                 gtk_list_store_set (GTK_LIST_STORE (model),
                                     &iter,
-                                    col_num,
+                                    col_num + 1,
                                     FALSE,
                                     -1);
             }
@@ -1841,7 +1900,8 @@ check_connect_cb (jack_port_id_t a,
 
     if (g_strcmp0 (jack_port_type (port1), JACK_DEFAULT_AUDIO_TYPE) == 0)
     {
-        check_ports (pdata -> view,
+        check_ports (pdata -> fview1,
+                     pdata -> tview1,
                      port1_str,
                      port2_str,
                      connect,
@@ -1850,7 +1910,8 @@ check_connect_cb (jack_port_id_t a,
     }
     else
     {
-        check_ports (pdata -> view2,
+        check_ports (pdata -> fview2,
+                     pdata -> tview2,
                      port1_str,
                      port2_str,
                      connect,
@@ -1881,8 +1942,10 @@ jack_ports (GtkWidget     *button_box,
     gtk_widget_show_all (button_box);
 
     pdata -> pwindow = NULL;
-    pdata -> view = gtk_tree_view_new ();
-    pdata -> view2 = gtk_tree_view_new ();
+    pdata -> fview1 = gtk_tree_view_new ();
+    pdata -> tview1 = gtk_tree_view_new ();
+    pdata -> fview2 = gtk_tree_view_new ();
+    pdata -> tview2 = gtk_tree_view_new ();
     pdata -> list_store = NULL;
     pdata -> list_store2 = NULL;
     pdata -> from_audio = gtk_label_new ("system");
@@ -1916,15 +1979,19 @@ jack_ports (GtkWidget     *button_box,
     gtk_label_set_use_underline (GTK_LABEL (pdata -> to_midi), FALSE);
     gtk_label_set_use_underline (GTK_LABEL (pdata -> from_midi), FALSE);
 
-    gtk_tree_view_set_grid_lines (GTK_TREE_VIEW (pdata -> view),
+    gtk_tree_view_set_grid_lines (GTK_TREE_VIEW (pdata -> fview1),
+                                  GTK_TREE_VIEW_GRID_LINES_BOTH);
+    gtk_tree_view_set_grid_lines (GTK_TREE_VIEW (pdata -> tview1),
                                   GTK_TREE_VIEW_GRID_LINES_BOTH);
 
-    gtk_tree_view_set_grid_lines (GTK_TREE_VIEW (pdata -> view2),
+    gtk_tree_view_set_grid_lines (GTK_TREE_VIEW (pdata -> fview2),
+                                  GTK_TREE_VIEW_GRID_LINES_BOTH);
+    gtk_tree_view_set_grid_lines (GTK_TREE_VIEW (pdata -> tview2),
                                   GTK_TREE_VIEW_GRID_LINES_BOTH);
 
     g_signal_connect (pdata -> button,
                       "clicked",
-                      G_CALLBACK (popover_button_clicked_cb),
+                      G_CALLBACK (popup_button_clicked_cb),
                       pdata);
 
     g_signal_connect (pdata -> audio_from_button,

@@ -151,7 +151,6 @@ jackdrc_init_input ()
     /*********************************************************************/
     config_lookup_string (&config, "gjackctl.driver.type", &value);
 
-
     if (g_strcmp0 (value, NULL) != 0 && g_strcmp0 (value, "dummy") == 0)
     {
         g_fprintf (fp," -d%s", value);
@@ -237,6 +236,8 @@ subprocess_out_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
     GtkTextBuffer *buffer;
     GtkPassedMainData *rdata;
     gchar *string;
+    gchar *num_str;
+    gchar *modded_str;
     gssize bytes;
 
     rdata = data;
@@ -246,13 +247,12 @@ subprocess_out_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
 
     g_print ("1.'jack_server_init.c': number of bytes in log out pipe %d\n", (gint) bytes);
 
-    string = g_strndup (log_out, bytes - 1);
-
+    string = g_strndup (log_out, bytes);
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> text));
 
+    gtk_text_buffer_insert_at_cursor (buffer, "\n", -1);
     gtk_text_buffer_insert_at_cursor (buffer, string, -1);
-
-    sleep (1);
+    timestamp_newline (buffer);
 
     g_free (string);
 }
@@ -265,7 +265,7 @@ subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
     gchar *string1;
     //const gchar *string2;
     gssize bytes;
-    GtkTextIter iter;
+    GtkTextIter start, end;
     GtkTextTagTable *table;
 
     rdata = data;
@@ -277,27 +277,12 @@ subprocess_err_pipe_cb (GObject *source, GAsyncResult *res, gpointer data)
 
     string1 = g_strndup (log_err, bytes - 1);
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (rdata -> text));
-    table = gtk_text_buffer_get_tag_table (buffer);
-    
-    if (gtk_text_tag_table_lookup (table, "red_fg") == NULL)
-    {
-        gtk_text_buffer_create_tag (buffer,
-                                    "red_fg",
-                                    "foreground",
-                                    "red",
-                                    NULL);
-    }
 
-    gtk_text_buffer_get_end_iter (buffer, &iter);
+    gtk_text_buffer_get_end_iter (buffer, &end);
+    gtk_text_buffer_place_cursor (buffer, &end);
+    gtk_text_buffer_insert_at_cursor (buffer, string1, -1);
 
-    gtk_text_buffer_insert (buffer, &iter, "\n\n", -1);
-
-    gtk_text_buffer_insert_with_tags_by_name (buffer,
-                                              &iter,
-                                              string1,
-                                              -1,
-                                              "red_fg",
-                                              NULL);
+    timestamp_newline (buffer);
 
     g_free (string1);
 }

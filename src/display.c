@@ -1,13 +1,6 @@
 #include "display.h"
 
-typedef struct _GtkPassedDisplayData GtkPassedDisplayData;
-
-struct _GtkPassedDisplayData {
-    GtkWidget *grid;
-    GtkWidget *pbar;
-    GtkPassedMainData *pdata;
-    gint handler_id;
-};
+GtkWidget *grid;
 
 static const gchar *
 get_config_setting_string (const gchar *path)
@@ -50,7 +43,7 @@ clear_container (GtkWidget *container)
 }
 
 static gboolean
-grid_on (GtkPassedDisplayData *rdata)
+grid_on (GtkPassedMainData *pdata)
 {
     GtkWidget *label;
     GtkWidget *labela;
@@ -79,45 +72,44 @@ grid_on (GtkPassedDisplayData *rdata)
     gtk_level_bar_set_mode (GTK_LEVEL_BAR (level_bar),
                             GTK_LEVEL_BAR_MODE_CONTINUOUS);
 
-    if (jack_client_init (rdata -> pdata -> client,
-                          rdata -> pdata -> sw,
-                          rdata -> pdata -> button_box,
+    if (jack_client_init (pdata -> client,
+                          pdata -> sw,
+                          pdata -> button_box,
                           labela,
                           label2a,
-                          level_bar,
-                          rdata -> pdata -> text) != 0)
+                          level_bar) != 0)
     {
         return FALSE;
     }
 
     gtk_widget_set_tooltip_text (level_bar, "CPU Load");
 
-    gtk_grid_attach (GTK_GRID (rdata -> grid), level_bar, 0, 0, 7, 1);
-    gtk_grid_attach_next_to (GTK_GRID (rdata -> grid),
+    gtk_grid_attach (GTK_GRID (grid), level_bar, 0, 0, 7, 1);
+    gtk_grid_attach_next_to (GTK_GRID (grid),
                              labela,
                              level_bar,
                              GTK_POS_RIGHT,
                              1,
                              1); 
 
-    gtk_grid_attach (GTK_GRID (rdata -> grid), label3, 0, 1, 1, 1);
-    gtk_grid_attach_next_to (GTK_GRID (rdata -> grid),
+    gtk_grid_attach (GTK_GRID (grid), label3, 0, 1, 1, 1);
+    gtk_grid_attach_next_to (GTK_GRID (grid),
                              label3a,
                              label3,
                              GTK_POS_RIGHT,
                              1,
                              1);
 
-    gtk_grid_attach (GTK_GRID (rdata -> grid), label4, 3, 1, 1, 1);
-    gtk_grid_attach_next_to (GTK_GRID (rdata -> grid),
+    gtk_grid_attach (GTK_GRID (grid), label4, 3, 1, 1, 1);
+    gtk_grid_attach_next_to (GTK_GRID (grid),
                              label4a,
                              label4,
                              GTK_POS_RIGHT,
                              1,
                              1);
 
-    gtk_grid_attach (GTK_GRID (rdata -> grid), label2, 5, 1, 1, 1);
-    gtk_grid_attach_next_to (GTK_GRID (rdata -> grid),
+    gtk_grid_attach (GTK_GRID (grid), label2, 5, 1, 1, 1);
+    gtk_grid_attach_next_to (GTK_GRID (grid),
                              label2a,
                              label2,
                              GTK_POS_RIGHT,
@@ -134,23 +126,24 @@ grid_on (GtkPassedDisplayData *rdata)
     gtk_widget_set_margin_start (label2, 26);
     gtk_widget_set_margin_start (label2a, 4);
     gtk_widget_set_margin_start (labela, 4);
+    gtk_widget_set_size_request (level_bar, 200, 20);
 
     //gtk_widget_set_vexpand (level_bar, TRUE);
     gtk_widget_set_halign (level_bar, GTK_ALIGN_FILL);
 
-    gtk_widget_show_all (rdata -> grid);
+    gtk_widget_show_all (grid);
 
     return TRUE;
 }
-
+/*
 static gboolean
 pulse_timeout_cb (gpointer user_data)
 {
     gboolean value;
-    GtkPassedDisplayData *rdata;
+    GtkPassedMainData *pdata;
 
-    rdata = user_data;
-    value = gtk_switch_get_active (GTK_SWITCH (rdata -> pdata -> sw));
+    pdata = user_data;
+    value = gtk_switch_get_active (GTK_SWITCH (pdata -> sw));
 
     if (value == TRUE)
     {
@@ -165,11 +158,12 @@ pulse_timeout_cb (gpointer user_data)
         return TRUE;
     }
 }
-
+*/
 static void
-grid_off (GtkPassedDisplayData *rdata)
+grid_off ()
 {
-    clear_container (rdata -> grid);
+    clear_container (grid);
+    gtk_widget_set_size_request (grid, 500, 50);
 }
 
 static void
@@ -181,45 +175,87 @@ switch_pos_cb (GtkSwitch *sw, GParamSpec *pspec, gpointer user_data)
      */
 
     GtkWidget *stack_child;
-    GtkPassedDisplayData *rdata;
+    GtkPassedMainData *pdata;
+    jack_status_t status;
+    gint res;
 
-    rdata = user_data;
+    pdata = user_data;
 
     if (gtk_switch_get_active (sw) == TRUE)
     {
-        if (grid_on (rdata) == FALSE)
+        /*
+         * We have to start the server first so our app can make itself a
+         * client.
+         */
+	    jack_server_init (pdata);
+
+        /*
+         * We make our app a jack client if server was not running else we
+         * just activate ourselves after making ourselves a client in 'main.c'.
+         */
+        /*if (pdata -> client == NULL)
+        {*/
+            pdata -> client = jack_client_open ("gjackctl",
+                                                JackNoStartServer,
+                                                &status,
+                                                "default");
+        /*}
+        else
         {
-            grid_off (rdata);
+            res = jack_activate (pdata -> client);
+            g_print ("client activate result: %d\n", res);
+        }*/
+
+        gtk_widget_set_tooltip_text (GTK_WIDGET (sw) , "Shutdown Server");
+        if (grid_on (pdata) == FALSE)
+        {
+            grid_off ();
         }
+
+
     }
     else
     {
-        grid_off (rdata);
+        gtk_widget_set_tooltip_text (GTK_WIDGET (sw),
+                                     "Start Server");
+
+        grid_off ();
+        g_print ("Right before closing client\n");
+        jack_client_close (pdata -> client);
+
+        kill (get_jack_gpid (NULL), SIGTERM);
     }
 
-    gtk_widget_show_all (rdata -> grid);
+    gtk_widget_show_all (grid);
 }
 
 void
 display (GtkPassedMainData *pdata)
 {
-    GtkPassedDisplayData *rdata;
+    //GtkWidget *grid;
 
-    rdata = g_slice_new (GtkPassedDisplayData);
-    rdata -> grid = gtk_grid_new ();
-    rdata -> pdata = pdata;
+    grid = gtk_grid_new ();
 
-    if (gtk_switch_get_active (GTK_SWITCH (rdata -> pdata -> sw)) == TRUE)
+    if (kill (get_jack_gpid (NULL), 0) == 0)
+	{
+        gtk_switch_set_active (GTK_SWITCH (pdata -> sw), TRUE);
+	}
+
+    if (gtk_switch_get_active (GTK_SWITCH (pdata -> sw)) == TRUE)
     {
-        grid_on (rdata);
+        grid_on (pdata);
+        gtk_widget_set_tooltip_text (GTK_WIDGET (pdata -> sw),
+                                     "Shutdown Server");
     }
 	else
     {
-        grid_off (rdata);
+        grid_off ();
+        gtk_widget_set_tooltip_text (GTK_WIDGET (pdata -> sw),
+                                     "Start Server");
     }
 
     gtk_box_pack_start (GTK_BOX (pdata -> vbox),
-                        rdata -> grid,
+                        grid,
                         FALSE,
                         FALSE,
                         2);
@@ -227,5 +263,5 @@ display (GtkPassedMainData *pdata)
     g_signal_connect (pdata -> sw,
                       "notify::active",
                       G_CALLBACK (switch_pos_cb),
-                      rdata);
+                      pdata);
 }

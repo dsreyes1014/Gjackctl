@@ -16,6 +16,7 @@ typedef struct _GtkPassedMainData GtkPassedMainData;
 
 struct _GtkPassedMainData {
     GtkWidget *window;
+    GtkWidget *log_window;
     GtkWidget *text;
     GtkWidget *sw;
     GtkWidget *button_box;
